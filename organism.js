@@ -41,18 +41,18 @@ class Gene {
 }
 
 class Organism {
-    constructor(geneAmount = DEFAULT_GENE_AMOUNT,
-                geneDimensions = DEFAULT_GENE_DIMENSION,
-                isRandom = true,
-                genes = []) {
-        this.genes = genes;
-        if (isRandom) this.randomizeGenes(geneAmount, geneDimensions);
+    constructor(options = null) {
+        if (options === null) {
+            this.randomizeGenes();
+        }
     }
 
-    randomizeGenes(geneAmount, geneDimensions) {
-        this.genes = [];
-        for (let i = 0; i < geneAmount; i++) {
-            this.genes[i] = new Gene(geneDimensions);
+    randomizeGenes(options = null) {
+        if (options === null) {
+            this.genes = [];
+            for (let i = 0; i < geneAmount; i++) {
+                this.genes[i] = new Gene(geneDimensions);
+            }
         }
     }
 
