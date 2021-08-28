@@ -61,7 +61,7 @@ class Gene {
         this.generateLevels();
     }
 
-    // Very rough idea of partitions (shapes) which are represented with binary
+    // Very rough idea of partitions (shapes) which are represented with Integer Representation
     generatePartitions() {
         const partitionAmount = PARAMS.GENE_DIMENSIONS / PARAMS.PARTITION_SIZE;
         this.partitions = [];
