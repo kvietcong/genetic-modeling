@@ -3,7 +3,7 @@ Instructor: Chris Marriott
 
 Students:
 - Dustin
-- KV
 - Kumiko
+- KV
 - Parker
 - Raz
