@@ -5,9 +5,9 @@ let gameEngine = new GameEngine();
 function restart() {
     gameEngine.entities = [];
     let organisms = [];
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 20; i++) {
         organisms[i] = [];
-        for (let j = 0; j < 11; j++) {
+        for (let j = 0; j < 21; j++) {
             organisms[i][j] = i == 0
                 ? new Organism()
                 : organisms[i-1][j].reproduce(

@@ -1,16 +1,20 @@
 function getRandomInteger(min, max) {
-    return Math.round(Math.random() * (max - min) + min);
+    return round(Math.random() * (max - min) + min);
 }
 
+const pow = Math.pow;
+const ceil = Math.ceil;
+const round = Math.round;
+
+// WARNING: INDEXING IS REALLY WEIRD RN. I NEED TO NORMALIZE HOW I/X AND J/Y WORKS. - KV
 const PARAMS = {
     CELL_SIZE: 3,
     GENE_AMOUNT: 1,
-    PARTITION_SIZE: 5,
-    MUTATION_CHANCE: 0.008,
-    FILL_TO: 3
+    PARTITION_SIZE: 2,
+    MUTATION_CHANCE: 0.1,
+    FILL_TO: 0
 }
 PARAMS.GENE_DIMENSIONS = PARAMS.PARTITION_SIZE * 5
-// WARNING: INDEXING IS REALLY WEIRD RN. I NEED TO NORMALIZE HOW I/X AND J/Y WORKS. - KV
 
 const INIT_FUNCS = {
     BLANK: (i, j) => 0,
@@ -27,19 +31,16 @@ const INIT_FUNCS = {
 class Gene {
     constructor(options = null) {
         if (options) {
-            ({
-                cells: this.cells
-            } = options);
+            this.initializeCells((i,j) => options.cells[i][j]);
         } else {
             // this.initializeCells(INIT_FUNCS.BLANK); // Everything blank
             // this.initializeCells(INIT_FUNCS.RANDOM); // Random Everywhere
             // this.initializeCells((i,j) =>
-            //     INIT_FUNCS.RANDOM_TO_PARTITION(1, i, j)); // Random first Partition
+            //     INIT_FUNCS.RANDOM_TO_PARTITION(1, i, j)); // Random certain Partition
             this.initializeCells((i,j) =>
-                INIT_FUNCS.FILL_TO_PARTITION(PARAMS.FILL_TO, i, j)); // Fill first Partition
-
-            this.mutate(); // MUTATION
+                INIT_FUNCS.FILL_TO_PARTITION(PARAMS.FILL_TO, i, j)); // Fill certain Partition
         }
+        this.mutate();
     }
 
     copy() {
@@ -47,7 +48,7 @@ class Gene {
     }
 
     initializeCells(f) {
-        let dimensions = PARAMS.GENE_DIMENSIONS;
+        const dimensions = PARAMS.GENE_DIMENSIONS;
         this.cells = [];
 
         for (let i = 0; i < dimensions; i++) {
@@ -56,14 +57,13 @@ class Gene {
                 this.cells[i][j] = f(i,j);
             }
         }
-
         this.generatePartitions();
         this.generateLevels();
     }
 
     // Very rough idea of partitions (shapes) which are represented with binary
     generatePartitions() {
-        let partitionAmount = PARAMS.GENE_DIMENSIONS / PARAMS.PARTITION_SIZE;
+        const partitionAmount = PARAMS.GENE_DIMENSIONS / PARAMS.PARTITION_SIZE;
         this.partitions = [];
 
         for (let i = 0; i < partitionAmount; i++) {
@@ -76,14 +76,14 @@ class Gene {
 
     getPartition(i, j) {
         let partition = 0;
-        let startX = PARAMS.PARTITION_SIZE * i;
-        let startY = PARAMS.PARTITION_SIZE * j;
-        let partitionSize = PARAMS.PARTITION_SIZE;
+        const startX = PARAMS.PARTITION_SIZE * i;
+        const startY = PARAMS.PARTITION_SIZE * j;
+        const partitionSize = PARAMS.PARTITION_SIZE;
 
         for (let x = startX; x < startX + partitionSize; x++) {
             for (let y = startY; y < startY + partitionSize; y++) {
-                partition += this.cells[x][y] == 1 ? Math.pow(2,
-                    Math.pow(partitionSize, 2) - 1 - ((x-startX) * partitionSize + (y-startY)))
+                partition += this.cells[x][y] == 1 ? pow(2,
+                    pow(partitionSize, 2) - 1 - ((x-startX) * partitionSize + (y-startY)))
                     : 0;
             }
         }
@@ -91,9 +91,10 @@ class Gene {
     }
 
     generateLevels() {
-        let levelAmount = Math.round(PARAMS.GENE_DIMENSIONS / PARAMS.PARTITION_SIZE);
-        let filledAmount = Math.pow(2, Math.pow(PARAMS.PARTITION_SIZE, 2)) - 1;
+        const levelAmount = round(PARAMS.GENE_DIMENSIONS / PARAMS.PARTITION_SIZE);
+        const filledAmount = pow(2, pow(PARAMS.PARTITION_SIZE, 2)) - 1;
         this.levels = []
+
         for (let level = 0; level < levelAmount; level++) {
             this.levels[level] = 1;
             const checkFill = (i, j) =>
@@ -110,9 +111,9 @@ class Gene {
     }
 
     recombine(otherGene) {
-        let newCells = [];
+        const newCells = [];
 
-        const OR = (a, b) => Math.ceil((a + b) / 2);
+        const OR = (a, b) => ceil((a + b) / 2);
         const XOR = (a, b) => (a + b) % 2;
         const AND = (a, b) => (a + b) == 2 ? 1 : 0;
 
@@ -132,10 +133,10 @@ class Gene {
     }
 
     mutate() {
-        let level = this.getLevel();
-        let chance = PARAMS.MUTATION_CHANCE;
-        let partitionSize = PARAMS.PARTITION_SIZE;
-        let partitionStart = partitionSize * level;
+        const level = this.getLevel();
+        const chance = PARAMS.MUTATION_CHANCE;
+        const partitionSize = PARAMS.PARTITION_SIZE;
+        const partitionStart = partitionSize * level;
 
         const mutateCell = (i, j) => this.cells[i][j] =
             Math.random() <= chance ? (this.cells[i][j] + 1) % 2 : this.cells[i][j]
@@ -184,18 +185,18 @@ class Organism {
     }
 
     draw(ctx) {
-        let size = PARAMS.CELL_SIZE;
-        let partitionSize = PARAMS.PARTITION_SIZE;
+        const size = PARAMS.CELL_SIZE;
+        const partitionSize = PARAMS.PARTITION_SIZE;
 
-        let gene = this.genes[0];
-        let cells = gene.cells;
-        let colors = ["red", "green", "blue"];
+        const gene = this.genes[0];
+        const cells = gene.cells;
+        const colors = ["red", "green", "blue"];
 
         // Fill the grid up specially with levels in mind
-        let x = this.x + size;
-        let y = this.y + size;
+        const x = this.x + size;
+        const y = this.y + size;
         for (let level = 0; level < cells.length / partitionSize; level++) {
-            let partitionStart = partitionSize * level;
+            const partitionStart = partitionSize * level;
             const fill = (i, j) => {
                 ctx.fillStyle = cells[i][j] == 1
                     ? colors[level % colors.length]
@@ -223,10 +224,10 @@ class Organism {
     }
 
     reproduce(otherOrganism) {
-        let otherGenes = otherOrganism.genes;
+        const otherGenes = otherOrganism.genes;
         if (this.genes.length !== otherGenes.length) return console.log("Incompatible!");
 
-        let newGenes = []
+        const newGenes = []
 
         for (let i = 0; i < this.genes.length; i++) {
             newGenes[i] = this.genes[i].recombine(otherGenes[i]);
@@ -240,8 +241,8 @@ class Organism {
     }
 }
 
-let testOrganism1 = new Organism();
-let testOrganism2 = new Organism();
+const testOrganism1 = new Organism();
+const testOrganism2 = new Organism();
 console.log(testOrganism1.toString(), "\n");
 /* console.log(testOrganism2.toString(), "\n");
 console.log(testOrganism1.reproduce(testOrganism2).toString()); */
