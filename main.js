@@ -15,7 +15,7 @@ function restart() {
         }
     }
 
-    const organismSize = PARAMS.CELL_SIZE * PARAMS.GENE_DIMENSIONS;
+    const organismSize = PARAMS.CELL_SIZE * PARAMS.GENE_DIMENSIONS + PARAMS.CELL_SIZE * 2;
     const padding = PARAMS.CELL_SIZE * 4;
 
     // OG
