@@ -2,11 +2,13 @@ function getRandomInteger(min, max) {
     return Math.round(Math.random() * (max - min) + min);
 }
 
-const CELL_SIZE = 5;
-
-const GENE_AMOUNT = 1;
-const PARTITION_SIZE = 5;
-const GENE_DIMENSIONS = PARTITION_SIZE * 4;
+const PARAMS = {
+    CELL_SIZE: 3,
+    GENE_AMOUNT: 1,
+    PARTITION_SIZE: 5
+}
+PARAMS.GENE_DIMENSIONS = PARAMS.PARTITION_SIZE * 5
+// WARNING: INDEXING IS REALLY WEIRD RN. I NEED TO NORMALIZE HOW I/X AND J/Y WORKS. - KV
 
 class Gene {
     constructor(options = null) {
@@ -15,7 +17,13 @@ class Gene {
                 cells: this.cells
             } = options);
         } else {
-            this.randomizeCells();
+            // this.initializeCells((i,j) => 0); // Everything blank
+            this.initializeCells((i,j) => {
+                return i < PARAMS.PARTITION_SIZE && j < PARAMS.PARTITION_SIZE
+                    ? getRandomInteger(0,1)
+                    : 0;
+            }); // Random first Partition
+            this.initializeCells((i,j) => getRandomInteger(0,1)); // Random Everywhere
         }
     }
 
@@ -23,14 +31,14 @@ class Gene {
         return new Gene({cells: this.cells});
     }
 
-    randomizeCells() {
-        let dimensions = GENE_DIMENSIONS;
+    initializeCells(f) {
+        let dimensions = PARAMS.GENE_DIMENSIONS;
         this.cells = [];
 
         for (let i = 0; i < dimensions; i++) {
             this.cells[i] = [];
             for (let j = 0; j < dimensions; j++) {
-                this.cells[i][j] = getRandomInteger(0, 1);
+                this.cells[i][j] = f(i,j);
             }
         }
 
@@ -39,7 +47,7 @@ class Gene {
 
     // Very rough idea of partitions (shapes) which are represented with binary
     generatePartitions() {
-        let partitionAmount = GENE_DIMENSIONS / PARTITION_SIZE;
+        let partitionAmount = PARAMS.GENE_DIMENSIONS / PARAMS.PARTITION_SIZE;
         this.partitions = [];
 
         for (let i = 0; i < partitionAmount; i++) {
@@ -52,9 +60,9 @@ class Gene {
 
     getPartition(i, j) {
         let partition = 0;
-        let startX = PARTITION_SIZE * i;
-        let startY = PARTITION_SIZE * j;
-        let partitionSize = PARTITION_SIZE;
+        let startX = PARAMS.PARTITION_SIZE * i;
+        let startY = PARAMS.PARTITION_SIZE * j;
+        let partitionSize = PARAMS.PARTITION_SIZE;
 
         for (let x = startX; x < startX + partitionSize; x++) {
             for (let y = startY; y < startY + partitionSize; y++) {
@@ -68,10 +76,15 @@ class Gene {
 
     recombine(otherGene) {
         let newCells = [];
+
+        const OR = (a, b) => Math.ceil((a + b) / 2);
+        const XOR = (a, b) => (a + b) % 2;
+        const AND = (a, b) => (a + b) == 2 ? 1 : 0;
+
         for (let i = 0; i < this.cells.length; i++) {
             newCells[i] = [];
             for (let j = 0; j < this.cells.length; j++) {
-                newCells[i][j] = (this.cells[i][j] + otherGene.cells[i][j]) % 2;
+                newCells[i][j] = OR(this.cells[i][j], otherGene.cells[i][j])
             }
         }
         return new Gene({cells: newCells});
@@ -99,37 +112,49 @@ class Organism {
 
     randomizeGenes() {
         this.genes = [];
-        for (let i = 0; i < GENE_AMOUNT; i++) {
+        for (let i = 0; i < PARAMS.GENE_AMOUNT; i++) {
             this.genes[i] = new Gene();
         }
     }
-
 
     attachGameEngine(gameEngine, x, y) {
         Object.assign(this, {gameEngine, x, y})
     }
 
     draw(ctx) {
-        let size = CELL_SIZE;
-        let x = this.x + size;
-        let y = this.y + size;
+        let size = PARAMS.CELL_SIZE;
+        let partitionSize = PARAMS.PARTITION_SIZE;
 
         let gene = this.genes[0];
         let cells = gene.cells;
+        let colors = ["red", "green", "blue"];
 
-        for (let i = 0; i < cells.length; i++) {
-            for (let j = 0; j < cells.length; j++) {
-                ctx.fillStyle = cells[i][j] == 1 ? "black" : "white";
-                ctx.fillRect(x, y, size, size);
-                x += size;
+        // Fill the grid up specially with levels in mind
+        let x = this.x + size;
+        let y = this.y + size;
+        for (let level = 0; level < cells.length / partitionSize; level++) {
+            let partitionStart = partitionSize * level;
+            const fill = (i, j, level) => {
+                ctx.fillStyle = cells[i][j] == 1
+                    ? colors[level % colors.length]
+                    : "white";
+                ctx.fillRect(size * j + x, size * i + y, size, size);
             }
-            x = this.x + size;
-            y += size;
+
+            for (let i = 0; i < partitionStart + partitionSize; i++)
+                for (let j = partitionStart; j < partitionStart + partitionSize; j++)
+                    fill(i,j,level);
+
+            for (let i = partitionStart; i < partitionStart + partitionSize; i++)
+                for (let j = 0; j < partitionStart + partitionSize; j++)
+                    fill(i,j,level);
         }
 
+        // Outline for box for clarity
         ctx.lineWidth = size;
-        ctx.strokeStyle = "red";
-        ctx.strokeRect(this.x+size/2, this.y+size/2, size * cells.length + size, size * cells.length + size);
+        ctx.strokeStyle = "black";
+        ctx.strokeRect(this.x+size/2, this.y+size/2,
+                       size * cells.length + size, size * cells.length + size);
     }
 
     update() {
