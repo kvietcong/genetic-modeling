@@ -2,9 +2,11 @@ function getRandomInteger(min, max) {
     return Math.round(Math.random() * (max - min) + min);
 }
 
-const DEFAULT_PARTITION_SIZE = 2
-const DEFAULT_GENE_AMOUNT = 1
-const DEFAULT_GENE_DIMENSION = DEFAULT_PARTITION_SIZE * 2
+const CELL_SIZE = 5;
+
+const GENE_AMOUNT = 1;
+const PARTITION_SIZE = 5;
+const GENE_DIMENSIONS = PARTITION_SIZE * 4;
 
 class Gene {
     constructor(options = null) {
@@ -22,7 +24,7 @@ class Gene {
     }
 
     randomizeCells() {
-        let dimensions = DEFAULT_GENE_DIMENSION;
+        let dimensions = GENE_DIMENSIONS;
         this.cells = [];
 
         for (let i = 0; i < dimensions; i++) {
@@ -37,7 +39,7 @@ class Gene {
 
     // Very rough idea of partitions (shapes) which are represented with binary
     generatePartitions() {
-        let partitionAmount = DEFAULT_GENE_DIMENSION / DEFAULT_PARTITION_SIZE;
+        let partitionAmount = GENE_DIMENSIONS / PARTITION_SIZE;
         this.partitions = [];
 
         for (let i = 0; i < partitionAmount; i++) {
@@ -50,9 +52,9 @@ class Gene {
 
     getPartition(i, j) {
         let partition = 0;
-        let startX = DEFAULT_PARTITION_SIZE * i;
-        let startY = DEFAULT_PARTITION_SIZE * j;
-        let partitionSize = DEFAULT_PARTITION_SIZE;
+        let startX = PARTITION_SIZE * i;
+        let startY = PARTITION_SIZE * j;
+        let partitionSize = PARTITION_SIZE;
 
         for (let x = startX; x < startX + partitionSize; x++) {
             for (let y = startY; y < startY + partitionSize; y++) {
@@ -97,13 +99,40 @@ class Organism {
 
     randomizeGenes() {
         this.genes = [];
-        for (let i = 0; i < DEFAULT_GENE_AMOUNT; i++) {
+        for (let i = 0; i < GENE_AMOUNT; i++) {
             this.genes[i] = new Gene();
         }
     }
 
-    draw(context) {
-        console.log("Drawing");
+
+    attachGameEngine(gameEngine, x, y) {
+        Object.assign(this, {gameEngine, x, y})
+    }
+
+    draw(ctx) {
+        let size = CELL_SIZE;
+        let x = this.x + size;
+        let y = this.y + size;
+
+        let gene = this.genes[0];
+        let cells = gene.cells;
+
+        for (let i = 0; i < cells.length; i++) {
+            for (let j = 0; j < cells.length; j++) {
+                ctx.fillStyle = cells[i][j] == 1 ? "black" : "white";
+                ctx.fillRect(x, y, size, size);
+                x += size;
+            }
+            x = this.x + size;
+            y += size;
+        }
+
+        ctx.lineWidth = size;
+        ctx.strokeStyle = "red";
+        ctx.strokeRect(this.x+size/2, this.y+size/2, size * cells.length + size, size * cells.length + size);
+    }
+
+    update() {
     }
 
     reproduce(otherOrganism) {
@@ -120,13 +149,13 @@ class Organism {
     }
 
     toString() {
-        return this.genes.map(gene => gene.toString()).join("\n\n");
+        return this.genes.map(gene => gene.toString()).join("\n");
     }
 }
 
-let testOrganism1 = new Organism();
+/* let testOrganism1 = new Organism();
 let testOrganism2 = new Organism();
 console.log(testOrganism1.toString(), "\n");
 console.log(testOrganism2.toString(), "\n");
 console.log(testOrganism1.reproduce(testOrganism2).toString());
-console.log(testOrganism1.genes[0].partitions);
+console.log(testOrganism1.genes[0].partitions); */
