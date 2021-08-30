@@ -1,21 +1,24 @@
-const getRandomInteger = (min, max) =>
-    round(Math.random() * (max - min) + min);
+const {pow, ceil, round, log2: lg, max, min} = Math
 
-const pow = Math.pow;
-const ceil = Math.ceil;
-const round = Math.round;
+// WUT?
+const getLevel = (i, j) => ceil(max(lg(i+1), lg(j+1)));
+// WUT?
+const geometricSum = (a, r, n) => n === 0 ? 0 : 1 + a * (1-pow(r, n-1)) / (1-r);
+// WUT?
+const getLevelIndex = (n) => geometricSum(1, 2, n);
+const getRandomInteger = (min, max) => round(Math.random() * (max - min) + min);
 
 // WARNING: INDEXING IS REALLY WEIRD RN. I NEED TO NORMALIZE HOW I/X AND J/Y WORKS. - KV
 
 /* Default Parameters */
 const PARAMS = {
-    CELL_SIZE: 3,
+    CELL_SIZE: 1,
     GENE_AMOUNT: 1,
-    PARTITION_SIZE: 2,
     MUTATION_CHANCE: 0.1,
-    FILL_TO: 0
+    FILL_TO: 2,
+    LEVELS: 6,
 };
-PARAMS.GENE_DIMENSIONS = PARAMS.PARTITION_SIZE * 5;
+PARAMS.GENE_DIMENSIONS = pow(2, PARAMS.LEVELS-1);
 
 /** Different Functions to initialize a Gene's cells */
 const INIT_FUNCTIONS = {
@@ -23,10 +26,10 @@ const INIT_FUNCTIONS = {
     FILL: (i, j) => 1,
     RANDOM: (i, j) => getRandomInteger(0, 1),
     FILL_TO_PARTITION: (p, i, j) =>
-        i < PARAMS.PARTITION_SIZE * p && j < PARAMS.PARTITION_SIZE * p
+        i < getLevelIndex(p) && j < getLevelIndex(p)
             ? 1 : 0,
     RANDOM_TO_PARTITION: (p, i, j) =>
-        i < PARAMS.PARTITION_SIZE * p && j < PARAMS.PARTITION_SIZE * p
+        i < getLevelIndex(p) && j < getLevelIndex(p)
             ? getRandomInteger(0,1) : 0,
 };
 INIT_FUNCTIONS.DEFAULT = (i, j) =>
@@ -69,59 +72,43 @@ class Gene {
                 this.cells[i][j] = fun(i, j);
             }
         }
-        this.generatePartitions();
         this.generateLevels();
     }
 
-    // Very rough idea of partitions (shapes) which are represented with Integer Representation
-    generatePartitions() {
-        const partitionAmount = PARAMS.GENE_DIMENSIONS / PARAMS.PARTITION_SIZE;
-        this.partitions = [];
-
-        for (let i = 0; i < partitionAmount; i++) {
-            this.partitions[i] = [];
-            for (let j = 0; j < partitionAmount; j++) {
-                this.partitions[i][j] = this.getPartition(i, j);
-            }
-        }
-    }
-
-    getPartition(i, j) {
-        let partition = 0;
-        const startX = PARAMS.PARTITION_SIZE * i;
-        const startY = PARAMS.PARTITION_SIZE * j;
-        const partitionSize = PARAMS.PARTITION_SIZE;
-
-        for (let x = startX; x < startX + partitionSize; x++) {
-            for (let y = startY; y < startY + partitionSize; y++) {
-                partition += this.cells[x][y] == 1 ? pow(2,
-                    pow(partitionSize, 2) - 1
-                        - ((x-startX) * partitionSize + (y-startY)))
-                    : 0;
-            }
-        }
-        return partition;
-    }
-
     generateLevels() {
-        const levelAmount = round(PARAMS.GENE_DIMENSIONS /
-                                  PARAMS.PARTITION_SIZE);
-        const filledAmount = pow(2, pow(PARAMS.PARTITION_SIZE, 2)) - 1;
+        // WUT?
+        const levelAmount = round(lg(this.cells.length)) + 1;
         this.levels = []
 
         for (let level = 0; level < levelAmount; level++) {
+            const filledAmount = pow(2, pow(level, 2)) - 1;
             this.levels[level] = 1;
-            const checkFill = (i, j) =>
-                this.levels[level] = this.partitions[i][j] !== filledAmount
-                    ? 0 : this.levels[level];
 
             let i, j;
             j = level;
-            for (i = 0; i <= level; i++) checkFill(i, j);
+            for (i = 0; i <= level; i++)
+                if(!this.getIsFilled(i, j)) this.levels[level] = 0;
 
             i = level;
-            for (j = 0; i <= level; i++) checkFill(i, j);
+            for (j = 0; j <= level; j++)
+                if(!this.getIsFilled(i, j)) this.levels[level] = 0;
         }
+    }
+
+    getIsFilled(i, j) {
+        let isFilled = true;
+        const level = max(i, j);
+        // WUT?
+        const partitionSize = level === 0 ? 1 : pow(2, max(i, j)-1);
+        const startX = getLevelIndex(i);
+        const startY = getLevelIndex(j);
+
+        for (let x = startX; x < startX + partitionSize; x++) {
+            for (let y = startY; y < startY + partitionSize; y++) {
+                isFilled = this.cells[x][y] == 1 ? isFilled : 0;
+            }
+        }
+        return isFilled;
     }
 
     recombine(otherGene, fun = RECOMBO_FUNCTIONS.DEFAULT) {
@@ -131,7 +118,7 @@ class Gene {
             for (let j = 0; j < this.cells.length; j++) {
                 newCells[i][j] = fun(this.cells[i][j],
                                      otherGene.cells[i][j],
-                                     i, j)
+                                     i, j);
             }
         }
 
@@ -146,24 +133,26 @@ class Gene {
 
     // Might be bugged
     mutate() {
+        // WUT?
         const level = this.getLevel();
         const chance = PARAMS.MUTATION_CHANCE;
-        const partitionSize = PARAMS.PARTITION_SIZE;
-        const indexStart = partitionSize * level;
+        const maxMutationIndex = getLevelIndex(level+1);
+        if (maxMutationIndex > this.cells.length) return;
+        // WUT?
+        const minMutationIndex = maxMutationIndex - pow(2, level-1);
 
         const mutateCell = (i, j) => this.cells[i][j] =
             Math.random() <= chance ? (this.cells[i][j] + 1) % 2
                                     : this.cells[i][j]
 
-        for (let i = 0; i < indexStart + partitionSize; i++)
-            for (let j = indexStart; j < indexStart + partitionSize; j++)
+        for (let i = minMutationIndex; i < maxMutationIndex; i++)
+            for (let j = 0; j < maxMutationIndex; j++)
                 mutateCell(i, j);
 
-        for (let i = indexStart; i < indexStart + partitionSize; i++)
-            for (let j = 0; j < indexStart + partitionSize; j++)
+        for (let i = 0; i < maxMutationIndex; i++)
+            for (let j = minMutationIndex; j < maxMutationIndex; j++)
                 mutateCell(i, j);
 
-        this.generatePartitions();
         this.generateLevels();
     }
 
@@ -200,7 +189,6 @@ class Organism {
 
     draw(ctx) {
         const cellSize = PARAMS.CELL_SIZE;
-        const partitionSize = PARAMS.PARTITION_SIZE;
 
         const gene = this.genes[0];
         const cells = gene.cells;
@@ -209,23 +197,17 @@ class Organism {
         // Fill the grid up specially with levels in mind
         const x = this.x + cellSize;
         const y = this.y + cellSize;
-        for (let level = 0; level < cells.length / partitionSize; level++) {
-            const indexStart = partitionSize * level;
-            const fill = (i, j) => {
-                ctx.fillStyle = cells[i][j] == 1
-                    ? colors[level % colors.length]
-                    : "white";
-                ctx.fillRect(cellSize * j + x, cellSize * i + y, cellSize, cellSize);
-            }
-
-            for (let i = 0; i < indexStart + partitionSize; i++)
-                for (let j = indexStart; j < indexStart + partitionSize; j++)
-                    fill(i, j);
-
-            for (let i = indexStart; i < indexStart + partitionSize; i++)
-                for (let j = 0; j < indexStart + partitionSize; j++)
-                    fill(i, j);
+        const fill = (i, j) => {
+            const level = getLevel(i, j);
+            ctx.fillStyle = cells[i][j] == 1
+                ? colors[level % colors.length]
+                : "white";
+            ctx.fillRect(cellSize * j + x, cellSize * i + y, cellSize, cellSize);
         }
+
+        for (let i = 0; i < cells.length; i++)
+            for (let j = 0; j < cells.length; j++)
+                fill(i, j);
 
         // Outline for box for clarity
         ctx.lineWidth = cellSize;
@@ -257,7 +239,6 @@ class Organism {
 }
 
 // Good ol' Testing
-const testOrganism = new Organism();
-console.log(testOrganism.toString(), "\n");
-console.log(testOrganism.genes[0].partitions);
-console.log(testOrganism.genes[0].levels);
+// const testOrganism = new Organism();
+// console.log(testOrganism.toString(), "\n");
+// console.log(testOrganism.genes[0].levels);

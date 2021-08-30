@@ -1,13 +1,13 @@
-let ASSET_MANAGER = new AssetManager();
-let gameEngine = new GameEngine();
+const ASSET_MANAGER = new AssetManager();
+const gameEngine = new GameEngine();
+const organisms = []
 
 // WARNING: INDEXING IS REALLY WEIRD RN. I NEED TO NORMALIZE HOW I/X AND J/Y WORKS. - KV
 function restart() {
     gameEngine.entities = [];
-    let organisms = [];
     for (let i = 0; i < 20; i++) {
         organisms[i] = [];
-        for (let j = 0; j < 21; j++) {
+        for (let j = 0; j < 26; j++) {
             organisms[i][j] = i == 0
                 ? new Organism()
                 : organisms[i-1][j].reproduce(
