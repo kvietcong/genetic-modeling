@@ -18,9 +18,9 @@ const initializers = {
      * @returns 0|1
      */
     template: (i, j, gene) => undefined,
-    blank: (i, j) => 0,
-    fill: (i, j) => 1,
-    random: (i, j) => getRandomInteger(0, 1),
+    blank: () => 0,
+    fill: () => 1,
+    random: () => getRandomInteger(0, 1),
     fillToPartition: (p, i, j) =>
         i < params.partitionSize * p && j < params.partitionSize * p
             ? 1 : 0,
