@@ -12,6 +12,7 @@ function restart() {
                 ? new Organism()
                 : organisms[i-1][j].reproduce(
                     organisms[i-1][getRandomInteger(0, organisms[0].length-1)]);
+            for (const gene of organisms[i][j].genes) gene.mutate();
         }
     }
 

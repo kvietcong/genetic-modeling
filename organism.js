@@ -10,6 +10,14 @@ params.geneDimensions = params.partitionSize * 5;
 
 /** Different Functions to initialize a Gene's cells */
 const initializers = {
+    /**
+     * Template for function initializing gene cells
+     * @param {Number} i Row Index
+     * @param {Number} j Column Index
+     * @param {Gene} gene The gene's state
+     * @returns 0|1
+     */
+    template: (i, j, gene) => undefined,
     blank: (i, j) => 0,
     fill: (i, j) => 1,
     random: (i, j) => getRandomInteger(0, 1),
@@ -25,6 +33,16 @@ initializers.default = (i, j) =>
 
 /** Different Functions to recombine two Genes' cells */
 const recomboers = {
+    /**
+     * Template for function combining genes.
+     * @param {0|1} a First Gene's State
+     * @param {0|1} b Second Gene's State
+     * @param {Number} i Row Index
+     * @param {Number} j Column Index
+     * @param {Gene} gene The gene's state
+     * @returns 0|1
+     */
+    template: (a, b, i, j, gene) => undefined,
     OR: (a, b) => ceil((a + b) / 2),
     XOR: (a, b) => (a + b) % 2,
     AND: (a, b) => (a + b) == 2 ? 1 : 0,
@@ -33,6 +51,15 @@ recomboers.default = recomboers.OR;
 
 /** Different Functions to mutate a Gene's cells */
 const mutators = {
+    /**
+     * Template for function mutating gene cells
+     * @param {0|1} currentState Current Cell's State
+     * @param {Number} i Row Index
+     * @param {Number} j Column Index
+     * @param {Gene} gene The gene's state
+     * @returns 0|1
+     */
+    template: (currentState, i, j, gene) => undefined,
     flip: (currentState) =>
         Math.random() <= params.mutationChance
             ? (currentState + 1) % 2
@@ -40,25 +67,29 @@ const mutators = {
 };
 mutators.default = mutators.flip;
 
-
 /** Representation of an organism's specific gene */
 class Gene {
     constructor(options = null) {
         if (options) {
             if (options.cells) {
-                this.initializeCells((i, j) => options.cells[i][j]);
+                this.cells = options.cells;
             } else if (options.init_function) {
                 this.initializeCells(options.init_function);
             } else {
-                throw "Invalid Options!"
+                throw "Invalid Options!";
             }
         } else {
             this.initializeCells();
         }
-        this.mutate();
+        this.updateInfo();
     }
 
-    copy() { return new Gene({cells: this.cells}); }
+    clone() { return new Gene({cells: this.cells}); }
+
+    updateInfo() {
+        this.generatePartitions();
+        this.generateLevels();
+    }
 
     initializeCells(initializer = initializers.default) {
         const dimensions = params.geneDimensions;
@@ -70,8 +101,6 @@ class Gene {
                 this.cells[i][j] = initializer(i, j, this);
             }
         }
-        this.generatePartitions();
-        this.generateLevels();
     }
 
     // Very rough idea of partitions (shapes) which are represented with Integer Representation
@@ -132,7 +161,7 @@ class Gene {
             for (let j = 0; j < this.cells.length; j++) {
                 newCells[i][j] = recomboer(this.cells[i][j],
                                            otherGene.cells[i][j],
-                                           i, j)
+                                           i, j, this)
             }
         }
 
@@ -150,7 +179,7 @@ class Gene {
         const partitionSize = params.partitionSize;
         const indexStart = partitionSize * level;
 
-        // Currently only mutates on the current level
+        // NOTE: Currently only mutates on the current level
         for (let i = 0; i < indexStart + partitionSize; i++)
             for (let j = indexStart; j < indexStart + partitionSize; j++)
                 this.cells[i][j] = mutator(this.cells[i][j], i, j, this);
@@ -159,8 +188,7 @@ class Gene {
             for (let j = 0; j < indexStart + partitionSize; j++)
                 this.cells[i][j] = mutator(this.cells[i][j], i, j, this);
 
-        this.generatePartitions();
-        this.generateLevels();
+        this.updateInfo();
     }
 
     toString() {
@@ -174,14 +202,14 @@ class Organism {
             if (options.genes) {
                 this.genes = options.genes
             } else {
-                throw "Invalid Options!"
+                throw "Invalid Options!";
             }
         } else {
             this.randomizeGenes();
         }
     }
 
-    copy() { return new Organism({genes: this.genes}); }
+    clone() { return new Organism({genes: this.genes}); }
 
     randomizeGenes() {
         this.genes = [];
