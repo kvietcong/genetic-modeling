@@ -1,44 +1,45 @@
-const getRandomInteger = (min, max) =>
-    round(Math.random() * (max - min) + min);
-
-const pow = Math.pow;
-const ceil = Math.ceil;
-const round = Math.round;
-
 // WARNING: INDEXING IS REALLY WEIRD RN. I NEED TO NORMALIZE HOW I/X AND J/Y WORKS. - KV
 
 /* Default Parameters */
-const PARAMS = {
-    CELL_SIZE: 3,
-    GENE_AMOUNT: 1,
-    PARTITION_SIZE: 2,
-    MUTATION_CHANCE: 0.1,
-    FILL_TO: 0
-};
-PARAMS.GENE_DIMENSIONS = PARAMS.PARTITION_SIZE * 5;
+params.fillTo = 0;
+params.cellSize = 3;
+params.geneAmount = 1;
+params.partitionSize = 2;
+params.mutationChance = 0.1;
+params.geneDimensions = params.partitionSize * 5;
 
 /** Different Functions to initialize a Gene's cells */
-const INIT_FUNCTIONS = {
-    BLANK: (i, j) => 0,
-    FILL: (i, j) => 1,
-    RANDOM: (i, j) => getRandomInteger(0, 1),
-    FILL_TO_PARTITION: (p, i, j) =>
-        i < PARAMS.PARTITION_SIZE * p && j < PARAMS.PARTITION_SIZE * p
+const initializers = {
+    blank: (i, j) => 0,
+    fill: (i, j) => 1,
+    random: (i, j) => getRandomInteger(0, 1),
+    fillToPartition: (p, i, j) =>
+        i < params.partitionSize * p && j < params.partitionSize * p
             ? 1 : 0,
-    RANDOM_TO_PARTITION: (p, i, j) =>
-        i < PARAMS.PARTITION_SIZE * p && j < PARAMS.PARTITION_SIZE * p
+    randomToPartition: (p, i, j) =>
+        i < params.partitionSize * p && j < params.partitionSize * p
             ? getRandomInteger(0,1) : 0,
 };
-INIT_FUNCTIONS.DEFAULT = (i, j) =>
-    INIT_FUNCTIONS.FILL_TO_PARTITION(PARAMS.FILL_TO, i, j);
+initializers.default = (i, j) =>
+    initializers.fillToPartition(params.fillTo, i, j);
 
 /** Different Functions to recombine two Genes' cells */
-const RECOMBO_FUNCTIONS = {
+const recomboers = {
     OR: (a, b) => ceil((a + b) / 2),
     XOR: (a, b) => (a + b) % 2,
     AND: (a, b) => (a + b) == 2 ? 1 : 0,
 };
-RECOMBO_FUNCTIONS.DEFAULT = RECOMBO_FUNCTIONS.OR;
+recomboers.default = recomboers.OR;
+
+/** Different Functions to mutate a Gene's cells */
+const mutators = {
+    flip: (currentState) =>
+        Math.random() <= params.mutationChance
+            ? (currentState + 1) % 2
+            : currentState
+};
+mutators.default = mutators.flip;
+
 
 /** Representation of an organism's specific gene */
 class Gene {
@@ -59,14 +60,14 @@ class Gene {
 
     copy() { return new Gene({cells: this.cells}); }
 
-    initializeCells(fun = INIT_FUNCTIONS.DEFAULT) {
-        const dimensions = PARAMS.GENE_DIMENSIONS;
+    initializeCells(initializer = initializers.default) {
+        const dimensions = params.geneDimensions;
         this.cells = [];
 
         for (let i = 0; i < dimensions; i++) {
             this.cells[i] = [];
             for (let j = 0; j < dimensions; j++) {
-                this.cells[i][j] = fun(i, j);
+                this.cells[i][j] = initializer(i, j, this);
             }
         }
         this.generatePartitions();
@@ -75,7 +76,7 @@ class Gene {
 
     // Very rough idea of partitions (shapes) which are represented with Integer Representation
     generatePartitions() {
-        const partitionAmount = PARAMS.GENE_DIMENSIONS / PARAMS.PARTITION_SIZE;
+        const partitionAmount = params.geneDimensions / params.partitionSize;
         this.partitions = [];
 
         for (let i = 0; i < partitionAmount; i++) {
@@ -88,9 +89,9 @@ class Gene {
 
     getPartition(i, j) {
         let partition = 0;
-        const startX = PARAMS.PARTITION_SIZE * i;
-        const startY = PARAMS.PARTITION_SIZE * j;
-        const partitionSize = PARAMS.PARTITION_SIZE;
+        const startX = params.partitionSize * i;
+        const startY = params.partitionSize * j;
+        const partitionSize = params.partitionSize;
 
         for (let x = startX; x < startX + partitionSize; x++) {
             for (let y = startY; y < startY + partitionSize; y++) {
@@ -104,9 +105,9 @@ class Gene {
     }
 
     generateLevels() {
-        const levelAmount = round(PARAMS.GENE_DIMENSIONS /
-                                  PARAMS.PARTITION_SIZE);
-        const filledAmount = pow(2, pow(PARAMS.PARTITION_SIZE, 2)) - 1;
+        const levelAmount = round(params.geneDimensions /
+                                  params.partitionSize);
+        const filledAmount = pow(2, pow(params.partitionSize, 2)) - 1;
         this.levels = []
 
         for (let level = 0; level < levelAmount; level++) {
@@ -124,14 +125,14 @@ class Gene {
         }
     }
 
-    recombine(otherGene, fun = RECOMBO_FUNCTIONS.DEFAULT) {
+    recombine(otherGene, recomboer = recomboers.default) {
         const newCells = [];
         for (let i = 0; i < this.cells.length; i++) {
             newCells[i] = [];
             for (let j = 0; j < this.cells.length; j++) {
-                newCells[i][j] = fun(this.cells[i][j],
-                                     otherGene.cells[i][j],
-                                     i, j)
+                newCells[i][j] = recomboer(this.cells[i][j],
+                                           otherGene.cells[i][j],
+                                           i, j)
             }
         }
 
@@ -144,24 +145,19 @@ class Gene {
         return level;
     }
 
-    // Might be bugged
-    mutate() {
+    mutate(mutator = mutators.default) {
         const level = this.getLevel();
-        const chance = PARAMS.MUTATION_CHANCE;
-        const partitionSize = PARAMS.PARTITION_SIZE;
+        const partitionSize = params.partitionSize;
         const indexStart = partitionSize * level;
 
-        const mutateCell = (i, j) => this.cells[i][j] =
-            Math.random() <= chance ? (this.cells[i][j] + 1) % 2
-                                    : this.cells[i][j]
-
+        // Currently only mutates on the current level
         for (let i = 0; i < indexStart + partitionSize; i++)
             for (let j = indexStart; j < indexStart + partitionSize; j++)
-                mutateCell(i, j);
+                this.cells[i][j] = mutator(this.cells[i][j], i, j, this);
 
         for (let i = indexStart; i < indexStart + partitionSize; i++)
             for (let j = 0; j < indexStart + partitionSize; j++)
-                mutateCell(i, j);
+                this.cells[i][j] = mutator(this.cells[i][j], i, j, this);
 
         this.generatePartitions();
         this.generateLevels();
@@ -189,7 +185,7 @@ class Organism {
 
     randomizeGenes() {
         this.genes = [];
-        for (let i = 0; i < PARAMS.GENE_AMOUNT; i++) {
+        for (let i = 0; i < params.geneAmount; i++) {
             this.genes[i] = new Gene();
         }
     }
@@ -199,8 +195,8 @@ class Organism {
     }
 
     draw(ctx) {
-        const cellSize = PARAMS.CELL_SIZE;
-        const partitionSize = PARAMS.PARTITION_SIZE;
+        const cellSize = params.cellSize;
+        const partitionSize = params.partitionSize;
 
         const gene = this.genes[0];
         const cells = gene.cells;

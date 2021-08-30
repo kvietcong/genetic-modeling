@@ -1,11 +1,11 @@
-let ASSET_MANAGER = new AssetManager();
-let gameEngine = new GameEngine();
-
 // WARNING: INDEXING IS REALLY WEIRD RN. I NEED TO NORMALIZE HOW I/X AND J/Y WORKS. - KV
+const ASSET_MANAGER = new AssetManager();
+const gameEngine = new GameEngine();
+
 function restart() {
     gameEngine.entities = [];
-    let organisms = [];
-    for (let i = 0; i < 20; i++) {
+    const organisms = [];
+    for (let i = 0; i < 16; i++) {
         organisms[i] = [];
         for (let j = 0; j < 21; j++) {
             organisms[i][j] = i == 0
@@ -15,12 +15,12 @@ function restart() {
         }
     }
 
-    const organismSize = PARAMS.CELL_SIZE * PARAMS.GENE_DIMENSIONS + PARAMS.CELL_SIZE * 2;
-    const padding = PARAMS.CELL_SIZE * 4;
+    const organismSize = params.cellSize * (params.geneDimensions + 2);
+    const padding = params.cellSize * 4;
 
     // OG
-    for (let [i, row] of organisms.entries()) {
-        for (let [j, organism] of row.entries()) {
+    for (const [i, row] of organisms.entries()) {
+        for (const [j, organism] of row.entries()) {
             organism.attachGameEngine(
                 gameEngine,
                 j * (organismSize + padding),
@@ -31,8 +31,8 @@ function restart() {
 }
 
 ASSET_MANAGER.downloadAll(function () {
-	let canvas = document.getElementById("gameWorld");
-	let ctx = canvas.getContext("2d");
+	const canvas = document.getElementById("gameWorld");
+	const ctx = canvas.getContext("2d");
 
 	gameEngine.init(ctx);
 
