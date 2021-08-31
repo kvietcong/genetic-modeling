@@ -1,7 +1,7 @@
 // WARNING: INDEXING IS REALLY WEIRD RN. I NEED TO NORMALIZE HOW I/X AND J/Y WORKS. - KV
 
 /* Default Parameters */
-params.fillTo = 0;
+params.fillTo = 2;
 params.cellSize = 3;
 params.geneAmount = 1;
 params.partitionSize = 2;
@@ -178,6 +178,8 @@ class Gene {
         const level = this.getLevel();
         const partitionSize = params.partitionSize;
         const indexStart = partitionSize * level;
+
+        if (indexStart >= this.cells.length) return console.log("FULL!")
 
         // NOTE: Currently only mutates on the current level
         for (let i = 0; i < indexStart + partitionSize; i++)
