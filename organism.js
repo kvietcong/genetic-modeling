@@ -157,6 +157,11 @@ mutators.default = (gene) =>
 /** Representation of an organism's specific gene */
 class Gene {
     constructor(options = null) {
+        /** Grid (2D Array) of cells that are either filled or not (1 or 0) */
+        this.cells;
+        /** An array of 0 or 1 to determine if a level is filled */
+        this.levels;
+
         if (options) {
             if (options.cells) {
                 this.cells = deepCopy(options.cells);
@@ -232,6 +237,7 @@ class Gene {
         return recomboer(this, otherGene);
     }
 
+    /** Retrieve the current level of the gene. Accessed like a property */
     get ["level"]() {
         let level = -1;
         while (this.levels[++level] === 1);
