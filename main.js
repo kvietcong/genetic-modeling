@@ -1,13 +1,15 @@
 // WARNING: INDEXING IS REALLY WEIRD RN. I NEED TO NORMALIZE HOW I/X AND J/Y WORKS. - KV
 const ASSET_MANAGER = new AssetManager();
 const gameEngine = new GameEngine();
+let debug;
 
 function restart() {
     gameEngine.entities = [];
     const organisms = [];
-    for (let i = 0; i < 16; i++) {
+    debug = organisms;
+    for (let i = 0; i < 17; i++) {
         organisms[i] = [];
-        for (let j = 0; j < 21; j++) {
+        for (let j = 0; j < 23; j++) {
             organisms[i][j] = i == 0
                 ? new Organism()
                 : organisms[i-1][j].reproduce(
@@ -16,10 +18,11 @@ function restart() {
         }
     }
 
-    const organismSize = params.cellSize * (params.geneDimensions + 2);
+    const levelToIndex = partitionTools.default.levelToIndex;
+    const organismSize = params.cellSize
+        * (levelToIndex(params.initialPartitions) + 2);
     const padding = params.cellSize * 4;
 
-    // OG
     for (const [i, row] of organisms.entries()) {
         for (const [j, organism] of row.entries()) {
             organism.attachGameEngine(

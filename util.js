@@ -19,7 +19,7 @@ function rgb(r, g, b) {
 /**
  * @param {Number} h Hue
  * @param {Number} s Saturation
- * @param {Number} l Lightnes
+ * @param {Number} l Lightness
  * @returns String that can be used as a hsl web color
  */
 function hsl(h, s, l) {
@@ -33,7 +33,12 @@ window.requestAnimFrame = (function () {
         window.mozRequestAnimationFrame ||
         window.oRequestAnimationFrame ||
         window.msRequestAnimationFrame ||
-        function (/* function */ callback, /* DOMElement */ element) {
+        /**
+         * Compatibility for requesting animation frames in older browsers
+         * @param {Function} callback Function
+         * @param {DOM} element DOM ELEMENT
+         */
+        function (callback, element) {
             window.setTimeout(callback, 1000 / 60);
         };
 })();
@@ -47,7 +52,21 @@ const getRandomInteger = (min, max) =>
     round(Math.random() * (max - min) + min);
 
 /** Easy access to math functions */
-const {pow, ceil, floor, round, log2: lg, max, min} = Math
+const {pow, ceil, floor, round, log, log2: lg, max, min} = Math
+
+/**
+ * Compute log with arbitrary base
+ * @param {Number} base Base of the log
+ * @param {Number} x Number to take log of
+ */
+const logBase = (base, x) => log(x) / log(base);
+
+/**
+ * Deep copy JSON-serializable objects
+ * @param {*} object Object to deep copy
+ * @returns Deep copy of the object
+ */
+const deepCopy = (object) => JSON.parse(JSON.stringify(object));
 
 /** Global Parameters Object */
 const params = {};
