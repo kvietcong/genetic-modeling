@@ -156,12 +156,12 @@ mutators.default = (gene) =>
 
 /** Representation of an organism's specific gene */
 class Gene {
-    constructor(options = null) {
-        /** Grid (2D Array) of cells that are either filled or not (1 or 0) */
-        this.cells;
-        /** An array of 0 or 1 to determine if a level is filled */
-        this.levels;
+    /** {Array<Array<0|1>>} Grid (2D Array) of cells that are either filled or not (1 or 0) */
+    cells;
+    /** {Array<0|1>} An array of 0 or 1 to determine if a level is filled */
+    levels;
 
+    constructor(options = null) {
         if (options) {
             if (options.cells) {
                 this.cells = deepCopy(options.cells);
@@ -255,6 +255,15 @@ class Gene {
 }
 
 class Organism {
+    /** {Array<Genes>} A list of genes that the Organism has */
+    genes;
+    /** {GameEngine} Current game engine instance attached to this organism */
+    gameEngine;
+    /** {Integer} X position of the organism within a given game engine world */
+    x;
+    /** {Integer} Y position of the organism within a given game engine world */
+    y;
+
     constructor(options = null) {
         if (options) {
             if (options.genes) {
