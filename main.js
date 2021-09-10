@@ -1,3 +1,8 @@
+// Good ol' Testing
+const testOrganism = new Organism();
+console.log(testOrganism.toString(), "\n");
+console.log(testOrganism.genes[0].levels);
+
 // WARNING: INDEXING IS REALLY WEIRD RN. I NEED TO NORMALIZE HOW I/X AND J/Y WORKS. - KV
 const ASSET_MANAGER = new AssetManager();
 const gameEngine = new GameEngine();
