@@ -53,203 +53,256 @@ const partitionTools = {
 };
 partitionTools.default = partitionTools.quadratic;
 
-/** Different functions to initialize a Gene's cells */
-const initializers = {
-    /**
-     * @param {Gene} gene The gene's state
-     */
-    _: (gene) => undefined,
-    blank: () => 0,
-    fill: () => 1,
-    random: () => getRandomInteger(0, 1),
-};
-initializers.perCell = {
-    template: (gene, initializer, ...options) => {
-        const dimensions =  partitionTools.default.levelToIndex(
-            params.initialPartitions);
-        gene.cells = [];
-
-        for (let i = 0; i < dimensions; i++) {
-            gene.cells[i] = [];
-            for (let j = 0; j < dimensions; j++) {
-                gene.cells[i][j] = initializer(...options, i, j);
-            }
-        }
-    },
-    fillToLevel: (l, i, j) =>
-        [i, j].every(index => index < partitionTools.default.levelToIndex(l))
-            ? 1 : 0,
-    randomToLevel: (l, i, j) =>
-        [i, j].every(index => index < partitionTools.default.levelToIndex(l))
-            ? getRandomInteger(0,1) : 0,
-};
-initializers.default = (gene) =>
-    initializers.perCell.template(gene,
-                                  initializers.perCell.fillToLevel,
-                                  params.fillToLevel);
-
-/** Different functions to recombine two Genes' cells */
-const recomboers = {
-    /**
-     * @param {Gene} gene The first gene's state
-     * @param {Gene} otherGene The other gene's state
-     * @returns New Gene
-     */
-    _: (gene, otherGene) => undefined,
-};
-/** Combine on a per cell basis */
-recomboers.perCell = {
-    template: (gene, otherGene, recomboer) => {
-        const newCells = [];
-        for (let i = 0; i < gene.cells.length; i++) {
-            newCells[i] = [];
-            for (let j = 0; j < gene.cells.length; j++) {
-                newCells[i][j] = recomboer(gene.cells[i][j],
-                                           otherGene.cells[i][j],
-                                           i, j);
-            }
-        }
-        return new Gene({cells: newCells});
-    },
-    XOR: (a, b) => (a + b) % 2,
-    OR: (a, b) => ceil((a + b) / 2),
-    AND: (a, b) => (a + b) == 2 ? 1 : 0,
-    NAND: (a, b) => !recomboers.perCell.AND(a, b),
-    NOR: (a, b) => !recomboers.perCell.OR(a, b),
-};
-recomboers.default = (gene, otherGene) =>
-    recomboers.perCell.template(gene, otherGene, recomboers.perCell.OR);
-
-/** Different functions to mutate a Gene's cells */
-const mutators = {
-    /** @param {Gene} gene The gene's state */
-    _: (gene) => undefined,
-};
-/** Mutate Cells on the current level */
-mutators.currentLevel = {
-    template: (gene, mutator) => {
-        const level = gene.level;
-        const levelToIndex = partitionTools.default.levelToIndex;
-        const indexStart = levelToIndex(level);
-        const indexEnd = levelToIndex(level + 1);
-
-        if (indexStart >= gene.cells.length) return console.log("FULL!")
-
-        for (let i = 0; i < indexEnd; i++)
-            for (let j = indexStart; j < indexEnd; j++)
-                gene.cells[i][j] = mutator(gene.cells[i][j], i, j, gene);
-
-        for (let i = indexStart; i < indexEnd; i++)
-            for (let j = 0; j < indexEnd; j++)
-                gene.cells[i][j] = mutator(gene.cells[i][j], i, j, gene);
-    },
-    flip: (currentState) =>
-        Math.random() <= params.mutationChance
-            ? (currentState + 1) % 2
-            : currentState,
-    rejuvenate: () => 1,
-    destroy: () => 0,
-}
-mutators.default = (gene) =>
-    mutators.currentLevel.template(gene, mutators.currentLevel.flip);
-
+// The following  is wrapping a a lot to make sure that things don't leak.
+// Javascript has the habit of polluting the name space so this is to ensure it
+// doesn't. If you need to have some variable accessible to all files, put it
+// above like the partitionTools or the parameters.
 
 /** Representation of an organism's specific gene */
-class Gene {
-    /** {Array<Array<0|1>>} Grid (2D Array) of cells that are either filled or not (1 or 0) */
-    cells;
-    /** {Array<0|1>} An array of 0 or 1 to determine if a level is filled */
-    levels;
+const Gene = (() => {
+    /** Different functions to initialize a Gene's cells */
+    const initializers = {
+        /**
+         * @param {Gene} gene The gene's state
+         */
+        _: (gene) => undefined,
+        blank: () => 0,
+        fill: () => 1,
+        random: () => getRandomInteger(0, 1),
+    };
+    initializers.perCell = {
+        template: (gene, initializer, ...options) => {
+            const dimensions =  partitionTools.default.levelToIndex(
+                params.initialPartitions);
+            gene.cells = [];
 
-    constructor(options = null) {
-        if (options) {
-            if (options.cells) {
-                this.cells = deepCopy(options.cells);
-            } else if (options.init_function) {
-                this.initializeCells(options.init_function);
+            for (let i = 0; i < dimensions; i++) {
+                gene.cells[i] = [];
+                for (let j = 0; j < dimensions; j++) {
+                    gene.cells[i][j] = initializer(...options, i, j);
+                }
+            }
+        },
+        fillToLevel: (l, i, j) =>
+            [i, j].every(index => index < partitionTools.default.levelToIndex(l))
+                ? 1 : 0,
+        randomToLevel: (l, i, j) =>
+            [i, j].every(index => index < partitionTools.default.levelToIndex(l))
+                ? getRandomInteger(0,1) : 0,
+    };
+    initializers.default = (gene) =>
+        initializers.perCell.template(gene,
+                                    initializers.perCell.fillToLevel,
+                                    params.fillToLevel);
+
+    /** Different functions to recombine two Genes' cells */
+    const recomboers = {
+        /**
+         * @param {Gene} gene The first gene's state
+         * @param {Gene} otherGene The other gene's state
+         * @returns New Gene
+         */
+        _: (gene, otherGene) => undefined,
+    };
+    /** Combine on a per cell basis */
+    recomboers.perCell = {
+        template: (gene, otherGene, recomboer) => {
+            const newCells = [];
+            for (let i = 0; i < gene.cells.length; i++) {
+                newCells[i] = [];
+                for (let j = 0; j < gene.cells.length; j++) {
+                    newCells[i][j] = recomboer(gene.cells[i][j],
+                                            otherGene.cells[i][j],
+                                            i, j);
+                }
+            }
+            return new Gene({cells: newCells});
+        },
+        XOR: (a, b) => (a + b) % 2,
+        OR: (a, b) => ceil((a + b) / 2),
+        AND: (a, b) => (a + b) == 2 ? 1 : 0,
+        NAND: (a, b) => !recomboers.perCell.AND(a, b),
+        NOR: (a, b) => !recomboers.perCell.OR(a, b),
+    };
+    recomboers.default = (gene, otherGene) =>
+        recomboers.perCell.template(gene, otherGene, recomboers.perCell.OR);
+
+    /** Different functions to mutate a Gene's cells */
+    const mutators = {
+        /** @param {Gene} gene The gene's state */
+        _: (gene) => undefined,
+    };
+    /** Mutate Cells on the current level */
+    mutators.currentLevel = {
+        template: (gene, mutator) => {
+            const level = gene.level;
+            const levelToIndex = partitionTools.default.levelToIndex;
+            const indexStart = levelToIndex(level);
+            const indexEnd = levelToIndex(level + 1);
+
+            if (indexStart >= gene.cells.length) return console.log("FULL!")
+
+            for (let i = 0; i < indexEnd; i++)
+                for (let j = indexStart; j < indexEnd; j++)
+                    gene.cells[i][j] = mutator(gene.cells[i][j], i, j, gene);
+
+            for (let i = indexStart; i < indexEnd; i++)
+                for (let j = 0; j < indexEnd; j++)
+                    gene.cells[i][j] = mutator(gene.cells[i][j], i, j, gene);
+        },
+        flip: (currentState) =>
+            Math.random() <= params.mutationChance
+                ? (currentState + 1) % 2
+                : currentState,
+        rejuvenate: () => 1,
+        destroy: () => 0,
+    }
+    mutators.default = (gene) =>
+        mutators.currentLevel.template(gene, mutators.currentLevel.flip);
+
+    const drawers = {
+        /**
+         * @param {Gene} gene The gene's state
+         * @param {CanvasRenderingContext2D} ctx The context where you can draw
+         */
+        _: (gene, ctx) => undefined,
+        simpleDraw: (gene, ctx) => {
+            const cellSize = params.cellSize;
+            const indexToLevel = partitionTools.default.indexToLevel;
+
+            const cells = gene.cells;
+            const colors = ["red", "green", "blue"];
+
+            // Fill the grid up specially with levels in mind
+            const x = gene.x + cellSize;
+            const y = gene.y + cellSize;
+            for (let i = 0; i < cells.length; i++) {
+                for (let j = 0; j < cells.length; j++) {
+                    ctx.fillStyle = cells[i][j] == 1
+                        ? colors[indexToLevel(max(i, j)) % colors.length]
+                        : "white";
+                    ctx.fillRect(cellSize * j + x, cellSize * i + y,
+                                    cellSize, cellSize);
+                }
+            }
+
+            // Outline for box for clarity
+            ctx.lineWidth = cellSize;
+            ctx.strokeStyle = "black";
+            ctx.strokeRect(gene.x+cellSize/2, gene.y+cellSize/2,
+                        cellSize * cells.length + cellSize,
+                        cellSize * cells.length + cellSize);
+        },
+    };
+    drawers.default = drawers.simpleDraw;
+
+    /** Representation of an organism's specific gene */
+    return class Gene {
+        /** {Array<Array<0|1>>} Grid (2D Array) of cells that are either filled or not (1 or 0) */
+        cells;
+        /** {Array<0|1>} An array of 0 or 1 to determine if a level is filled */
+        levels;
+
+        constructor(options = null) {
+            if (options) {
+                if (options.cells) {
+                    this.cells = deepCopy(options.cells);
+                } else if (options.init_function) {
+                    this.initializeCells(options.init_function);
+                } else {
+                    throw "Invalid Options!";
+                }
             } else {
-                throw "Invalid Options!";
+                this.initializeCells();
             }
-        } else {
-            this.initializeCells();
+            this.updateInfo();
         }
-        this.updateInfo();
-    }
 
-    clone() {
-        return new Gene({cells: this.cells});
-    }
-
-    updateInfo() {
-        this.generateLevels();
-    }
-
-    initializeCells(initializer = initializers.default) {
-        initializer(this);
-    }
-
-    getPartition(i, j) {
-        const partition = [];
-        const partitionSize = partitionTools.default.partitionSize(max(i, j));
-        let kStart, lStart;
-        if (i > j) {
-            kStart = partitionTools.default.levelToIndex(i);
-            lStart = j * partitionSize;
-        } else {
-            kStart = i * partitionSize;
-            lStart = partitionTools.default.levelToIndex(j);
+        clone() {
+            return new Gene({cells: this.cells});
         }
-        const kEnd = kStart + partitionSize;
-        const lEnd = lStart + partitionSize;
 
-        let x = 0;
-        for (let k = kStart; k < kEnd; k++) {
-            partition[x] = [];
-            let y = 0;
-            for (let l = lStart; l < lEnd; l++) {
-                partition[x][y] = this.cells[k][l];
-                y++;
+        updateInfo() {
+            this.generateLevels();
+        }
+
+        initializeCells(initializer = initializers.default) {
+            initializer(this);
+        }
+
+        getPartition(i, j) {
+            const partition = [];
+            const partitionSize = partitionTools.default.partitionSize(max(i, j));
+            let kStart, lStart;
+            if (i > j) {
+                kStart = partitionTools.default.levelToIndex(i);
+                lStart = j * partitionSize;
+            } else {
+                kStart = i * partitionSize;
+                lStart = partitionTools.default.levelToIndex(j);
             }
-            x++;
+            const kEnd = kStart + partitionSize;
+            const lEnd = lStart + partitionSize;
+
+            let x = 0;
+            for (let k = kStart; k < kEnd; k++) {
+                partition[x] = [];
+                let y = 0;
+                for (let l = lStart; l < lEnd; l++) {
+                    partition[x][y] = this.cells[k][l];
+                    y++;
+                }
+                x++;
+            }
+            return partition;
         }
-        return partition;
-    }
 
-    generateLevels() {
-        const indexToLevel = partitionTools.default.indexToLevel;
-        const levelAmount = indexToLevel(this.cells.length);
-        const getLevel = (i, j) => indexToLevel(max(i, j));
-        this.levels = []
+        generateLevels() {
+            const indexToLevel = partitionTools.default.indexToLevel;
+            const levelAmount = indexToLevel(this.cells.length);
+            const getLevel = (i, j) => indexToLevel(max(i, j));
+            this.levels = []
 
-        for (let level = 0; level < levelAmount; level++)
-            this.levels[level] = 1;
+            for (let level = 0; level < levelAmount; level++)
+                this.levels[level] = 1;
 
-        for (let i = 0; i < this.cells.length; i++) {
-            for (let j = 0; j < this.cells.length; j++) {
-                const level = getLevel(i, j);
-                this.levels[level] = this.cells[i][j] === 1
-                    ? this.levels[level] : 0;
+            for (let i = 0; i < this.cells.length; i++) {
+                for (let j = 0; j < this.cells.length; j++) {
+                    const level = getLevel(i, j);
+                    this.levels[level] = this.cells[i][j] === 1
+                        ? this.levels[level] : 0;
+                }
             }
         }
-    }
 
-    recombine(otherGene, recomboer = recomboers.default) {
-        return recomboer(this, otherGene);
-    }
+        recombine(otherGene, recomboer = recomboers.default) {
+            return recomboer(this, otherGene);
+        }
 
-    /** Retrieve the current level of the gene. Accessed like a property */
-    get ["level"]() {
-        let level = -1;
-        while (this.levels[++level] === 1);
-        return level;
-    }
+        /** Retrieve the current level of the gene. Accessed like a property */
+        get ["level"]() {
+            let level = -1;
+            while (this.levels[++level] === 1);
+            return level;
+        }
 
-    mutate(mutator = mutators.default) {
-        mutator(this);
-        this.updateInfo();
-    }
+        mutate(mutator = mutators.default) {
+            mutator(this);
+            this.updateInfo();
+        }
 
-    toString() {
-        return this.cells.map(row => row.join(" ")).join("\n");
+        attachGameEngine(gameEngine, x, y) {
+            Object.assign(this, {gameEngine, x, y});
+        }
+
+        draw(ctx, drawer = drawers.default) {
+            return drawer(this, ctx);
+        }
+
+        update() { }
+
+        toString() {
+            return this.cells.map(row => row.join(" ")).join("\n");
+        }
     }
-}
+})();

@@ -10,16 +10,16 @@ let debug;
 
 function restart() {
     gameEngine.entities = [];
-    const organisms = [];
-    debug = organisms;
+    const genes = [];
+    debug = genes;
     for (let i = 0; i < 17; i++) {
-        organisms[i] = [];
+        genes[i] = [];
         for (let j = 0; j < 23; j++) {
-            organisms[i][j] = i == 0
-                ? new Organism()
-                : organisms[i-1][j].reproduce(
-                    organisms[i-1][getRandomInteger(0, organisms[0].length-1)]);
-            for (const gene of organisms[i][j].genes) gene.mutate();
+            genes[i][j] = i == 0
+                ? new Gene()
+                : genes[i-1][j].recombine(
+                    genes[i-1][getRandomInteger(0, genes[0].length-1)]);
+            genes[i][j].mutate();
         }
     }
 
@@ -28,7 +28,7 @@ function restart() {
         * (levelToIndex(params.initialPartitions) + 2);
     const padding = params.cellSize * 4;
 
-    for (const [i, row] of organisms.entries()) {
+    for (const [i, row] of genes.entries()) {
         for (const [j, organism] of row.entries()) {
             organism.attachGameEngine(
                 gameEngine,
