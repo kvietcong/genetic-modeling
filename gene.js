@@ -53,7 +53,7 @@ const partitionTools = {
 };
 partitionTools.default = partitionTools.quadratic;
 
-// The following  is wrapping a a lot to make sure that things don't leak.
+// The following is wraps a lot to make sure that things don't leak.
 // Javascript has the habit of polluting the name space so this is to ensure it
 // doesn't. If you need to have some variable accessible to all files, put it
 // above like the partitionTools or the parameters.
@@ -193,6 +193,7 @@ const Gene = (() => {
     mutators.default = (gene) =>
         mutators.currentLevel.template(gene, mutators.currentLevel.flip);
 
+    /** Different functions to draw a Gene's cells */
     const drawers = {
         /**
          * @param {Gene} gene The gene's state
