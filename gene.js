@@ -124,8 +124,41 @@ const Gene = (() => {
         NAND: (a, b) => !recomboers.perCell.AND(a, b),
         NOR: (a, b) => !recomboers.perCell.OR(a, b),
     };
+    const replacePartition = (cells, newPartition, x, y) => {
+        let newCells = deepCopy(cells);
+        for (let i = x; i < x + newPartition.length; i++) {
+            for (let j = y; j < y + newPartition[0].length; j++) {
+                newCells[i][j] = newPartition[i-x][j-y];
+            }
+        }
+        return newCells;
+    }
+    // IDK if this actually works XD
+    recomboers.chooseOnePartition = (gene, otherGene) => {
+        let newCells = deepCopy(gene.cells);
+        if (gene.level !== otherGene.level)
+            return (gene.level > otherGene.level ? gene : otherGene).clone();
+        let level = gene.level;
+        let i;
+        for (i = 0; i < level; i++) {
+            const newPartition = (Math.random() < .5 ? gene : otherGene)
+                .getPartition(i, level);
+            const x = partitionTools.default.levelToIndex(i);
+            const y = partitionTools.default.levelToIndex(level);
+            newCells = replacePartition(newCells, newPartition, x, y);
+        }
+        for (i = 0; i < level; i++) {
+            const newPartition = (Math.random() < .5 ? gene : otherGene)
+                .getPartition(i, level);
+            const x = partitionTools.default.levelToIndex(i);
+            const y = partitionTools.default.levelToIndex(level);
+            newCells = replacePartition(newCells, newPartition, y, x);
+        }
+        return new Gene({cells: newCells});
+    };
     recomboers.default = (gene, otherGene) =>
         recomboers.perCell.template(gene, otherGene, recomboers.perCell.OR);
+    recomboers.default = recomboers.chooseOnePartition;
 
     /** Different functions to mutate a Gene's cells */
     const mutators = {
@@ -167,11 +200,10 @@ const Gene = (() => {
          */
         _: (gene, ctx) => undefined,
         simpleDraw: (gene, ctx) => {
-            const cellSize = params.cellSize;
-            const indexToLevel = partitionTools.default.indexToLevel;
-
             const cells = gene.cells;
+            const cellSize = params.cellSize;
             const colors = ["red", "green", "blue"];
+            const indexToLevel = partitionTools.default.indexToLevel;
 
             // Fill the grid up specially with levels in mind
             const x = gene.x + cellSize;
@@ -182,7 +214,7 @@ const Gene = (() => {
                         ? colors[indexToLevel(max(i, j)) % colors.length]
                         : "white";
                     ctx.fillRect(cellSize * j + x, cellSize * i + y,
-                                    cellSize, cellSize);
+                                 cellSize, cellSize);
                 }
             }
 

@@ -19,7 +19,8 @@ function restart() {
                 ? new Gene()
                 : genes[i-1][j].recombine(
                     genes[i-1][getRandomInteger(0, genes[0].length-1)]);
-            genes[i][j].mutate();
+            // Only mutate first ten generations
+            if (i <= 10) genes[i][j].mutate();
         }
     }
 
