@@ -1,10 +1,14 @@
+/** Easy access to math functions */
+const {pow, ceil, floor, round, log, log2: lg, max, min, random} = Math
+
+/** Easy access to logging :) */
+const {log: print} = console
+
 /**
  * @param {Number} n
  * @returns Random Integer Between 0 and n-1
  */
-function randomInt(n) {
-    return Math.floor(Math.random() * n);
-};
+const randomInt = n => floor(random() * n);
 
 /**
  * @param {Number} r Red Value
@@ -51,9 +55,6 @@ window.requestAnimFrame = (function () {
 const getRandomInteger = (min, max) =>
     round(Math.random() * (max - min) + min);
 
-/** Easy access to math functions */
-const {pow, ceil, floor, round, log, log2: lg, max, min} = Math
-
 /**
  * Compute log with arbitrary base
  * @param {Number} base Base of the log
@@ -66,7 +67,16 @@ const logBase = (base, x) => log(x) / log(base);
  * @param {*} object Object to deep copy
  * @returns Deep copy of the object
  */
-const deepCopy = (object) => JSON.parse(JSON.stringify(object));
+const deepCopy = object => JSON.parse(JSON.stringify(object));
+
+/**
+ * Returns random element from array
+ * @param {Array} items
+ * @returns Returns random element from array. Null if empty
+ */
+const chooseRandom = items => items.length > 0
+    ? items[floor(random() * items.length)]
+    : null;
 
 /** Global Parameters Object */
 const params = {};
