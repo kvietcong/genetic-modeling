@@ -23,7 +23,7 @@ function restart() {
         }
     }
 
-    const levelToIndex = partitionTools.default.levelToIndex;
+    const levelToIndex = libGene.partitionTooling.levelToIndex;
     const organismSize = params.cellSize
         * (levelToIndex(params.initialPartitions) + 2);
     const padding = params.cellSize * 4;
