@@ -32,7 +32,6 @@
 
 /* Default Global Parameters related to Genes */
 params.cellSize = 2;
-params.geneAmount = 1;
 params.fillToLevel = 1;
 params.partitionSize = 2;
 params.mutationChance = 0.1;
@@ -68,9 +67,6 @@ const libGene = (() => {
          * @param {Gene} gene The gene's state
          */
         _: gene => undefined,
-        blank: () => 0,
-        fill: () => 1,
-        random: () => getRandomInteger(0, 1),
     };
     _.initializers.perCell = {
         template: (gene, initializer, ...options) => {
@@ -85,6 +81,9 @@ const libGene = (() => {
                 }
             }
         },
+        blank: () => 0,
+        fill: () => 1,
+        random: () => getRandomInteger(0, 1),
         fillToLevel: (l, i, j) => [i, j].every(index =>
                 index < _.partitionTooling.levelToIndex(l))
                 ? 1 : 0,
@@ -95,8 +94,8 @@ const libGene = (() => {
     /** Default Initializer to create new genes */
     _.initializer = gene =>
         _.initializers.perCell.template(gene,
-                                    _.initializers.perCell.fillToLevel,
-                                    params.fillToLevel);
+                                        _.initializers.perCell.fillToLevel,
+                                        params.fillToLevel);
 
     /**
      *
@@ -253,7 +252,7 @@ const libGene = (() => {
                            cellSize * cells.length + cellSize);
         },
     };
-    /** Default drawing function to display gene */
+    /** Default drawing function to display a gene */
     _.drawer = _.drawers.simpleDraw;
 
     /** Representation of an organism's specific gene */

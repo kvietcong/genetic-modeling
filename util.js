@@ -79,4 +79,7 @@ const chooseRandom = items => items.length > 0
     : null;
 
 /** Global Parameters Object */
-const params = {};
+const params = {
+    // Maybe use for toggle-able logging?
+    DEBUG: false,
+};
