@@ -37,7 +37,7 @@ const libOrganism = (() => {
             if (organism.genes.length !== otherGenes.length)
                 return console.log("Incompatible!");
 
-            const newGenes = []
+            const newGenes = [];
 
             for (let i = 0; i < organism.genes.length; i++) {
                 newGenes[i] = organism.genes[i].recombine(otherGenes[i]);
@@ -89,13 +89,6 @@ const libOrganism = (() => {
             return new Organism({genes: this.genes});
         }
 
-        randomizeGenes() {
-            this.genes = [];
-            for (let i = 0; i < params.geneAmount; i++) {
-                this.genes[i] = new Gene();
-            }
-        }
-
         attachGameEngine(gameEngine, x, y) {
             Object.assign(this, {gameEngine, x, y});
         }
@@ -109,7 +102,9 @@ const libOrganism = (() => {
         }
 
         toString() {
-            return this.genes.map(gene => gene.toString()).join("\n");
+            return this.genes.map(
+                (gene, i) => `Gene ${i+1}:\n${gene.toString()}`
+            ).join("\n\n");
         }
     }
 
