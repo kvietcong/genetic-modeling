@@ -1,5 +1,5 @@
 /** Easy access to math functions */
-const {pow, ceil, floor, round, log, log2: lg, max, min, random} = Math
+const {pow, ceil, floor, round, log, log2: lg, max, min, random, sqrt} = Math
 
 /** Easy access to logging :) */
 const {log: print} = console
@@ -63,11 +63,20 @@ const getRandomInteger = (min, max) =>
 const logBase = (base, x) => log(x) / log(base);
 
 /**
- * Deep copy JSON-serializable objects
- * @param {*} object Object to deep copy
+ * Deep copy JSON-serializable objects. ONLY FOR OBJECTS. DON'T PUT CLASSES HERE
+ * @param {Object} object Object to deep copy
  * @returns Deep copy of the object
  */
-const deepCopy = object => JSON.parse(JSON.stringify(object));
+const deepObjectCopy = object => JSON.parse(JSON.stringify(object));
+
+/**
+ * Returns distance from two points
+ * @param {Number} x1, y1, x2, y2 Coordinates of first and second point
+ * @returns Distance between the two points
+ */
+const getDistance = (x1, y1, x2, y2) => {
+    return sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
+};
 
 /**
  * Returns random element from array
