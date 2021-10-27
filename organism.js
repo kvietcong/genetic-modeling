@@ -35,7 +35,7 @@ const libOrganism = (() => {
         firstGeneReproduction: (organism, otherOrganism) => {
             const otherGenes = otherOrganism.genes;
             if (organism.genes.length !== otherGenes.length)
-                return console.log("Incompatible!");
+                return console.log("Incompatible!") || organism;
 
             const newGenes = [];
 
@@ -56,9 +56,18 @@ const libOrganism = (() => {
          * @param {CanvasRenderingContext2D} ctx The context where you can draw
          */
         _: (organism, ctx) => undefined,
+        circleDraw: (organism, ctx) => {
+            const { x, y } = organism;
+            ctx.beginPath();
+            ctx.fillStyle = [
+                "red", "green", "blue", "purple", "black", "brown"
+            ][organism.genes[0].level % 6];
+            ctx.arc(x, y, 10, 0, 2 * Math.PI);
+            ctx.fill();
+        },
     };
     /** Default drawing function to display and organism */
-    _.drawer = _.drawers._;
+    _.drawer = _.drawers.circleDraw;
 
     _.Organism = class Organism {
         /** {Array<Genes>} A list of genes that the Organism has */
@@ -91,6 +100,36 @@ const libOrganism = (() => {
 
         attachGameEngine(gameEngine, x, y) {
             Object.assign(this, {gameEngine, x, y});
+        }
+
+        update() {
+            this.x += getRandomInteger(-5, 5);
+            this.y += getRandomInteger(-5, 5);
+            if (this.x < 0) this.x = 0;
+            if (this.y < 0) this.y = 0;
+            if (this.x > 1000) this.x = 1000;
+            if (this.y > 1000) this.y = 1000;
+            const entitiesToAdd = [];
+            this.gameEngine.entities.forEach(entity => {
+                if (entity !== this
+                    && (this.canReproduce || this.canReproduce === undefined)
+                    && (this.parent !== entity.parent || !entity.parent)
+                ) {
+                    if (getDistance(this.x, this.y, entity.x, entity.y) < 10) {
+                        const newOrganism = this.reproduce(entity);
+                        newOrganism.attachGameEngine(this.gameEngine, this.x, this.y);
+                        newOrganism.genes[0].mutate();
+                        newOrganism.parent = this;
+                        this.canReproduce = false;
+                        entitiesToAdd.push(newOrganism);
+                    }
+                }
+            });
+            entitiesToAdd.forEach(entity => this.gameEngine.addEntity(entity));
+            if (random() < 0.01
+                && !this.canReproduce
+                && (this.parent !== undefined)
+            ) this.removeFromWorld = true;
         }
 
         draw(ctx, drawer = _.drawer) {

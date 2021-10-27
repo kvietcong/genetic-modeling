@@ -9,7 +9,13 @@ const gameEngine = new GameEngine();
 let debug;
 
 function restart() {
-    gameEngine.entities = [];
+    for (let i = 0; i < 10; i++) {
+        const newOrganism = new Organism();
+        gameEngine.addEntity(newOrganism);
+        newOrganism.attachGameEngine(gameEngine, i * 100 + 50, 100);
+    }
+
+    return;
     const genes = [];
     debug = genes;
     for (let i = 0; i < 17; i++) {
