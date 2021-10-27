@@ -70,7 +70,7 @@ const libOrganism = (() => {
         constructor(options = null) {
             if (options) {
                 if (options.genes) {
-                    this.genes = deepCopy(options.genes);
+                    this.genes = options.genes;
                 } else if (options.init_function) {
                     this.initializeCells(options.init_function);
                 } else {

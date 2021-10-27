@@ -32,9 +32,9 @@
 
 /* Default Global Parameters related to Genes */
 params.cellSize = 2;
-params.fillToLevel = 1;
+params.fillToLevel = 0;
 params.partitionSize = 2;
-params.mutationChance = 0.1;
+params.mutationChance = 0.3;
 params.initialPartitions = 5;
 
 /** Library of Gene related values and functions */
@@ -98,7 +98,6 @@ const libGene = (() => {
                                         params.fillToLevel);
 
     /**
-     *
      * @param {Array2D} cells Array of cells
      * @param {Array2D} newPartition Array of replacements
      * @param {Integer} x Beginning row of replacement
@@ -106,7 +105,7 @@ const libGene = (() => {
      * @returns New cells with a replacement
      */
     const replacePartition = (cells, newPartition, x, y) => {
-        let newCells = deepCopy(cells);
+        let newCells = deepObjectCopy(cells);
         for (let i = x; i < x + newPartition.length; i++) {
             for (let j = y; j < y + newPartition[0].length; j++) {
                 newCells[i][j] = newPartition[i-x][j-y];
@@ -132,8 +131,8 @@ const libGene = (() => {
                 newCells[i] = [];
                 for (let j = 0; j < gene.cells.length; j++) {
                     newCells[i][j] = recomboer(gene.cells[i][j],
-                                            otherGene.cells[i][j],
-                                            i, j);
+                                               otherGene.cells[i][j],
+                                               i, j);
                 }
             }
             return new Gene({cells: newCells});
@@ -145,7 +144,7 @@ const libGene = (() => {
         NOR: (a, b) => !_.recomboers.perCell.OR(a, b),
     };
     _.recomboers.chooseOnePartition = (gene, otherGene) => {
-        let newCells = deepCopy(gene.cells);
+        let newCells = deepObjectCopy(gene.cells);
         if (gene.level !== otherGene.level)
             return (gene.level > otherGene.level ? gene : otherGene).clone();
         let level = gene.level;
@@ -163,10 +162,18 @@ const libGene = (() => {
         return new Gene({cells: newCells});
     };
     _.recomboers.chooseFromPartitionLibrary = (gene, otherGene) => {
-        let newCells = deepCopy(gene.cells);
-        if (gene.level !== otherGene.level)
+        let newCells = deepObjectCopy(gene.cells);
+        if (gene.level !== otherGene.level) {
+            // console.log("You don't have the same level")
             return (gene.level > otherGene.level ? gene : otherGene).clone();
+        }
+
         const level = gene.level;
+        if (_.partitionTooling.levelToIndex(level) >= gene.cells.length) {
+            // console.log("You have hit a level limit")
+            return (gene.level > otherGene.level ? gene : otherGene).clone();
+        }
+
         const library = [];
         let i;
         for (i = 0; i < level; i++) {
@@ -265,7 +272,7 @@ const libGene = (() => {
         constructor(options = null) {
             if (options) {
                 if (options.cells) {
-                    this.cells = deepCopy(options.cells);
+                    this.cells = deepObjectCopy(options.cells);
                 } else if (options.init_function) {
                     this.initializeCells(options.init_function);
                 } else {
