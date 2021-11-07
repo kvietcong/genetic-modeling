@@ -70,7 +70,7 @@ class GameEngine {
         // Clear the canvas with white
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         // Draw latest things first
-        this.entities.reduceRight((_, entity) => entity.draw(this.ctx));
+        this.entities.reduceRight((_, entity) => entity.draw(this.ctx), null);
     };
 
     update() {

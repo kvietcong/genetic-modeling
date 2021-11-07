@@ -26,7 +26,12 @@ class Stats {
     }
 }
 
-function restart() {
+const restart = () => {
+    organismExample();
+    // geneExample();
+}
+
+const organismExample = () => {
     const rows = 8;
     const cols = 8;
     gameEngine.addEntity(new Stats());
@@ -37,6 +42,33 @@ function restart() {
             newOrganism.y = j * 70 + 50;
             newOrganism.timeSinceLastReproduction = 20;
             gameEngine.addEntity(newOrganism);
+        }
+    }
+}
+
+const geneExample = () => {
+    const genes = [];
+    for (let i = 0; i < 16; i++) {
+        genes[i] = [];
+        for (let j = 0; j < 28; j++) {
+            genes[i][j] = i == 0
+                ? new Gene()
+                : genes[i-1][j].recombine(
+                    genes[i-1][getRandomInteger(0, genes[0].length-1)]);
+            if (i !== 0) genes[i][j].mutate();
+        }
+    }
+
+    const levelToIndex = libGene.partitionTooling.levelToIndex;
+    const organismSize = params.cellSize
+        * (levelToIndex(params.initialPartitions) + 2);
+    const padding = params.cellSize * 4;
+
+    for (const [i, row] of genes.entries()) {
+        for (const [j, gene] of row.entries()) {
+            gene.x = j * (organismSize + padding);
+            gene.y = i * (organismSize + padding);
+            gameEngine.addEntity(gene);
         }
     }
 }
