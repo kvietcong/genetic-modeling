@@ -1,53 +1,48 @@
-// Good ol' Testing
-const testOrganism = new Organism();
-console.log(testOrganism.toString(), "\n");
-console.log(testOrganism.genes[0].levels);
-
-// WARNING: INDEXING IS REALLY WEIRD RN. I NEED TO NORMALIZE HOW I/X AND J/Y WORKS. - KV
 const ASSET_MANAGER = new AssetManager();
 const gameEngine = new GameEngine();
-let debug;
+
+class Stats {
+    update(gameEngine) {
+        this.averages = gameEngine.entities.reduce((averages, entity) => {
+            if (entity instanceof Organism) {
+                for (const skill of params.skills) {
+                    averages[skill] = (
+                        (averages[skill] || 0)
+                        + entity.genes[skill].level
+                    ) / 2;
+                }
+            }
+            return averages;
+        }, {});
+    }
+
+    draw(ctx) {
+        ctx.font = "bold 15px Arial";
+        ctx.fillStyle = "black";
+        Object.entries(this.averages).forEach(([skill, average], i) => {
+            ctx.fillText(skill, 25, 25 + 12 * i);
+            ctx.fillText(average.toFixed(4), 125, 25 + 12 * i);
+        });
+    }
+}
 
 function restart() {
-    for (let i = 0; i < 10; i++) {
-        const newOrganism = new Organism();
-        gameEngine.addEntity(newOrganism);
-        newOrganism.attachGameEngine(gameEngine, i * 100 + 50, 100);
-    }
-
-    return;
-    const genes = [];
-    debug = genes;
-    for (let i = 0; i < 17; i++) {
-        genes[i] = [];
-        for (let j = 0; j < 23; j++) {
-            genes[i][j] = i == 0
-                ? new Gene()
-                : genes[i-1][j].recombine(
-                    genes[i-1][getRandomInteger(0, genes[0].length-1)]);
-            if (i !== 0) genes[i][j].mutate();
-        }
-    }
-
-    const levelToIndex = libGene.partitionTooling.levelToIndex;
-    const organismSize = params.cellSize
-        * (levelToIndex(params.initialPartitions) + 2);
-    const padding = params.cellSize * 4;
-
-    for (const [i, row] of genes.entries()) {
-        for (const [j, organism] of row.entries()) {
-            organism.attachGameEngine(
-                gameEngine,
-                j * (organismSize + padding),
-                i * (organismSize + padding));
-            gameEngine.addEntity(organism);
+    const rows = 8;
+    const cols = 8;
+    gameEngine.addEntity(new Stats());
+    for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+            const newOrganism = new Organism();
+            newOrganism.x = i * 150 + 50
+            newOrganism.y = j * 70 + 50;
+            newOrganism.timeSinceLastReproduction = 20;
+            gameEngine.addEntity(newOrganism);
         }
     }
 }
 
 ASSET_MANAGER.downloadAll(function () {
-	const canvas = document.getElementById("gameWorld");
-	const ctx = canvas.getContext("2d");
+    const ctx = initCanvas();
 
 	gameEngine.init(ctx);
 

@@ -268,6 +268,8 @@ const libGene = (() => {
         cells;
         /** {Array<0|1>} An array of 0 or 1 to determine if a level is filled */
         levels;
+        /** {Number} Coordinates for canvas rendering */
+        x = 0; y = 0;
 
         constructor(options = null) {
             if (options) {
@@ -359,11 +361,8 @@ const libGene = (() => {
             this.updateInfo();
         }
 
-        attachGameEngine(gameEngine, x, y) {
-            Object.assign(this, {gameEngine, x, y});
-        }
-
-        draw(ctx, drawer = _.drawer) {
+        draw(ctx) {
+            const drawer = _.drawer;
             return drawer(this, ctx);
         }
 

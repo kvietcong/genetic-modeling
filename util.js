@@ -1,5 +1,20 @@
+/** Global Parameters Object */
+const params = {
+    // Maybe use for toggle-able logging?
+    DEBUG: false,
+    canvas: {
+        id: "game-world",
+        width: 1280,
+        height: 720,
+        backgroundColor: "white",
+        border: "1px solid black"
+    },
+};
+
 /** Easy access to math functions */
-const {pow, ceil, floor, round, log, log2: lg, max, min, random, sqrt} = Math
+const {
+    pow, ceil, floor, round, log, log2: lg, max, min, random, sqrt, abs
+} = Math
 
 /** Easy access to logging :) */
 const {log: print} = console
@@ -52,8 +67,14 @@ window.requestAnimFrame = (function () {
  * @param {Number} min Lower bound
  * @param {Number} max Upper bound
  */
-const getRandomInteger = (min, max) =>
-    round(Math.random() * (max - min) + min);
+const getRandomInteger = (min, max) => round(Math.random() * (max - min) + min);
+
+/**
+ * Random number between two numbers inclusively
+ * @param {Number} min Lower bound
+ * @param {Number} max Upper bound
+ */
+const getRandomRange = (min, max) => Math.random() * (max - min) + min;
 
 /**
  * Compute log with arbitrary base
@@ -87,8 +108,56 @@ const chooseRandom = items => items.length > 0
     ? items[floor(random() * items.length)]
     : null;
 
-/** Global Parameters Object */
-const params = {
-    // Maybe use for toggle-able logging?
-    DEBUG: false,
+/**
+ * Initialize Canvas within DOM and returns canvas context
+ * @param {Object} options Options for canvas. Look at params for defaults
+ * @returns Canvas context
+ */
+const initCanvas = options => {
+    const {
+        id, backgroundColor, border, width, height,
+    } = options || params.canvas;
+
+	const canvas = document.createElement("canvas");
+    canvas.id = id;
+    canvas.width = width;
+    canvas.height = height;
+    canvas.style.border = border;
+    canvas.style.backgroundColor = backgroundColor;
+
+	const context = canvas.getContext("2d");
+    document.body.prepend(canvas);
+
+    return context;
 };
+
+/** A class to represent a 2D vector */
+class Vector {
+    x; y;
+    constructor(x = 0, y = 0) {
+        this.x = x;
+        this.y = y;
+    }
+
+    add(vector, y = null) {
+        if (!y) {
+            return new Vector(this.x + vector.x, this.y + vector.y);
+        } else {
+            const x = vector;
+            return new Vector(this.x + x, this.y + y);
+        }
+    }
+
+    scale(scalar) {
+        return new Vector(this.x * scalar, this.y * scalar);
+    }
+
+    get["length"]() {
+        return sqrt(pow(this.x, 2) + pow(this.y, 2));
+    }
+
+    get["normal"]() {
+        const length = this.length;
+        return new Vector(this.x / length, this.y / length);
+    }
+}
