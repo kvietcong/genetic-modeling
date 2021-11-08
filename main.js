@@ -1,15 +1,14 @@
 const ASSET_MANAGER = new AssetManager();
 const gameEngine = new GameEngine();
 
-class Stats {
+class OrganismStats {
     update(gameEngine) {
         this.averages = gameEngine.entities.reduce((averages, entity) => {
             if (entity instanceof Organism) {
                 for (const skill of params.skills) {
-                    averages[skill] = (
-                        (averages[skill] || 0)
-                        + entity.genes[skill].level
-                    ) / 2;
+                    averages[skill] = averages[skill]
+                        ? (averages[skill] + entity.genes[skill].level) / 2
+                        : entity.genes[skill].level;
                 }
             }
             return averages;
@@ -34,7 +33,7 @@ const restart = () => {
 const organismExample = () => {
     const rows = 8;
     const cols = 8;
-    gameEngine.addEntity(new Stats());
+    gameEngine.addEntity(new OrganismStats());
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
             const newOrganism = new Organism();

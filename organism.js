@@ -3,6 +3,7 @@
 /* Default Global Parameters related to Organisms */
 params.geneAmount = 1;
 params.skills = ["speed", "vision", "reproduction", "size", "health"];
+params.maxReproductionTime = 15;
 
 const libOrganism = (() => {
     "use strict";
@@ -51,10 +52,10 @@ const libOrganism = (() => {
     _.drawers = {
         /**
          * @param {Organism} organism The Organism's state
-         * @param {CanvasRenderingContext2D} ctx The context where you can draw
+         * @param {GameEngine} gameEngine The Game Engine's State
          */
-        _: (organism, ctx) => undefined,
-        circleDraw: (organism, ctx) => {
+        _: (organism, ctx, gameEngine) => undefined,
+        sizeDraw: (organism, ctx) => {
             const { x, y } = organism;
             ctx.beginPath();
             const size = organism.genes.size.level;
@@ -66,14 +67,14 @@ const libOrganism = (() => {
         },
     };
     /** Default drawing function to display and organism */
-    _.drawer = _.drawers.circleDraw;
+    _.drawer = _.drawers.sizeDraw;
 
     _.Organism = class Organism {
         /** {Array<Genes>} A list of genes that the Organism has */
         genes;
         /** {Number} Coordinates for canvas rendering */
         x = 0; y = 0;
-        velocity = new Vector(getRandomRange(-3, 3), getRandomRange(3, -3));
+        direction = Vector.randomUnit();
 
         timeSinceLastReproduction = 0;
         children = 0;
@@ -107,29 +108,29 @@ const libOrganism = (() => {
 
         canReproduce() {
             return this.timeSinceLastReproduction >
-                (15 / sqrt(this.genes.reproduction.level + 1));
+                (params.maxReproductionTime
+                    / sqrt(this.genes.reproduction.level + 1));
         }
 
         update(gameEngine) {
-            // this.x += getRandomInteger(-5, 5);
-            // this.y += getRandomInteger(-5, 5);
-            this.x += this.velocity.x;
-            this.y += this.velocity.y;
+            const newSpeed = this.direction.scale(this.genes.speed.level + 3);
+            this.x += newSpeed.x;
+            this.y += newSpeed.y;
             this.timeSinceLastReproduction += gameEngine.deltaTime;
             if (this.x < 0) {
-                this.velocity.x = abs(this.velocity.x);
+                this.direction.x = abs(this.direction.x);
                 this.x = 0;
             }
             if (this.x > params.canvas.width) {
-                this.velocity.x = -abs(this.velocity.x);
+                this.direction.x = -abs(this.direction.x);
                 this.x = params.canvas.width;
             }
             if (this.y < 0) {
-                this.velocity.y = abs(this.velocity.y);
+                this.direction.y = abs(this.direction.y);
                 this.y = 0;
             }
             if (this.y > params.canvas.height) {
-                this.velocity.y = -abs(this.velocity.y);
+                this.direction.y = -abs(this.direction.y);
                 this.y = params.canvas.height;
             }
 
@@ -146,10 +147,6 @@ const libOrganism = (() => {
                         const newOrganism = this.reproduce(entity);
                         newOrganism.x = this.x;
                         newOrganism.y = this.y;
-                        newOrganism.velocity = new Vector(
-                            getRandomRange(3, -3) * (newOrganism.genes.speed.level + 1),
-                            getRandomRange(3, -3) * (newOrganism.genes.speed.level + 1),
-                        );
                         newOrganism.generation = this.generation + 1;
 
                         for (const skill in newOrganism.genes)
@@ -166,9 +163,9 @@ const libOrganism = (() => {
             }
         }
 
-        draw(ctx) {
+        draw(ctx, gameEngine) {
             const drawer = _.drawer;
-            return drawer(this, ctx);
+            return drawer(this, ctx, gameEngine);
         }
 
         reproduce(otherOrganism, reproducer = _.reproducer) {

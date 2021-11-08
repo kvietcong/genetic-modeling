@@ -230,8 +230,9 @@ const libGene = (() => {
         /**
          * @param {Gene} gene The gene's state
          * @param {CanvasRenderingContext2D} ctx The context where you can draw
+         * @param {GameEngine} gameEngine The Game Engine's State
          */
-        _: (gene, ctx) => undefined,
+        _: (gene, ctx, gameEngine) => undefined,
         simpleDraw: (gene, ctx) => {
             const cells = gene.cells;
             const cellSize = params.cellSize;
@@ -361,9 +362,9 @@ const libGene = (() => {
             this.updateInfo();
         }
 
-        draw(ctx) {
+        draw(ctx, gameEngine) {
             const drawer = _.drawer;
-            return drawer(this, ctx);
+            return drawer(this, ctx, gameEngine);
         }
 
         update() { }

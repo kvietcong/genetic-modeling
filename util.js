@@ -13,7 +13,8 @@ const params = {
 
 /** Easy access to math functions */
 const {
-    pow, ceil, floor, round, log, log2: lg, max, min, random, sqrt, abs
+    pow, ceil, floor, round, log, log2: lg, max, min, random, sqrt, abs,
+    PI, E, sin, cos, tan, asin, acos, atan, atan2,
 } = Math
 
 /** Easy access to logging :) */
@@ -134,6 +135,7 @@ const initCanvas = options => {
 /** A class to represent a 2D vector */
 class Vector {
     x; y;
+
     constructor(x = 0, y = 0) {
         this.x = x;
         this.y = y;
@@ -152,12 +154,24 @@ class Vector {
         return new Vector(this.x * scalar, this.y * scalar);
     }
 
-    get["length"]() {
-        return sqrt(pow(this.x, 2) + pow(this.y, 2));
-    }
+    get["magnitude"]() { return sqrt(pow(this.x, 2) + pow(this.y, 2)); }
+    get["length"]() { return this.magnitude; }
 
-    get["normal"]() {
+    get["unit"]() {
         const length = this.length;
         return new Vector(this.x / length, this.y / length);
+    }
+
+    static angleToUnit(angle) {
+        return new Vector(cos(angle / 180 * PI), sin(angle / 180 * PI));
+    }
+
+    static radToUnit(rad) {
+        return new Vector(cos(rad), sin(rad));
+    }
+
+    static randomUnit() {
+        const randomDirection = random() * 2 * PI;
+        return Vector.radToUnit(randomDirection);
     }
 }
