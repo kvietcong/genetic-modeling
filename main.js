@@ -72,28 +72,8 @@ const geneExample = gameEngine => {
     }
 }
 
-const nuke = () => {
-    const simulations = document.getElementById("simulations");
-    while (simulations.firstChild) {
-        simulations.removeChild(simulations.firstChild);
-    }
-    gameEngines = [];
-}
-
-const regenerateDeletionButtons = () => {
-    const deletionList = document.getElementById("deletion-list");
-    while (deletionList.firstChild) {
-        deletionList.removeChild(deletionList.firstChild);
-    }
-    gameEngines.forEach((_, id) => {
-        const deletionButton = document.createElement("button");
-        deletionButton.innerText = `Delete Sim ${id + 1}`;
-        deletionButton.onclick = () => deleteSim(id);
-        const li = document.createElement("li");
-        li.appendChild(deletionButton);
-        deletionList.appendChild(li);
-    });
-};
+// DOM Manipulation
+// There's probably a memory leak somewhere XD
 
 const deleteSim = simID => {
     gameEngines[simID].stop();
@@ -102,7 +82,33 @@ const deleteSim = simID => {
     const simulations = document.getElementById("simulations");
     simulations.removeChild(simulations.childNodes[simID]);
 
-    regenerateDeletionButtons();
+    regenerateButtons();
+};
+
+const scrollToSim = simID => {
+    const simulations = document.getElementById("simulations");
+    simulations.children[simID].scrollIntoView({behavior: "smooth"});
+}
+
+const regenerateButtons = () => {
+    const buttonList = document.getElementById("buttons");
+    while (buttonList.firstChild) {
+        buttonList.removeChild(buttonList.firstChild);
+    }
+    gameEngines.forEach((_, id) => {
+        const deletionButton = document.createElement("button");
+        deletionButton.innerText = `Delete Sim ${id + 1}`;
+        deletionButton.onclick = () => deleteSim(id);
+
+        const scrollToButton = document.createElement("button");
+        scrollToButton.innerText = `Scroll To Sim ${id + 1}`;
+        scrollToButton.onclick = () => scrollToSim(id);
+
+        const li = document.createElement("li");
+        li.appendChild(deletionButton);
+        li.appendChild(scrollToButton);
+        buttonList.appendChild(li);
+    });
 };
 
 const addSim = () => {
@@ -116,8 +122,18 @@ const addSim = () => {
 
         gameEngines.push(gameEngine);
 
-        regenerateDeletionButtons();
+        regenerateButtons();
     });
+}
+
+const nuke = () => {
+    const simulations = document.getElementById("simulations");
+    while (simulations.firstChild) {
+        simulations.removeChild(simulations.firstChild);
+    }
+    gameEngines.forEach(gameEngine => gameEngine.stop());
+    gameEngines = [];
+    regenerateButtons();
 }
 
 addSim();
