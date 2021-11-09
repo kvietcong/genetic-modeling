@@ -1,7 +1,7 @@
 // This game shell was happily modified from Googler Seth Ladd's "Bad Aliens" game and his Google IO talk in 2011
 
 class GameEngine {
-    constructor() {
+    constructor(options) {
         this.entities = [];
         this.showOutlines = false;
         this.ctx = null;
@@ -10,6 +10,14 @@ class GameEngine {
         this.wheel = null;
         this.surfaceWidth = null;
         this.surfaceHeight = null;
+        this.running = false;
+        this.options = options || {
+            prevent: {
+                contextMenu: false,
+                scrolling: false,
+            },
+            debugging: false,
+        };
     };
 
     init(ctx) {
@@ -21,45 +29,60 @@ class GameEngine {
     };
 
     start() {
-        let that = this;
-        (function gameLoop() {
-            that.loop();
-            requestAnimFrame(gameLoop, that.ctx.canvas);
-        })();
+        this.running = true;
+        const gameLoop = () => {
+            this.loop();
+            if (this.running) {
+                requestAnimFrame(gameLoop, this.ctx.canvas);
+            }
+        };
+        gameLoop();
     };
 
+    stop() {
+        this.running = false;
+    }
+
     startInput() {
-        let that = this;
-
-        const getXandY = function (e) {
-            const x = e.clientX - that.ctx.canvas.getBoundingClientRect().left;
-            const y = e.clientY - that.ctx.canvas.getBoundingClientRect().top;
-
+        const getXandY = e => {
+            const x = e.clientX - this.ctx.canvas.getBoundingClientRect().left;
+            const y = e.clientY - this.ctx.canvas.getBoundingClientRect().top;
             return { x: x, y: y };
         }
 
-        this.ctx.canvas.addEventListener("mousemove", function (e) {
-            //console.log(getXandY(e));
-            that.mouse = getXandY(e);
-        }, false);
+        this.ctx.canvas.addEventListener("mousemove", e => {
+            if (this.options.debugging) {
+                console.log("MOUSE_MOVE", getXandY(e));
+            }
+            this.mouse = getXandY(e);
+        });
 
-        this.ctx.canvas.addEventListener("click", function (e) {
-            //console.log(getXandY(e));
-            that.click = getXandY(e);
-        }, false);
+        this.ctx.canvas.addEventListener("click", e => {
+            if (this.options.debugging) {
+                console.log("CLICK", getXandY(e));
+            }
+            this.click = getXandY(e);
+        });
 
-        this.ctx.canvas.addEventListener("wheel", function (e) {
-            //console.log(getXandY(e));
-            that.wheel = e;
-            //       console.log(e.wheelDelta);
-            e.preventDefault();
-        }, false);
+        this.ctx.canvas.addEventListener("wheel", e => {
+            if (this.options.debugging) {
+                console.log("WHEEL", getXandY(e), e.wheelDelta);
+            }
+            if (this.options.prevent.scrolling) {
+                e.preventDefault(); // Prevent Scrolling
+            }
+            this.wheel = e;
+        });
 
-        this.ctx.canvas.addEventListener("contextmenu", function (e) {
-            //console.log(getXandY(e));
-            that.rightclick = getXandY(e);
-            e.preventDefault();
-        }, false);
+        this.ctx.canvas.addEventListener("contextmenu", e => {
+            if (this.options.debugging) {
+                console.log("RIGHT_CLICK", getXandY(e));
+            }
+            if (this.options.prevent.contextMenu) {
+                e.preventDefault(); // Prevent Context Menu
+            }
+            this.rightclick = getXandY(e);
+        });
     };
 
     addEntity(entity) {

@@ -3,11 +3,11 @@ const params = {
     // Maybe use for toggle-able logging?
     DEBUG: false,
     canvas: {
-        id: "game-world",
         width: 1280,
         height: 720,
         backgroundColor: "white",
-        border: "1px solid black"
+        border: "1px solid black",
+        attachID: "simulations",
     },
 };
 
@@ -116,18 +116,21 @@ const chooseRandom = items => items.length > 0
  */
 const initCanvas = options => {
     const {
-        id, backgroundColor, border, width, height,
+        backgroundColor, border, width, height, attachID,
     } = options || params.canvas;
 
+    const simulations = document.getElementById(attachID);
+
 	const canvas = document.createElement("canvas");
-    canvas.id = id;
     canvas.width = width;
     canvas.height = height;
     canvas.style.border = border;
     canvas.style.backgroundColor = backgroundColor;
 
 	const context = canvas.getContext("2d");
-    document.body.prepend(canvas);
+    const listItem = document.createElement("li");
+    listItem.appendChild(canvas);
+    simulations.appendChild(listItem);
 
     return context;
 };

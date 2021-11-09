@@ -1,5 +1,5 @@
 const ASSET_MANAGER = new AssetManager();
-const gameEngine = new GameEngine();
+let gameEngines = [];
 
 class OrganismStats {
     update(gameEngine) {
@@ -25,12 +25,12 @@ class OrganismStats {
     }
 }
 
-const restart = () => {
-    organismExample();
-    // geneExample();
+const restart = gameEngine => {
+    organismExample(gameEngine);
+    // geneExample(gameEngine);
 }
 
-const organismExample = () => {
+const organismExample = gameEngine => {
     const rows = 8;
     const cols = 8;
     gameEngine.addEntity(new OrganismStats());
@@ -45,7 +45,7 @@ const organismExample = () => {
     }
 }
 
-const geneExample = () => {
+const geneExample = gameEngine => {
     const genes = [];
     for (let i = 0; i < 16; i++) {
         genes[i] = [];
@@ -72,12 +72,52 @@ const geneExample = () => {
     }
 }
 
-ASSET_MANAGER.downloadAll(function () {
-    const ctx = initCanvas();
+const nuke = () => {
+    const simulations = document.getElementById("simulations");
+    while (simulations.firstChild) {
+        simulations.removeChild(simulations.firstChild);
+    }
+    gameEngines = [];
+}
 
-	gameEngine.init(ctx);
+const regenerateDeletionButtons = () => {
+    const deletionList = document.getElementById("deletion-list");
+    while (deletionList.firstChild) {
+        deletionList.removeChild(deletionList.firstChild);
+    }
+    gameEngines.forEach((_, id) => {
+        const deletionButton = document.createElement("button");
+        deletionButton.innerText = `Delete Sim ${id + 1}`;
+        deletionButton.onclick = () => deleteSim(id);
+        const li = document.createElement("li");
+        li.appendChild(deletionButton);
+        deletionList.appendChild(li);
+    });
+};
 
-    restart();
+const deleteSim = simID => {
+    gameEngines[simID].stop();
+    gameEngines = gameEngines.filter((_, id) => id !== simID);
 
-	gameEngine.start();
-});
+    const simulations = document.getElementById("simulations");
+    simulations.removeChild(simulations.childNodes[simID]);
+
+    regenerateDeletionButtons();
+};
+
+const addSim = () => {
+    ASSET_MANAGER.downloadAll(function () {
+        const gameEngine = new GameEngine();
+        const ctx = initCanvas();
+
+        gameEngine.init(ctx);
+        restart(gameEngine);
+        gameEngine.start();
+
+        gameEngines.push(gameEngine);
+
+        regenerateDeletionButtons();
+    });
+}
+
+addSim();
