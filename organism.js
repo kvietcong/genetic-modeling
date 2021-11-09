@@ -65,9 +65,21 @@ const libOrganism = (() => {
             ctx.arc(x, y, organism.radius, 0, 2 * Math.PI);
             ctx.fill();
         },
+        blendDraw: (organism, ctx) => {
+            const { x, y } = organism;
+            ctx.beginPath();
+            ctx.fillStyle = rgba(
+                organism.genes.size.level / params.initialPartitions * 400,
+                organism.genes.speed.level / params.initialPartitions * 400,
+                organism.genes.health.level / params.initialPartitions * 400,
+                1
+            );
+            ctx.arc(x, y, organism.radius, 0, 2 * Math.PI);
+            ctx.fill();
+        }
     };
     /** Default drawing function to display and organism */
-    _.drawer = _.drawers.sizeDraw;
+    _.drawer = _.drawers.blendDraw;
 
     _.Organism = class Organism {
         /** {Array<Genes>} A list of genes that the Organism has */
@@ -113,7 +125,10 @@ const libOrganism = (() => {
         }
 
         update(gameEngine) {
-            const newSpeed = this.direction.scale(this.genes.speed.level + 3);
+            const newSpeed = this.direction
+                .scale(this.genes.speed.level + 3)
+                // Scale speed based on time since last frame
+                .scale(gameEngine.deltaTime * 100);
             this.x += newSpeed.x;
             this.y += newSpeed.y;
             this.timeSinceLastReproduction += gameEngine.deltaTime;
@@ -140,6 +155,7 @@ const libOrganism = (() => {
                     && entity instanceof Organism
                     && getDistance(this.x, this.y, entity.x, entity.y) < this.radius
                 ) {
+                    // Eat the other organism if they are >2 levels smaller
                     if (this.genes.size.level - 1 > entity.genes.size.level) {
                         entity.removeFromWorld = true;
                     } else if (this.canReproduce() && entity.canReproduce()) {
