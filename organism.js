@@ -69,7 +69,7 @@ const libOrganism = (() => {
             const { x, y } = organism;
             ctx.beginPath();
             ctx.fillStyle = rgba(
-                organism.genes.size.level / params.initialPartitions * 400,
+                organism.genes.reproduction.level / params.initialPartitions * 400,
                 organism.genes.speed.level / params.initialPartitions * 400,
                 organism.genes.health.level / params.initialPartitions * 400,
                 1
@@ -81,16 +81,116 @@ const libOrganism = (() => {
     /** Default drawing function to display and organism */
     _.drawer = _.drawers.blendDraw;
 
-    _.Organism = class Organism {
+    class Task {
+        constructor(costFunction, taskFunction, arity = 2) {
+            this.arity = arity;
+            this.costFunction = costFunction;
+            this.taskFunction = taskFunction;
+        }
+
+        checkInputArity(input) {
+            if (input.length !== this.arity) {
+                throw new Error(
+                    `Expected ${this.arity} organisms,`
+                    + ` got ${input.length}`
+                );
+            }
+        }
+
+        getCost(...input) {
+            this.checkInputArity(input);
+            return this.costFunction(...input);
+        }
+
+        doTask(gameEngine, ...input) {
+            this.checkInputArity(input);
+            return this.taskFunction(gameEngine, ...input);
+        }
+    }
+    _.Task = Task;
+
+    _.tasks = {};
+    _.tasks.unary = {};
+    _.tasks.unary.required = {
+        move: new Task(
+            (organism) => pow(organism.genes.size.level + 1, 2),
+            (gameEngine, organism) => {
+                const newSpeed = organism.direction
+                    .scale(organism.genes.speed.level + 3)
+                    // Scale speed based on time since last frame
+                    .scale(gameEngine.deltaTime * 100);
+                organism.x += newSpeed.x;
+                organism.y += newSpeed.y;
+            },
+            1
+        ),
+        rollDiceOfFate: new Task(
+            (organism) => 0,
+            (gameEngine, organism) => {
+                if (random() < (0.0025 / (organism.genes.health.level + 1))
+                    && (organism.children || organism.generation)
+                ) {
+                    organism.removeFromWorld = true;
+                }
+            },
+            1
+        ),
+    };
+    _.tasks.unary.chosen = {};
+
+    _.tasks.binary = {}
+    _.tasks.binary.required = {}
+    _.tasks.binary.chosen = {
+        reproduce: new Task(
+            (organism1, organism2) => {
+                if (organism1.canReproduce() && organism2.canReproduce()) {
+                    return 20 /
+                        (organism1.genes.reproduction.level
+                            + organism2.genes.reproduction.level + 1);
+                } else return Infinity;
+            },
+            (gameEngine, organism1, organism2) => {
+                organism1.children++;
+                organism2.children++;
+
+                const newOrganism = organism1.reproduce(organism2);
+                newOrganism.x = organism1.x;
+                newOrganism.y = organism1.y;
+                newOrganism.generation = organism1.generation + 1;
+
+                for (const skill in newOrganism.genes)
+                    newOrganism.genes[skill].mutate();
+
+                gameEngine.addEntity(newOrganism);
+            }
+        ),
+        cannibalize: new Task(
+            (organism1, organism2) => {
+                if (organism1.genes.size.level - 1 > organism2.genes.size.level) {
+                    return -10;
+                } else return Infinity;
+            },
+            (organism1, organism2) => {
+                organism2.removeFromWorld = true;
+            }
+        ),
+    }
+
+    class Organism {
         /** {Array<Genes>} A list of genes that the Organism has */
         genes;
+
         /** {Number} Coordinates for canvas rendering */
         x = 0; y = 0;
         direction = Vector.randomUnit();
 
+        // Reproductive Values
         timeSinceLastReproduction = 0;
         children = 0;
         generation = 0;
+
+        // TODO: Add Energy Usage
+        energy = 100;
 
         constructor(options = null) {
             if (options) {
@@ -125,13 +225,10 @@ const libOrganism = (() => {
         }
 
         update(gameEngine) {
-            const newSpeed = this.direction
-                .scale(this.genes.speed.level + 3)
-                // Scale speed based on time since last frame
-                .scale(gameEngine.deltaTime * 100);
-            this.x += newSpeed.x;
-            this.y += newSpeed.y;
+            // Update internal values
             this.timeSinceLastReproduction += gameEngine.deltaTime;
+            // this.energy += gameEngine.deltaTime * this.genes.speed.level;
+
             if (this.x < 0) {
                 this.direction.x = abs(this.direction.x);
                 this.x = 0;
@@ -149,34 +246,39 @@ const libOrganism = (() => {
                 this.y = params.canvas.height;
             }
 
-            const entitiesToAdd = [];
+            // Do Tasks
+            // TODO: Add Energy Usage
+            Object.values(_.tasks.unary.required).forEach(task => {
+                task.doTask(gameEngine, this);
+            });
+            const validTasks = Object.values(_.tasks.unary.chosen)
+                .filter(task =>
+                    task.getCost(this) < 100)
+                .sort((task1, task2) =>
+                    task1.getCost(this)
+                    - task2.getCost(this)
+                )
+            validTasks[0]?.doTask(gameEngine, this);
+
             gameEngine.entities.forEach(entity => {
                 if (entity !== this
                     && entity instanceof Organism
-                    && getDistance(this.x, this.y, entity.x, entity.y) < this.radius
+                    && getDistance(
+                        this.x, this.y, entity.x, entity.y) < this.radius
                 ) {
-                    // Eat the other organism if they are >2 levels smaller
-                    if (this.genes.size.level - 1 > entity.genes.size.level) {
-                        entity.removeFromWorld = true;
-                    } else if (this.canReproduce() && entity.canReproduce()) {
-                        this.children++;
-                        const newOrganism = this.reproduce(entity);
-                        newOrganism.x = this.x;
-                        newOrganism.y = this.y;
-                        newOrganism.generation = this.generation + 1;
-
-                        for (const skill in newOrganism.genes)
-                            newOrganism.genes[skill].mutate();
-                        entitiesToAdd.push(newOrganism);
-                    }
+                    Object.values(_.tasks.binary.required).forEach(task => {
+                        task.doTask(gameEngine, this, entity);
+                    });
+                    const validTasks = Object.values(_.tasks.binary.chosen)
+                        .filter(task =>
+                            task.getCost(this, entity) < 100)
+                        .sort((task1, task2) =>
+                            task1.getCost(this, entity)
+                            - task2.getCost(this, entity)
+                        )
+                    validTasks[0]?.doTask(gameEngine, this, entity);
                 }
             });
-            entitiesToAdd.forEach(entity => gameEngine.addEntity(entity));
-            if (random() < (0.0025 / (this.genes.health.level + 1))
-                && (this.children || this.generation)
-            ) {
-                this.removeFromWorld = true;
-            }
         }
 
         draw(ctx, gameEngine) {
@@ -194,9 +296,10 @@ const libOrganism = (() => {
             ).join("\n\n");
         }
     }
+    _.Organism = Organism;
 
     return _;
 })();
 
 // General export to have things easily accessible to all other files.
-const { Organism } = libOrganism;
+const { Organism, Task } = libOrganism;

@@ -2,19 +2,32 @@
 
 class GameEngine {
     constructor(options) {
-        this.entities = [];
-        this.showOutlines = false;
+        // What you will use to draw
+        // Documentation: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D
         this.ctx = null;
+
+        // Context dimensions
+        this.surfaceWidth = null;
+        this.surfaceHeight = null;
+
+        // Everything that will be updated and drawn each frame
+        this.entities = [];
+        // Entities to be added at the end of each update
+        this.entitiesToAdd = [];
+
+        // Information on the input
         this.click = null;
         this.mouse = null;
         this.wheel = null;
-        this.surfaceWidth = null;
-        this.surfaceHeight = null;
+
+        // THE KILL SWITCH
         this.running = false;
+
+        // Options and the Details
         this.options = options || {
             prevent: {
-                contextMenu: false,
-                scrolling: false,
+                contextMenu: true,
+                scrolling: true,
             },
             debugging: false,
         };
@@ -85,11 +98,11 @@ class GameEngine {
     };
 
     addEntity(entity) {
-        this.entities.push(entity);
+        this.entitiesToAdd.push(entity);
     };
 
     draw() {
-        // Clear the canvas with white
+        // Clear the whole canvas
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         // Draw latest things first
         this.entities.reduceRight((_, entity) => entity.draw(this.ctx, this), null);
@@ -100,6 +113,9 @@ class GameEngine {
         this.entities.forEach(entity => entity.update(this));
         // Remove dead things
         this.entities = this.entities.filter(entity => !entity.removeFromWorld);
+        // Add new things
+        this.entities = this.entities.concat(this.entitiesToAdd);
+        this.entitiesToAdd = [];
     };
 
     get["deltaTime"]() { return this.clockTick; }

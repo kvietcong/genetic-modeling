@@ -2,6 +2,8 @@ const ASSET_MANAGER = new AssetManager();
 let gameEngines = [];
 
 class OrganismStats {
+    constructor() { this.averages = {}; }
+
     update(gameEngine) {
         this.averages = gameEngine.entities.reduce((averages, entity) => {
             if (entity instanceof Organism) {
