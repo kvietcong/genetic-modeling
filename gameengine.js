@@ -26,8 +26,8 @@ class GameEngine {
         // Options and the Details
         this.options = options || {
             prevent: {
-                contextMenu: true,
-                scrolling: true,
+                contextMenu: false,
+                scrolling: false,
             },
             debugging: false,
         };

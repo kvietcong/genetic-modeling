@@ -1,6 +1,5 @@
 const ASSET_MANAGER = new AssetManager();
 let gameEngines = [];
-
 class OrganismStats {
     constructor() { this.averages = {}; }
 
@@ -114,7 +113,7 @@ const regenerateButtons = () => {
 };
 
 const addSim = () => {
-    ASSET_MANAGER.downloadAll(function () {
+    ASSET_MANAGER.downloadAll(() => {
         const gameEngine = new GameEngine();
         const ctx = initCanvas();
 
