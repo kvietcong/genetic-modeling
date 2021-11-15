@@ -248,18 +248,8 @@ const libOrganism = (() => {
 
             // Do Tasks
             // TODO: Add Energy Usage
-            Object.values(_.tasks.unary.required).forEach(task => {
-                task.doTask(gameEngine, this);
-            });
-            const validTasks = Object.values(_.tasks.unary.chosen)
-                .filter(task =>
-                    task.getCost(this) < 100)
-                .sort((task1, task2) =>
-                    task1.getCost(this)
-                    - task2.getCost(this)
-                )
-            validTasks[0]?.doTask(gameEngine, this);
 
+            // Interact with other entities
             gameEngine.entities.forEach(entity => {
                 if (entity !== this
                     && entity instanceof Organism
@@ -279,10 +269,26 @@ const libOrganism = (() => {
                     validTasks[0]?.doTask(gameEngine, this, entity);
                 }
             });
+
+            // Interact with self
+            // Idea: Store data from binary tasks that you then access in the
+            // unary tasks. This way you can do things like "I saw a food
+            // source (stored in something like `this.detectedFood`) that will
+            // now be accounted for in unary tasks."
+            Object.values(_.tasks.unary.required).forEach(task => {
+                task.doTask(gameEngine, this);
+            });
+            const validTasks = Object.values(_.tasks.unary.chosen)
+                .filter(task =>
+                    task.getCost(this) < 100)
+                .sort((task1, task2) =>
+                    task1.getCost(this)
+                    - task2.getCost(this)
+                )
+            validTasks[0]?.doTask(gameEngine, this);
         }
 
-        draw(ctx, gameEngine) {
-            const drawer = _.drawer;
+        draw(ctx, gameEngine, drawer = _.drawer) {
             return drawer(this, ctx, gameEngine);
         }
 
