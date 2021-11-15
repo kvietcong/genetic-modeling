@@ -3,7 +3,9 @@
 /* Default Global Parameters related to Organisms */
 params.geneAmount = 1;
 params.skills = ["speed", "vision", "reproduction", "size", "health"];
-params.maxReproductionTime = 15;
+params.maxReproductionTime = 5;
+params.fate = 0.0025; // Base chance of death
+params.maxOffspringAtOneTime = 8;
 
 const libOrganism = (() => {
     "use strict";
@@ -69,9 +71,9 @@ const libOrganism = (() => {
             const { x, y } = organism;
             ctx.beginPath();
             ctx.fillStyle = rgba(
-                organism.genes.reproduction.level / params.initialPartitions * 400,
-                organism.genes.speed.level / params.initialPartitions * 400,
-                organism.genes.health.level / params.initialPartitions * 400,
+                organism.genes.reproduction.level / params.initialPartitions * 300,
+                organism.genes.speed.level / params.initialPartitions * 300,
+                organism.genes.health.level / params.initialPartitions * 300,
                 1
             );
             ctx.arc(x, y, organism.radius, 0, 2 * Math.PI);
@@ -127,7 +129,7 @@ const libOrganism = (() => {
         rollDiceOfFate: new Task(
             (organism) => 0,
             (gameEngine, organism) => {
-                if (random() < (0.0025 / (organism.genes.health.level + 1))
+                if (random() < (params.fate / (organism.genes.health.level + 1))
                     && (organism.children || organism.generation)
                 ) {
                     organism.removeFromWorld = true;
@@ -139,7 +141,15 @@ const libOrganism = (() => {
     _.tasks.unary.chosen = {};
 
     _.tasks.binary = {}
-    _.tasks.binary.required = {}
+    _.tasks.binary.required = {
+        // bounceOff: new Task(
+        //     (organism1, organism2) => 0,
+        //     (gameEngine, organism1, organism2) => {
+        //         organism1.direction.scaleInPlace(-1);
+        //         organism2.direction.scaleInPlace(-1);
+        //     }
+        // ),
+    }
     _.tasks.binary.chosen = {
         reproduce: new Task(
             (organism1, organism2) => {
@@ -150,18 +160,25 @@ const libOrganism = (() => {
                 } else return Infinity;
             },
             (gameEngine, organism1, organism2) => {
-                organism1.children++;
-                organism2.children++;
+                for (let i = 0;
+                     i < randomInt(params.maxOffspringAtOneTime);
+                     i++
+                ) {
+                    organism1.children++;
+                    organism2.children++;
 
-                const newOrganism = organism1.reproduce(organism2);
-                newOrganism.x = organism1.x;
-                newOrganism.y = organism1.y;
-                newOrganism.generation = organism1.generation + 1;
+                    const newOrganism = organism1.reproduce(organism2);
+                    newOrganism.x = organism1.x;
+                    newOrganism.y = organism1.y;
+                    newOrganism.generation = organism1.generation + 1;
 
-                for (const skill in newOrganism.genes)
-                    newOrganism.genes[skill].mutate();
+                    for (const skill in newOrganism.genes)
+                        newOrganism.genes[skill].mutate();
 
-                gameEngine.addEntity(newOrganism);
+                    gameEngine.addEntity(newOrganism);
+                }
+                organism1.timeSinceLastReproduction = 0;
+                organism2.timeSinceLastReproduction = 0;
             }
         ),
         cannibalize: new Task(

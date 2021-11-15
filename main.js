@@ -32,14 +32,14 @@ const restart = gameEngine => {
 }
 
 const organismExample = gameEngine => {
-    const rows = 8;
-    const cols = 8;
+    const rows = 16;
+    const cols = 16;
     gameEngine.addEntity(new OrganismStats());
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
             const newOrganism = new Organism();
-            newOrganism.x = i * 150 + 50
-            newOrganism.y = j * 70 + 50;
+            newOrganism.x = i * ((params.canvas.width - 50) / rows) + 50
+            newOrganism.y = j * ((params.canvas.height - 50) / rows) + 50
             newOrganism.timeSinceLastReproduction = 20;
             gameEngine.addEntity(newOrganism);
         }
