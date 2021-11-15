@@ -17,6 +17,13 @@ const {
     PI, E, sin, cos, tan, asin, acos, atan, atan2,
 } = Math
 
+/**
+ * Squaring function
+ * @param {Number} x
+ * @returns x squared
+ */
+const sq = x => x * x;
+
 /** Easy access to logging :) */
 const {log: print} = console
 
@@ -102,7 +109,7 @@ const deepObjectCopy = object => JSON.parse(JSON.stringify(object));
  * @returns Distance between the two points
  */
 const getDistance = (x1, y1, x2, y2) => {
-    return sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
+    return sqrt(sq(x2 - x1) + sq(y2 - y1));
 };
 
 /**
@@ -145,41 +152,88 @@ class Vector {
     x; y;
 
     constructor(x = 0, y = 0) {
-        this.x = x;
-        this.y = y;
+        this.x = x; this.y = y;
     }
 
-    add(vector, y = null) {
-        if (!y) {
-            return new Vector(this.x + vector.x, this.y + vector.y);
-        } else {
-            const x = vector;
-            return new Vector(this.x + x, this.y + y);
+    clone() { return new Vector(this.x, this.y); }
+
+    static detectInput(...input) {
+        if (input.length === 1 && input[0] instanceof Vector) {
+            return { x: input[0].x, y: input[0].y };
         }
+        if (input.length === 2
+            && typeof input[0] === "number"
+            && typeof input[1] === "number"
+        ) {
+            return { x: input[0], y: input[1] };
+        }
+        throw new Error("Invalid input");
     }
 
-    scale(scalar) {
-        return new Vector(this.x * scalar, this.y * scalar);
+    set(...input) {
+        const { x, y } = Vector.detectInput(...input);
+        this.x = x; this.y = y; return this;
     }
 
-    get["magnitude"]() { return sqrt(pow(this.x, 2) + pow(this.y, 2)); }
-    get["length"]() { return this.magnitude; }
+    add(...input) {
+        const { x, y } = Vector.detectInput(...input);
+        return this.clone().addInPlace(x, y);
+    }
+
+    addInPlace(...input) {
+        const { x, y } = Vector.detectInput(...input);
+        this.x += x; this.y += y; return this;
+    }
+
+    subtract(...input) {
+        const { x, y } = Vector.detectInput(...input);
+        return this.clone().subtractInPlace(x, y);
+    }
+
+    subtractInPlace(...input) {
+        const { x, y } = Vector.detectInput(...input);
+        this.x -= x; this.y -= y; return this;
+    }
+
+    scale(scaleFactor) {
+        return this.clone().scaleInPlace(scaleFactor);
+    }
+
+    scaleInPlace(scaleFactor) {
+        this.x *= scaleFactor; this.y *= scaleFactor; return this;
+    }
+
+    lerpTo(destinationVector, t) {
+        return this.clone().lerpInPlace(destinationVector, t);
+    }
+
+    lerpToInPlace(destinationVector, t) {
+        return this.addInPlace(destinationVector.subtract(this).scale(t));
+    }
+
+    setUnit() { return this.set(this.unit()); }
+
+    get["magnitude"]() { return getDistance(0, 0, this.x, this.y); }
 
     get["unit"]() {
         const length = this.length;
         return new Vector(this.x / length, this.y / length);
     }
 
-    static angleToUnit(angle) {
+    static angleToUnitVector(angle) {
         return new Vector(cos(angle / 180 * PI), sin(angle / 180 * PI));
     }
 
-    static radToUnit(rad) {
+    static radToUnitVector(rad) {
         return new Vector(cos(rad), sin(rad));
     }
 
-    static randomUnit() {
+    static randomUnitVector() {
         const randomDirection = random() * 2 * PI;
-        return Vector.radToUnit(randomDirection);
+        return Vector.radToUnitVector(randomDirection);
+    }
+
+    static lerp(vector1, vector2, t) {
+        return vector1.add(vector2.subtract(vector1).scale(t));
     }
 }

@@ -182,7 +182,7 @@ const libOrganism = (() => {
 
         /** {Number} Coordinates for canvas rendering */
         x = 0; y = 0;
-        direction = Vector.randomUnit();
+        direction = Vector.randomUnitVector();
 
         // Reproductive Values
         timeSinceLastReproduction = 0;
