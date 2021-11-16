@@ -38,8 +38,8 @@ const organismExample = gameEngine => {
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
             const newOrganism = new Organism();
-            newOrganism.x = i * ((params.canvas.width - 50) / rows) + 50
-            newOrganism.y = j * ((params.canvas.height - 50) / rows) + 50
+            newOrganism.x = i * ((params.canvas.width - 50) / rows) + 50;
+            newOrganism.y = j * ((params.canvas.height - 50) / rows) + 50;
             newOrganism.timeSinceLastReproduction = 20;
             gameEngine.addEntity(newOrganism);
         }

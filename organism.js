@@ -71,9 +71,9 @@ const libOrganism = (() => {
             const { x, y } = organism;
             ctx.beginPath();
             ctx.fillStyle = rgba(
-                organism.genes.reproduction.level / params.initialPartitions * 300,
-                organism.genes.speed.level / params.initialPartitions * 300,
-                organism.genes.health.level / params.initialPartitions * 300,
+                organism.genes.reproduction.level / params.initialPartitions * 350,
+                organism.genes.speed.level / params.initialPartitions * 350,
+                organism.genes.health.level / params.initialPartitions * 350,
                 1
             );
             ctx.arc(x, y, organism.radius, 0, 2 * Math.PI);
@@ -160,9 +160,10 @@ const libOrganism = (() => {
                 } else return Infinity;
             },
             (gameEngine, organism1, organism2) => {
-                for (let i = 0;
-                     i < randomInt(params.maxOffspringAtOneTime);
-                     i++
+                for (
+                    let i = 0;
+                    i <= randomInt(params.maxOffspringAtOneTime);
+                    i++
                 ) {
                     organism1.children++;
                     organism2.children++;
