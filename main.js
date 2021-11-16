@@ -32,8 +32,8 @@ const restart = gameEngine => {
 }
 
 const organismExample = gameEngine => {
-    const rows = 16;
-    const cols = 16;
+    const rows = 10;
+    const cols = 10;
     gameEngine.addEntity(new OrganismStats());
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {

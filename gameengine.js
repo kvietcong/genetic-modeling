@@ -24,13 +24,7 @@ class GameEngine {
         this.running = false;
 
         // Options and the Details
-        this.options = options || {
-            prevent: {
-                contextMenu: false,
-                scrolling: false,
-            },
-            debugging: false,
-        };
+        this.options = options || params.defaultGameEngineOptions;
     };
 
     init(ctx) {

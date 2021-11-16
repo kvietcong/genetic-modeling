@@ -9,6 +9,13 @@ const params = {
         border: "1px solid black",
         attachID: "simulations",
     },
+    defaultGameEngineOptions: {
+        prevent: {
+            contextMenu: false,
+            scrolling: false,
+        },
+        debugging: false,
+    }
 };
 
 /** Easy access to math functions */

@@ -4,8 +4,8 @@
 params.geneAmount = 1;
 params.skills = ["speed", "vision", "reproduction", "size", "health"];
 params.maxReproductionTime = 5;
-params.fate = 0.0025; // Base chance of death
-params.maxOffspringAtOneTime = 8;
+params.fate = 0.002; // Base chance of death
+params.maxOffspringAtOneTime = 4;
 
 const libOrganism = (() => {
     "use strict";
