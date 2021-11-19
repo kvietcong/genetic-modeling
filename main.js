@@ -40,7 +40,6 @@ const organismExample = gameEngine => {
             const newOrganism = new Organism();
             newOrganism.x = i * ((params.canvas.width - 50) / rows) + 50;
             newOrganism.y = j * ((params.canvas.height - 50) / rows) + 50;
-            newOrganism.timeSinceLastReproduction = 20;
             gameEngine.addEntity(newOrganism);
         }
     }

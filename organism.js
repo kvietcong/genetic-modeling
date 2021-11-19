@@ -162,29 +162,29 @@ const libOrganism = (() => {
 
     _.tasks.binary = {}
     _.tasks.binary.required = {
-        bounceOff: new Task(
+        // TO FIX: This causes sims to sometimes blank out for some reason.
+        rubAgainst: new Task(
             (gameEngine, organism1, organism2) => 0.1,
             (cost, gameEngine, organism1, organism2) => {
                 const distance = getDistance(
                     organism1.x, organism1.y,
                     organism2.x, organism2.y
                 );
-                const delta = organism1.radius + organism2.radius - distance;
-                const difX = (organism1.x - organism2.x) / distance;
-                const difY = (organism1.y - organism2.y) / distance;
+                const overlap = organism1.radius + organism2.radius - distance;
+                const difRatioX = (organism1.x - organism2.x) / distance;
+                const difRatioY = (organism1.y - organism2.y) / distance;
 
-                organism1.x += difX * delta / 2;
-                organism1.y += difY * delta / 2;
-                organism2.x -= difX * delta / 2;
-                organism2.y -= difY * delta / 2;
+                const changeX = difRatioX * overlap / 2;
+                const changeY = difRatioY * overlap / 2;
+                organism1.x += changeX;
+                organism1.y += changeY;
+                organism2.x -= changeX;
+                organism2.y -= changeY;
 
-                const temp = {
-                    x: organism1.direction.x, y: organism1.direction.y
-                };
-                organism1.direction.x = organism2.direction.x;
-                organism1.direction.y = organism2.direction.y;
-                organism2.direction.x = temp.x;
-                organism2.direction.y = temp.y;
+                // This makes the blank outs happen more often than without.
+                // const tempDirection = organism1.direction;
+                // organism1.direction = organism2.direction;
+                // organism2.direction = tempDirection;
 
                 organism1.energy -= cost;
                 organism2.energy -= cost;
@@ -220,15 +220,14 @@ const libOrganism = (() => {
                     newOrganism.x = organism1.x;
                     newOrganism.y = organism1.y;
                     newOrganism.generation = organism1.generation + 1;
-
                     for (const skill in newOrganism.genes)
                         newOrganism.genes[skill].mutate();
 
                     gameEngine.addEntity(newOrganism);
                 }
+
                 organism1.timeSinceLastReproduction = 0;
                 organism2.timeSinceLastReproduction = 0;
-
                 organism1.energy -= cost;
                 organism2.energy -= cost;
             }
@@ -324,6 +323,7 @@ const libOrganism = (() => {
                     if ((cost <= this.energy)
                         && (cost <= entity.energy)) doTask()
                 });
+
                 const validTasks = Object.values(_.tasks.binary.chosen)
                     .reduce((accumulated, task) => {
                         accumulated.push(task.getInfo(gameEngine, this, entity));
