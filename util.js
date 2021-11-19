@@ -218,6 +218,33 @@ class Vector {
         return this.addInPlace(destinationVector.subtract(this).scale(t));
     }
 
+    dot(vector) {
+        return this.x * vector.x + this.y * vector.y;
+    }
+
+    angleTo(vector) {
+        return Vector.angleBetween(this, vector);
+    }
+
+    rotate(angle) {
+        return this.clone().rotateInPlace(angle);
+    }
+
+    rotateInPlace(angle) {
+        const { x, y } = this;
+        const cosVal = cos(angle); const sinVal = sin(angle);
+        this.x = x * cosVal - y * sinVal; this.y = x * sinVal + y * cosVal;
+        return this;
+    }
+
+    rotateTo(vector) {
+        return this.clone().rotateToInPlace(vector);
+    }
+
+    rotateToInPlace(vector) {
+        return this.rotateInPlace(this.angleTo(vector));
+    }
+
     setUnit() { return this.set(this.unit()); }
 
     get["magnitude"]() { return getDistance(0, 0, this.x, this.y); }
@@ -225,6 +252,13 @@ class Vector {
     get["unit"]() {
         const length = this.length;
         return new Vector(this.x / length, this.y / length);
+    }
+
+    static angleBetween(vector1, vector2) {
+        return acos(
+            vector1.dot(vector2)
+            / (vector1.magnitude * vector2.magnitude)
+        );
     }
 
     static angleToUnitVector(angle) {
@@ -242,5 +276,13 @@ class Vector {
 
     static lerp(vector1, vector2, t) {
         return vector1.add(vector2.subtract(vector1).scale(t));
+    }
+
+    static coordinatesToVector(x1, y1, x2, y2) {
+        return new Vector(x2 - x1, y2 - y1);
+    }
+
+    static pointsToVector(p1, p2) {
+        return Vector.coordinatesToVector(p1.x, p1.y, p2.x, p2.y);
     }
 }
