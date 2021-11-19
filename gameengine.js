@@ -104,7 +104,8 @@ class GameEngine {
 
     update() {
         // Update Entities
-        this.entities.forEach(entity => entity.update(this));
+        this.entities.forEach(entity =>
+            !entity.removeFromWorld && entity.update(this));
         // Remove dead things
         this.entities = this.entities.filter(entity => !entity.removeFromWorld);
         // Add new things
