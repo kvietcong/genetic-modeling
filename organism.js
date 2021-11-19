@@ -5,9 +5,10 @@
 /* Default Global Parameters related to Organisms */
 params.geneAmount = 1;
 params.skills = ["speed", "vision", "reproduction", "size", "health"];
-params.maxReproductionTime = 6;
-params.fate = 0.0001; // Base chance of death
+params.maxReproductionTime = 4;
+params.maxReproductionCost = 20;
 params.maxOffspringAtOneTime = 5;
+params.fate = 0.00005; // Base chance of death
 
 const libOrganism = (() => {
     "use strict";
@@ -131,6 +132,20 @@ const libOrganism = (() => {
             },
             1
         ),
+        faceFoodSources: new Task(
+            (gameEngine, organism) => 1,
+            (cost, gameEngine, organism) => {
+                if (organism.energy > 10) return;
+
+                const foodSource = organism.shortTermMemory?.foodSources?.[0];
+                if (!foodSource) return;
+
+                organism.direction = organism.direction
+                    .rotateTo(Vector.pointsToVector(organism, foodSource));
+                organism.energy -= cost;
+            },
+            1
+        ),
         metabolize: new Task(
             (gameEngine, organism) => Object.values(organism.genes).reduce(
                 (cost, gene) => cost * (gene.level + 1), 1
@@ -149,9 +164,7 @@ const libOrganism = (() => {
                 // Low energy means you are more likely to die.
                 fate += (organism.energy < 10) ? 0.05 : 0;
                 fate = (organism.energy < 0) ? Infinity : fate;
-                if ((random() < fate)
-                    && (organism.children || organism.generation)
-                ) {
+                if (random() < fate) {
                     organism.removeFromWorld = true;
                 }
             },
@@ -161,6 +174,26 @@ const libOrganism = (() => {
     _.tasks.unary.chosen = {};
 
     _.tasks.binary = {}
+    _.tasks.binary.inVision = {
+        detectFoodSources: new Task(
+            (gameEngine, organism1, organism2) => {
+                const cost = sq(organism1.genes.vision.level + 1);
+                return cost * gameEngine.deltaTime;
+            },
+            (cost, gameEngine, organism1, organism2) => {
+                if (organism1.energy > 10) return;
+                if (organism1.genes.size.level
+                    <= organism2.genes.size.level) return;
+
+                console.log("DETECTING")
+                organism1.shortTermMemory.foodSources =
+                    organism1.shortTermMemory.foodSources || [];
+                organism1.shortTermMemory.foodSources.push(organism2);
+                organism1.energy -= cost;
+            },
+            2
+        ),
+    }
     _.tasks.binary.required = {
         // TO FIX: This causes sims to sometimes blank out for some reason.
         rubAgainst: new Task(
@@ -182,9 +215,9 @@ const libOrganism = (() => {
                 organism2.y -= changeY;
 
                 // This makes the blank outs happen more often than without.
-                // const tempDirection = organism1.direction;
-                // organism1.direction = organism2.direction;
-                // organism2.direction = tempDirection;
+                const tempDirection = organism1.direction;
+                organism1.direction = organism2.direction;
+                organism2.direction = tempDirection;
 
                 organism1.energy -= cost;
                 organism2.energy -= cost;
@@ -202,7 +235,7 @@ const libOrganism = (() => {
                                 <= organism.timeSinceLastReproduction;
                 }
                 if (canReproduce(organism1) && canReproduce(organism2)) {
-                    return 50 /
+                    return params.maxReproductionCost /
                         (organism1.genes.reproduction.level
                             + organism2.genes.reproduction.level + 1);
                 } else return Infinity;
@@ -234,7 +267,7 @@ const libOrganism = (() => {
         ),
         cannibalize: new Task(
             (gameEngine, organism1, organism2) => {
-                return ((organism1.genes.size.level - 1)
+                return (organism1.genes.size.level
                             > organism2.genes.size.level) ? -20 : Infinity;
             },
             (cost, organism1, organism2) => {
@@ -282,7 +315,11 @@ const libOrganism = (() => {
         }
 
         get["radius"]() {
-            return this.genes.size.level * 2 + 10;
+            return sq(this.genes.size.level + 1) + 10;
+        }
+
+        get["visionRadius"]() {
+            return (this.genes.vision.level + 1) * 20;
         }
 
         update(gameEngine) {
@@ -314,25 +351,37 @@ const libOrganism = (() => {
                 if (entity.removeFromWorld) return;
                 if (entity === this) return;
                 if (!(entity instanceof Organism)) return;
+
                 const distance = getDistance(this.x, this.y, entity.x, entity.y);
-                if (distance >= (this.radius + entity.radius)) return;
+                if (distance < (this.radius + entity.radius)) {
+                    Object.values(_.tasks.binary.required).forEach(task => {
+                        const [cost, doTask] =
+                            task.getInfo(gameEngine, this, entity);
+                        if ((cost <= this.energy)
+                            && (cost <= entity.energy)) doTask()
+                    });
 
-                Object.values(_.tasks.binary.required).forEach(task => {
-                    const [cost, doTask] =
-                        task.getInfo(gameEngine, this, entity);
-                    if ((cost <= this.energy)
-                        && (cost <= entity.energy)) doTask()
-                });
+                    const validTasks = Object.values(_.tasks.binary.chosen)
+                        .reduce((accumulated, task) => {
+                            accumulated.push(
+                                task.getInfo(gameEngine, this, entity));
+                            return accumulated;
+                        }, [])
+                        .filter(([cost, doTask]) => (cost <= this.energy)
+                                                 && (cost <= entity.energy));
+                    const randomTask = chooseRandom(validTasks);
+                    randomTask?.[1]();
+                } else if (distance
+                    < (this.radius + entity.radius + this.visionRadius)
+                ) {
+                    Object.values(_.tasks.binary.inVision).forEach(task => {
+                        const [cost, doTask] =
+                            task.getInfo(gameEngine, this, entity);
+                        if ((cost <= this.energy)
+                            && (cost <= entity.energy)) doTask()
+                    });
+                }
 
-                const validTasks = Object.values(_.tasks.binary.chosen)
-                    .reduce((accumulated, task) => {
-                        accumulated.push(task.getInfo(gameEngine, this, entity));
-                        return accumulated;
-                    }, [])
-                    .filter(([cost, doTask]) => (cost <= this.energy)
-                                             && (cost <= entity.energy));
-                const randomTask = chooseRandom(validTasks);
-                randomTask?.[1]();
             });
 
             // Interact with self
