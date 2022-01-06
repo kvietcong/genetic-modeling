@@ -1,37 +1,17 @@
 /** Global Parameters Object */
 const params = {
-    // Maybe use for toggle-able logging?
-    DEBUG: false,
-    canvas: {
-        width: 1280,
-        height: 720,
-        backgroundColor: "white",
-        border: "1px solid black",
-        attachID: "simulations",
-    },
-    defaultGameEngineOptions: {
-        prevent: {
-            contextMenu: false,
-            scrolling: false,
-        },
-        debugging: false,
-    }
+    isDebugging: true,
 };
 
 /** Easy access to math functions */
 const {
     pow, ceil, floor, round, log, log2: lg, max, min, random, sqrt, abs,
     PI, E, sin, cos, tan, asin, acos, atan, atan2,
-} = Math
+} = Math;
 
-/**
- * Squaring function
- * @param {Number} x
- * @returns x squared
- */
 const sq = x => x * x;
 
-/** Easy access to logging :) */
+/** Easy access to logging :) (Python syntax XD) */
 const {log: print} = console
 
 /**
@@ -116,7 +96,7 @@ const deepObjectCopy = object => JSON.parse(JSON.stringify(object));
  * @returns Distance between the two points
  */
 const getDistance = (x1, y1, x2, y2) => {
-    return sqrt(sq(x2 - x1) + sq(y2 - y1));
+    return sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
 };
 
 /**
@@ -127,32 +107,6 @@ const getDistance = (x1, y1, x2, y2) => {
 const chooseRandom = items => items.length > 0
     ? items[floor(random() * items.length)]
     : null;
-
-/**
- * Initialize Canvas within DOM and returns canvas context
- * @param {Object} options Options for canvas. Look at params for defaults
- * @returns Canvas context
- */
-const initCanvas = options => {
-    const {
-        backgroundColor, border, width, height, attachID,
-    } = options || params.canvas;
-
-    const simulations = document.getElementById(attachID);
-
-	const canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
-    canvas.style.border = border;
-    canvas.style.backgroundColor = backgroundColor;
-
-	const context = canvas.getContext("2d");
-    const listItem = document.createElement("li");
-    listItem.appendChild(canvas);
-    simulations.appendChild(listItem);
-
-    return context;
-};
 
 /** A class to represent a 2D vector */
 class Vector {
@@ -245,12 +199,13 @@ class Vector {
         return this.rotateInPlace(this.angleTo(vector));
     }
 
-    setUnit() { return this.set(this.unit()); }
+    setUnit() { return this.set(this.unit); }
 
     get["magnitude"]() { return getDistance(0, 0, this.x, this.y); }
 
     get["unit"]() {
-        const length = this.length;
+        const length = sqrt(sq(this.x) + sq(this.y));
+        if (length === 0) return new Vector(0, 0);
         return new Vector(this.x / length, this.y / length);
     }
 
