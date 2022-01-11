@@ -1,49 +1,16 @@
-const ASSET_MANAGER = new AssetManager();
+const assetManager = new AssetManager();
 let gameEngines = [];
-class OrganismStats {
-    constructor() { this.averages = {}; }
-
-    update(gameEngine) {
-        this.averages = gameEngine.entities.reduce((averages, entity) => {
-            if (entity instanceof Organism) {
-                for (const skill of params.skills) {
-                    averages[skill] = averages[skill]
-                        ? (averages[skill] + entity.genes[skill].level) / 2
-                        : entity.genes[skill].level;
-                }
-            }
-            return averages;
-        }, {});
-    }
-
-    draw(ctx) {
-        ctx.font = "bold 15px Arial";
-        ctx.fillStyle = "black";
-        Object.entries(this.averages).forEach(([skill, average], i) => {
-            ctx.fillText(skill, 25, 25 + 12 * i);
-            ctx.fillText(average.toFixed(4), 125, 25 + 12 * i);
-        });
-    }
-}
 
 const restart = gameEngine => {
-    organismExample(gameEngine);
+    gridExample(gameEngine);
     // geneExample(gameEngine);
 }
 
-const organismExample = gameEngine => {
-    const rows = 8;
-    const cols = 8;
-    gameEngine.addEntity(new OrganismStats());
-    for (let i = 0; i < rows; i++) {
-        for (let j = 0; j < cols; j++) {
-            const newOrganism = new Organism();
-            newOrganism.x = i * ((params.canvas.width - 50) / rows) + 50;
-            newOrganism.y = j * ((params.canvas.height - 50) / rows) + 50;
-            gameEngine.addEntity(newOrganism);
-        }
-    }
-}
+const gridExample = gameEngine => {
+    const width = 8;
+    const height = 8;
+    gameEngine.addEntity(new World(width, height));
+};
 
 const geneExample = gameEngine => {
     const genes = [];
@@ -59,9 +26,9 @@ const geneExample = gameEngine => {
     }
 
     const levelToIndex = libGene.partitionTooling.levelToIndex;
-    const organismSize = params.cellSize
+    const organismSize = params.cellDrawSize
         * (levelToIndex(params.initialPartitions) + 2);
-    const padding = params.cellSize * 4;
+    const padding = params.cellDrawSize * 4;
 
     for (const [i, row] of genes.entries()) {
         for (const [j, gene] of row.entries()) {
@@ -112,7 +79,7 @@ const regenerateButtons = () => {
 };
 
 const addSim = () => {
-    ASSET_MANAGER.downloadAll(() => {
+    assetManager.downloadAll(() => {
         const gameEngine = new GameEngine();
         const ctx = initCanvas();
 

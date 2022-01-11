@@ -1,6 +1,21 @@
 /** Global Parameters Object */
 const params = {
+    // Maybe use for toggle-able logging?
     isDebugging: true,
+    canvas: {
+        width: 1280,
+        height: 720,
+        backgroundColor: "white",
+        border: "1px solid black",
+        attachID: "simulations",
+    },
+    defaultGameEngineOptions: {
+        prevent: {
+            contextMenu: false,
+            scrolling: false,
+        },
+        debugging: false,
+    }
 };
 
 /** Easy access to math functions */
@@ -107,6 +122,32 @@ const getDistance = (x1, y1, x2, y2) => {
 const chooseRandom = items => items.length > 0
     ? items[floor(random() * items.length)]
     : null;
+
+/**
+ * Initialize Canvas within DOM and returns canvas context
+ * @param {Object} options Options for canvas. Look at params for defaults
+ * @returns Canvas context
+ */
+const initCanvas = options => {
+    const {
+        backgroundColor, border, width, height, attachID,
+    } = options || params.canvas;
+
+    const simulations = document.getElementById(attachID);
+
+	const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    canvas.style.border = border;
+    canvas.style.backgroundColor = backgroundColor;
+
+	const context = canvas.getContext("2d");
+    const listItem = document.createElement("li");
+    listItem.appendChild(canvas);
+    simulations.appendChild(listItem);
+
+    return context;
+};
 
 /** A class to represent a 2D vector */
 class Vector {
