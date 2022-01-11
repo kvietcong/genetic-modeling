@@ -31,22 +31,23 @@
 // There are also some useful functions in the `./util.js` file.
 
 /* Default Global Parameters related to Genes */
-params.cellSize = 2;
-params.fillToLevel = 0;
-params.partitionSize = 2;
-params.mutationChance = 0.3;
-params.initialPartitions = 5;
+params.cellSize = 6;            // changes the size of the square that depicts a single gene - KV 2
+params.fillToLevel = 2;         // determine how much of the gene is pre-filled (evolved) - KV 0
+params.partitionSize = 5;       // NOT sure what this does - KV 5
+params.mutationChance = .5;     // chance that mutation will affect a gene KV 0.2
+params.initialPartitions = 5;   // the number of subsections within a gene KV 5
 
 /** Library of Gene related values and functions */
 const libGene = (() => {
     "use strict";
 
     /** Object that contains public facing things for the Gene Library */
-    const _ = {};
+    const _ = {};               // note the underscore is the "name" of the variable
 
     /** Different sets of functions to change partition sizes */
     _.partitionTools = {
         constant: {
+            
             indexToLevel: index => floor(index / params.partitionSize),
             levelToIndex: level => params.partitionSize * level,
             partitionSize: () => params.partitionSize,
@@ -57,6 +58,7 @@ const libGene = (() => {
             partitionSize: level => level < 2 ? 1 : pow(2, level - 1),
         },
     };
+
     /** Default Partitioning Tools */
     _.partitionTooling = _.partitionTools.quadratic;
 
@@ -121,23 +123,47 @@ const libGene = (() => {
          * @param {Gene} otherGene The other gene's state
          * @returns New Gene
          */
-        _: (gene, otherGene) => undefined,
+        _: (gene, otherGene) => undefined, // takes in two genes
     };
+
+    /** KDunn This method will just return the original gene */
+    _.recomboers.returnThisGene = {
+        template: (gene, otherGene) => { 
+            return gene;                 // why when we select gene does it select the last level of that gene
+                                         // but when we select other gene, it'll select the level that that gene was chosen?
+        },
+    };
+    
+    /** KDunn This method will just return the otherGene */
+    _.recomboers.returnOtherGene = {
+        template: (gene, otherGene) => { 
+            return otherGene;
+        },
+    };
+
+    /** KDunn This method will just "randomly" return gene or otherGene */
+    _.recomboers.randomGene = (gene, otherGene) => {
+        let rand = Math.floor(Math.random() *2); 
+        let returnGene;
+        returnGene = rand == 0 ? gene : otherGene;
+        return returnGene;
+    };
+
     /** Combine on a per cell basis */
     _.recomboers.perCell = {
-        template: (gene, otherGene, recomboer) => {
+        template: (gene, otherGene, recomboer) => { // goes to every cell in the gene matrix and applies the recomboer method.
             const newCells = [];
             for (let i = 0; i < gene.cells.length; i++) {
                 newCells[i] = [];
                 for (let j = 0; j < gene.cells.length; j++) {
-                    newCells[i][j] = recomboer(gene.cells[i][j],
+                    newCells[i][j] = recomboer(gene.cells[i][j],        // recomboer is called on the two gene cells
                                                otherGene.cells[i][j],
-                                               i, j);
+                                               i, j);                    
                 }
             }
             return new Gene({cells: newCells});
         },
-        XOR: (a, b) => (a + b) % 2,
+        XOR: (a, b) => (a + b) % 2,                                     // add randomly pick a or b
         OR: (a, b) => ceil((a + b) / 2),
         AND: (a, b) => (a + b) == 2 ? 1 : 0,
         NAND: (a, b) => !_.recomboers.perCell.AND(a, b),
@@ -189,7 +215,15 @@ const libGene = (() => {
         return new Gene({cells: newCells});
     }
     /** Default Recomboer to combine two genes */
-    _.recomboer = _.recomboers.chooseFromPartitionLibrary;
+     //  _.recomboer = _.recomboers.chooseFromPartitionLibrary;
+     //  _.recomboer = (gene, otherGene) =>  _.recomboers.perCell.template(gene, otherGene, _.recomboers.perCell.AND);  // default function that takes in two genes
+                                                                                                                    // then call the perCell.template
+                                                                                                                    // returns a new gene
+     //_.recomboer = (gene, otherGene) =>  _.recomboers.returnOtherGene.template(gene, otherGene, _.recomboers.returnOtherGene); // Returns the other gene
+                                                                                                                                  // Shows the the other gene may be itself
+     // _.recomboer = (gene, otherGene) =>  _.recomboers.returnThisGene.template(gene, otherGene, _.recomboers.returnThisGene); // Returns the gene
+       _.recomboer = (gene, otherGene) =>  _.recomboers.randomGene(gene, otherGene); // Randomly returns gene or otherGene
+                                                                                                                                  
 
     /** Different functions to mutate a Gene's cells */
     _.mutators = {
@@ -346,7 +380,7 @@ const libGene = (() => {
             }
         }
 
-        recombine(otherGene, recomboer = _.recomboer) {
+        recombine(otherGene, recomboer = _.recomboer) { // takes in gene and default recomboer
             return recomboer(this, otherGene);
         }
 

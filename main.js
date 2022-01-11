@@ -27,8 +27,8 @@ class OrganismStats {
 }
 
 const restart = gameEngine => {
-    organismExample(gameEngine);
-    // geneExample(gameEngine);
+    //organismExample(gameEngine);  // allows visualization of organisms with many genes
+    geneExample(gameEngine);        // allows visualization of the gene
 }
 
 const organismExample = gameEngine => {
@@ -45,25 +45,28 @@ const organismExample = gameEngine => {
     }
 }
 
+let numGenerations = 5;  //KV numbers 16
+let numGenes = 5;       // KV numbers 28
+
 const geneExample = gameEngine => {
     const genes = [];
-    for (let i = 0; i < 16; i++) {
+    for (let i = 0; i < numGenerations; i++) {      // i is the number of generations (number descenant genes - the first one) KV had this at 16
         genes[i] = [];
-        for (let j = 0; j < 28; j++) {
-            genes[i][j] = i == 0
-                ? new Gene()
-                : genes[i-1][j].recombine(
-                    genes[i-1][getRandomInteger(0, genes[0].length-1)]);
-            if (i !== 0) genes[i][j].mutate();
+        for (let j = 0; j < numGenes; j++) {        // j is the number of genes. (KV had it at 28)
+            genes[i][j] = i == 0                    // ternary operator that says if i is equal to 0, 
+                ? new Gene()                        // then create a new gene
+                : genes[i-1][j].recombine(          // else go through each gene and recombine with 
+                    genes[i-1][getRandomInteger(0, genes[0].length-1)]);   // a gene on the same row but any randome gene (DOES THIS INCLUDE THE CURRENT GENE?)
+            if (i !== 0) genes[i][j].mutate();      // how does this work? isn't i not equal to - in the above statement evaluated as well.
         }
     }
 
     const levelToIndex = libGene.partitionTooling.levelToIndex;
     const organismSize = params.cellSize
         * (levelToIndex(params.initialPartitions) + 2);
-    const padding = params.cellSize * 4;
+    const padding = params.cellSize * 4;            // this is the padding between each of the genes
 
-    for (const [i, row] of genes.entries()) {
+    for (const [i, row] of genes.entries()) {       // determines the x and y origin for each of the genes.
         for (const [j, gene] of row.entries()) {
             gene.x = j * (organismSize + padding);
             gene.y = i * (organismSize + padding);
@@ -72,7 +75,8 @@ const geneExample = gameEngine => {
     }
 }
 
-// DOM Manipulation
+// Document Object Model (DOM) Manipulation - 
+// https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Introduction
 // There's probably a memory leak somewhere XD
 
 const deleteSim = simID => {
