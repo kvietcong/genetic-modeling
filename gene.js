@@ -32,7 +32,7 @@
 
 /* Default Global Parameters related to Genes */
 params.cellSize = 6;            // changes the size of the square that depicts a single gene - KV 2
-params.fillToLevel = 2;         // determine how much of the gene is pre-filled (evolved) - KV 0
+params.fillToLevel = 4;         // determine how much of the gene is pre-filled (evolved) - KV 0
 params.partitionSize = 5;       // NOT sure what this does - KV 5
 params.mutationChance = .5;     // chance that mutation will affect a gene KV 0.2
 params.initialPartitions = 5;   // the number of subsections within a gene KV 5
@@ -124,12 +124,13 @@ const libGene = (() => {
          * @returns New Gene
          */
         _: (gene, otherGene) => undefined, // takes in two genes
+        // returnThisGene: (gene, otherGene) =>  gene , // defaults to what ever is at the end
     };
 
     /** KDunn This method will just return the original gene */
     _.recomboers.returnThisGene = {
         template: (gene, otherGene) => { 
-            return gene;                 // why when we select gene does it select the last level of that gene
+            return gene.clone();                 // why when we select gene does it select the last level of that gene
                                          // but when we select other gene, it'll select the level that that gene was chosen?
         },
     };
@@ -137,7 +138,7 @@ const libGene = (() => {
     /** KDunn This method will just return the otherGene */
     _.recomboers.returnOtherGene = {
         template: (gene, otherGene) => { 
-            return otherGene;
+            return otherGene.clone(); // a clone of the gene - a deep copy of all of the gene
         },
     };
 
@@ -163,14 +164,17 @@ const libGene = (() => {
             }
             return new Gene({cells: newCells});
         },
+        // these take the cells
+        // we can do arithmetic functions here too
         XOR: (a, b) => (a + b) % 2,                                     // add randomly pick a or b
         OR: (a, b) => ceil((a + b) / 2),
         AND: (a, b) => (a + b) == 2 ? 1 : 0,
         NAND: (a, b) => !_.recomboers.perCell.AND(a, b),
         NOR: (a, b) => !_.recomboers.perCell.OR(a, b),
+        // missing if then; iff
     };
     _.recomboers.chooseOnePartition = (gene, otherGene) => {
-        let newCells = deepObjectCopy(gene.cells);
+        let newCells = deepObjectCopy(gene.cells);                  // clones javascript primatives. KV wrote this. DONT CALL ON INSTANCES OF CLASSES!!
         if (gene.level !== otherGene.level)
             return (gene.level > otherGene.level ? gene : otherGene).clone();
         let level = gene.level;
@@ -216,13 +220,13 @@ const libGene = (() => {
     }
     /** Default Recomboer to combine two genes */
      //  _.recomboer = _.recomboers.chooseFromPartitionLibrary;
-     //  _.recomboer = (gene, otherGene) =>  _.recomboers.perCell.template(gene, otherGene, _.recomboers.perCell.AND);  // default function that takes in two genes
+    //   _.recomboer = (gene, otherGene) =>  _.recomboers.perCell.template(gene, otherGene, _.recomboers.perCell.AND);  // default function that takes in two genes
                                                                                                                     // then call the perCell.template
                                                                                                                     // returns a new gene
-     //_.recomboer = (gene, otherGene) =>  _.recomboers.returnOtherGene.template(gene, otherGene, _.recomboers.returnOtherGene); // Returns the other gene
+     _.recomboer = _.recomboers.returnOtherGene.template; // Returns the other gene
                                                                                                                                   // Shows the the other gene may be itself
-     // _.recomboer = (gene, otherGene) =>  _.recomboers.returnThisGene.template(gene, otherGene, _.recomboers.returnThisGene); // Returns the gene
-       _.recomboer = (gene, otherGene) =>  _.recomboers.randomGene(gene, otherGene); // Randomly returns gene or otherGene
+    // _.recomboer = (gene, otherGene) =>  _.recomboers.returnThisGene.template(gene, otherGene, _.recomboers.returnThisGene); // Returns the gene
+    //    _.recomboer = (gene, otherGene) =>  _.recomboers.randomGene(gene, otherGene); // Randomly returns gene or otherGene
                                                                                                                                   
 
     /** Different functions to mutate a Gene's cells */
@@ -230,6 +234,7 @@ const libGene = (() => {
         /** @param {Gene} gene The gene's state */
         _: gene => undefined,
     };
+
     /** Mutate Cells on the current level */
     _.mutators.currentLevel = {
         template: (gene, mutator) => {
@@ -255,9 +260,38 @@ const libGene = (() => {
         rejuvenate: () => 1,
         destroy: () => 0,
     }
+
+    /** KDunn Mutate Cells on the previous level */
+    // edge case either mutate from previous level or current level
+    _.mutators.previousLevel = {
+        template: (gene, mutator) => {
+            const level = gene.level - 1;
+            const levelToIndex = _.partitionTooling.levelToIndex;
+            const indexStart = levelToIndex(level);
+            const indexEnd = levelToIndex(level + 1);
+
+            if (indexStart >= gene.cells.length) return console.log("FULL!")
+
+            for (let i = 0; i < indexEnd; i++)
+                for (let j = indexStart; j < indexEnd; j++)
+                    gene.cells[i][j] = mutator(gene.cells[i][j], i, j, gene);
+
+            for (let i = indexStart; i < indexEnd; i++)
+                for (let j = 0; j < indexEnd; j++)
+                    gene.cells[i][j] = mutator(gene.cells[i][j], i, j, gene);
+        },
+        flip: currentState =>
+            Math.random() <= params.mutationChance
+                ? (currentState + 1) % 2
+                : currentState,
+        rejuvenate: () => 1,
+        destroy: () => 0,
+    }
+
     /** Default mutator for genes */
     _.mutator = gene =>
-        _.mutators.currentLevel.template(gene, _.mutators.currentLevel.flip);
+        // _.mutators.currentLevel.template(gene, _.mutators.currentLevel.flip);
+        _.mutators.previousLevel.template(gene, _.mutators.currentLevel.flip);
 
     /** Different functions to draw a Gene's cells */
     _.drawers = {

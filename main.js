@@ -48,6 +48,8 @@ const organismExample = gameEngine => {
 let numGenerations = 5;  //KV numbers 16
 let numGenes = 5;       // KV numbers 28
 
+// example, that tests the gene functions mutate and recombine
+// these are not within an organism
 const geneExample = gameEngine => {
     const genes = [];
     for (let i = 0; i < numGenerations; i++) {      // i is the number of generations (number descenant genes - the first one) KV had this at 16
@@ -58,6 +60,8 @@ const geneExample = gameEngine => {
                 : genes[i-1][j].recombine(          // else go through each gene and recombine with 
                     genes[i-1][getRandomInteger(0, genes[0].length-1)]);   // a gene on the same row but any randome gene (DOES THIS INCLUDE THE CURRENT GENE?)
             if (i !== 0) genes[i][j].mutate();      // how does this work? isn't i not equal to - in the above statement evaluated as well.
+                                                    // If it's not the first row of genes then mutate.
+                                                    // Turn off if we want to mutate the first row too.
         }
     }
 
