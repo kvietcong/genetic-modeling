@@ -89,7 +89,7 @@ class Organism {
         this.energy = 0;                // energy of the Organism
 
         this.createTaskList(NUM_TASKS);
-        this.doTasks(NUM_TASKS);
+
     };
 
     createTaskList(num){
@@ -138,5 +138,11 @@ class Organism {
     // Determine how to update itself and interact with its environment (the tile)
     step(tile, grid) {
         // tile.neighbors // This gets neighbors
+        const TICK = this.game.clockTick;  // not sure if we need this? We might be using the clockTick from wherever this function is being called.
+
+        this.doTasks(NUM_TASKS);
+        this.reproduce(this); // right now we're working with asexual reproduction so I'm just returing this organism.
+
+
     };
 };
