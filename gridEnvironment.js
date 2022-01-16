@@ -108,14 +108,30 @@ class World {
     // TODO
     // Draw the villages somehow (Maybe more opacity when more organisms?)
     draw(ctx) {
-        ctx.beginPath();
-        ctx.fillStyle = "black";
-        ctx.arc(50, 50, 10, 0, 2 * Math.PI);
-        ctx.fill();
+        const { width: ctxWidth, height: ctxHeight } = ctx.canvas;
+        const size = min(ctxWidth, ctxHeight);
+        const drawWidth = size / this.width;
+        const drawHeight = size / this.height;
+
+        for (let j = 0; j < this.width; j++) {
+            for (let i = 0; i < this.height; i++) {
+                const village = this.tiles[i][j];
+                ctx.fillStyle = "red";
+                ctx.fillRect(
+                    drawWidth * j, drawHeight * i,
+                    drawWidth, drawHeight);
+
+                ctx.strokeStyle = "black";
+                ctx.strokeRect(
+                    drawWidth * j, drawHeight * i,
+                    drawWidth, drawHeight);
+            }
+        }
     }
 
     toString() {
         return this.tiles.map(row =>
-            row.map(tile => tile.toString()).join(" ")).join("\n");
+            row.map(tile => tile.toString()).join(" "))
+            .join("\n");
     }
 }
