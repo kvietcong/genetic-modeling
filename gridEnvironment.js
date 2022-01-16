@@ -3,11 +3,44 @@ params.stepsPerSecond = 60;
 // This represents a "village"
 class Village {
     constructor(x, y, grid) {
+
         this._grid = grid;
         this._pos = Object.freeze({ x, y });
 
         this.organisms = [];
         this.organismsToAdd = [];
+
+        this.environment = 0;
+
+        const POPULATION = 20;
+
+        this.populateVillage();
+    }
+
+    // Raz & KDunn added for organism 
+    // Need to set an environment to determine vary the task parameters
+    setEnvironment() {
+        const TOTAL_ENVIRONMENTS = 5;
+
+        this.environment = Math.floor(Math.random() * TOTAL_ENVIRONMENTS);
+
+    }
+    // Raz & KDunn added for organism 
+    // Need to be able to determine which environment a task is in. 
+    getEnvironment() {
+        return this.environment;
+    }
+
+    
+    // Raz & KDunn added for organism 
+    populateVillage() {
+        for(let i = 0; i < this.POPULATION; i++ ) {
+            this.organisms.push([]);
+        }
+
+        for(let i = 0; i < this.POPULATION; i++ ) {
+            this.organisms.push(new Organism(this));
+        }
     }
 
     addOrganism(organism) {
@@ -43,7 +76,7 @@ class World {
         this.width = width;
         this.height = height;
         this.timeSinceLastStep = 0;
-        this._tiles = [];
+        this._tiles = [];               // list of villages
 
         // Indexing from top left
         for (let y = 0; y < width; y++) {
