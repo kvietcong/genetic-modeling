@@ -18,7 +18,8 @@ class Task {
      */
     constructor(doTaskWith, village) {  
         this.village = village;
-        this.doTaskWith = doTaskWith;    
+        this.doTaskWith = doTaskWith;    // we're not sure how to use this in a way that would benefit the program,
+                                         // because multiple organisms may have to complete the "same" task.
 
         this.reward = 0;        // what the organism gains if the task is completed
         this.taskThresh = 0;   // the requirement to complete the task that is equal to the environment + gene + learn   
@@ -118,6 +119,7 @@ class Organism {
         } else {
             this.gene = new Gene(); // if this is the first set of organisms created
         }
+
         this.learn = 0;                 // how well the organism will learn
         this.taskCapabiilty = 0;        // will be gene + learn
                                         // *****************************************
@@ -129,6 +131,9 @@ class Organism {
         this.successes = 0;             // keep track of successes on the tasks
         this.failures = 0;              // will allow percentage calculation
         this.energy = 0;                // energy of the Organism
+
+        this.alive = TRUE;              // sets the organism to be alive
+        this.days = 0;                  // the age of the organism in days.
 
         this.createTaskList(NUM_TASKS);
 
@@ -171,7 +176,6 @@ class Organism {
         }
     };
 
-
     /**
      * Add a task to the list of tasks that the organism will attempt in a tick
      * @param {*} task 
@@ -208,6 +212,9 @@ class Organism {
 
     // TODO
     // Determine how to update itself and interact with its environment (the tile)
+
+    // QUESTION: who calls step?
+    
     /**
      * step function will advance the organism by a day every tick
      * @param {*} tile 
@@ -217,13 +224,15 @@ class Organism {
         // tile.neighbors // This gets neighbors
         const TICK = this.game.clockTick;  // assuming that each tick is a day
 
-        /**
-         * I'm not sure how to implement this so that the tasks only complete on a tick? Does the step function only
-         * happen every tick?
-         */
-        this.doTasks(NUM_TASKS);
-        this.reproduce(this); // right now we're working with asexual reproduction so I'm just returing this organism.
+        this.days++; // increment the day/age
 
-
+        // determines the lifespan of an organism
+        if(this.days < 36500) { // this would be 100 "years" (365 days * 100 years)
+            this.doTasks(NUM_TASKS);
+            this.reproduce(this); // right now we're working with asexual reproduction so I'm just returing this organism.
+        } else {
+            this.alive = FALSE;
+            this.village.removeOrganism(this);
+        }
     };
 };
