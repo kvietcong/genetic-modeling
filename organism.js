@@ -19,21 +19,27 @@ class Task {
     constructor(village, organism) {
         this.village = village;
         this.organism = organism;
-
-        this.doTask();
     };
 
     doTask() {
-        for(const task in this.village.taskList){
-            
+        let reward = {successes: 0, failures: 0, energy: 0};
 
+        for(let task of this.village.taskList){
+            if (task.threshold > this.organism.taskCapability) {
+                reward.failures++;
+                reward.successes--;
+                reward.energy -= task.threshold;
+            } else if (task.threshold <= this.organism.taskCapability) {
+                reward.failures--;
+                reward.successes++;
+                reward.energy += task.threshold;
+            }
         }
-
-        return null; // return the reward
+        return reward; // return the reward
     };
 };
 
-// Constants associated with every Organisma
+// Constants associated with every Organism
 const NUM_TASKS = 5;            // the number of tasks that the Organism has to do
 const REPRODUCTION_THRESH = 50; // assume this will be the same for every Organism
 
@@ -42,10 +48,6 @@ const REPRODUCTION_THRESH = 50; // assume this will be the same for every Organi
  * Creates a single organism
  */
 class Organism {
-    // TODO
-    // Initialize an organism with proper genes
-    // No cost system yet (like energy or health)
-
     /**
      * Constructor for the Organism
      * @param {*} village
@@ -70,14 +72,13 @@ class Organism {
                                         // We need to figure out how to get the current complete level of the gene
                                         // *****************************************
 
-        this.successes = 0;             // keep track of successes on the tasks
-        this.failures = 0;              // will allow percentage calculation
-        this.energy = 0;                // energy of the Organism
+        this.reward = new Task(this.village, this).doTask();
+        this.successes = this.reward.successes;             // keep track of successes on the tasks
+        this.failures = this.reward.failures;              // will allow percentage calculation
+        this.energy = this.reward.energy;                // energy of the Organism
 
         this.alive = true;              // sets the organism to be alive
         this.days = 0;                  // the age of the organism in days.
-
-        this.createTaskList(NUM_TASKS); // put this in with the village?
 
     };
 
@@ -86,16 +87,10 @@ class Organism {
      * @returns the capability of the organism to complete a task
      */
     getTaskCapability() {
-        this.taskCapabiilty l=this.learn + this.gene.get(); // this.gene.get() is in place of getting the level of the genes
-        return this.taskCapabiilty;l
-   }
+        this.taskCapability=this.learn + this.gene.get(); // this.gene.get() is in place of getting the level of the genes
+        return this.taskCapability;
+    }
 
-
-
-    // TODO
-    // Default to Asexual reproduction but should most likely be overridden
-    // for sexual reproduction
-    // This should just get the corresponding genes and recombine them
     /**
      * reproduce
      * Will create a new Organism based on the current Organism.
@@ -107,26 +102,6 @@ class Organism {
             new Organism(this.village, this);
         }
     };
-
-
-
-    /**
-     * the organsim will attempt all the tasks in the task list
-     * @param {*} num
-     */
-    doTasks(num) {
-        //const successes = this.tasks.map(task => task.doWith(this));
-        for(let i = 0; i < num; i++) {
-            if(this.taskCapabiilty l> this.taskList[i].getTaskThresh) {
-                this.successes++;
-                this.energy += this.taskList[i].getReward;
-            } else {
-                this.failures++;
-                this.energy -= this.taskList[i].getTaskThresh;
-            }
-        }
-    };
-
 
     /**
      * This will return the success rate of this Organism in completing the tasks
@@ -150,21 +125,20 @@ class Organism {
 
     /**
      * step function will advance the organism by a day every tick
-     * @param {*} tile
-     * @param {*} grid
      */
     step(tile, grid) {
-        // tile.neighbors // This gets neighbors
-
         this.days++; // increment the day/age
 
         // determines the lifespan of an organism
         if(this.days < 36500) { // this would be 100 "years" (365 days * 100 years)
-            this.doTasks(NUM_TASKS);
+            this.successes += this.reward.successes;             // keep track of successes on the tasks
+            this.failures += this.reward.failures;              // will allow percentage calculation
+            this.energy += this.reward.energy;                // energy of the Organism
             this.reproduce(); // right now we're working with asexual reproduction so sending this organism.
         } else {
             this.alive = FALSE;
             this.village.removeOrganism(this);
         }
+
     };
 };
