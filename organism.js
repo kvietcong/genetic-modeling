@@ -1,29 +1,29 @@
 /**
- * 
+ *
  * Organism & Task classes
  * @author KV, Raz and Kumiko
  * @version Rev 1
- * 
+ *
  */
 
 /**
  * Task class:
- * Creates a single task for an organism 
+ * Creates a single task for an organism
  */
 class Task {
     /**
      * Task constructor
-     * @param {*} doTaskWith 
-     * @param {*} village 
+     * @param {*} doTaskWith
+     * @param {*} village
      */
-    constructor(doTaskWith, village) {  
+    constructor(doTaskWith, village) {
         this.village = village;
         this.doTaskWith = doTaskWith;    // we're not sure how to use this in a way that would benefit the program,
                                          // because multiple organisms may have to complete the "same" task.
 
         this.reward = 0;        // what the organism gains if the task is completed
-        this.taskThresh = 0;   // the requirement to complete the task that is equal to the environment + gene + learn   
-        
+        this.taskThresh = 0;   // the requirement to complete the task that is equal to the environment + gene + learn
+
         this.taskSpecifics();
     };
 
@@ -40,24 +40,24 @@ class Task {
             // We are assuming within each grid box, there is an environment classifcation, and this classification will determine the characteristics of the tasks.
             if(this.village.getEnvironment() === 0) {
                 this.reward = 3;        // what the organism gains if the task is completed
-                this.taskThresh = 5;   // the requirement to complete the task that is equal to the environment + gene + learn   
-            } 
+                this.taskThresh = 5;   // the requirement to complete the task that is equal to the environment + gene + learn
+            }
             else if(this.village.getEnvironment() === 1) {
-                this.reward = 2;        
-                this.taskThresh = 2;   
+                this.reward = 2;
+                this.taskThresh = 2;
             }
             else if(this.village.getEnvironment() === 2) {
-                this.reward = 3;        
-                this.taskThresh = 2;   
+                this.reward = 3;
+                this.taskThresh = 2;
             }
             else if(this.village.getEnvironment() === 3) {
-                this.reward = 4;       
-                this.taskThresh = 1;   
-            } 
+                this.reward = 4;
+                this.taskThresh = 1;
+            }
             else {
-                this.reward = 2;        
-                this.taskThresh = 4;   
-            } 
+                this.reward = 2;
+                this.taskThresh = 4;
+            }
         */
     };
 
@@ -70,7 +70,7 @@ class Task {
     };
 
     /**
-     * getTaskThresh function that returns the threshold requirded for the organism to 
+     * getTaskThresh function that returns the threshold requirded for the organism to
      * get the reward assigned to the task.
      * @returns the task threshold
      */
@@ -79,7 +79,7 @@ class Task {
     };
 
 /*  Do we really need this? We want to set up tasks and then assign them to individual Organsims.
-    But can't two different Organisms have the same task. 
+    But can't two different Organisms have the same task.
 
     doWith(organism) {
 
@@ -91,7 +91,7 @@ class Task {
 
 /**
  * Organism class:
- * Creates a single organism 
+ * Creates a single organism
  */
 class Organism {
     // TODO
@@ -100,8 +100,8 @@ class Organism {
 
     /**
      * Constructor for the Organism
-     * @param {*} village 
-     * @param {*} parent 
+     * @param {*} village
+     * @param {*} parent
      */
     constructor(village, parent) {
         this.village = village;         // the village that the Organism lives in
@@ -110,7 +110,7 @@ class Organism {
         // Constants associated with every Organisma
         const NUM_TASKS = 5;            // the number of tasks that the Organism has to do
         const REPRODUCTION_THRESH = 50; // assume this will be the same for every Organism
-    
+
         // Instance variables
         // Creation of the genes associated with the current organism
         if (this.parent !== null) { // if there's a parent organism
@@ -151,7 +151,7 @@ class Organism {
     /**
      * createTaskList:
      * will create a list of the tasks that the organism will attempt in a tick.
-     * @param {*} num 
+     * @param {*} num
      */
     createTaskList(num){
         let task = new Task(this, village);
@@ -167,26 +167,26 @@ class Organism {
     /**
      * reproduce
      * Will create a new Organism based on the current Organism.
-     * @param {*} otherOrganism 
+     * @param {*} otherOrganism
      */
     reproduce(otherOrganism = this) {
         if(this.energy >= REPRODUCTION_THRESH) {
             this.energy -= REPRODUCTION_THRESH;
-            new Organism(this.village, this);         
+            new Organism(this.village, this);
         }
     };
 
     /**
      * Add a task to the list of tasks that the organism will attempt in a tick
-     * @param {*} task 
+     * @param {*} task
      */
     addTask(task) {
-        this.taskList.push(task);   // adds the task to the task list.       
+        this.taskList.push(task);   // adds the task to the task list.
     };
 
     /**
      * the organsim will attempt all the tasks in the task list
-     * @param {*} num 
+     * @param {*} num
      */
     doTasks(num) {
         //const successes = this.tasks.map(task => task.doWith(this));
@@ -201,7 +201,7 @@ class Organism {
         }
     };
 
-    
+
     /**
      * This will return the success rate of this Organism in completing the tasks
      * @returns the success rate
@@ -214,13 +214,13 @@ class Organism {
     // Determine how to update itself and interact with its environment (the tile)
 
     // QUESTION: who calls step?
-    
+
     /**
      * step function will advance the organism by a day every tick
-     * @param {*} tile 
-     * @param {*} grid 
+     * @param {Village} village
+     * @param {World} world
      */
-    step(tile, grid) {
+    step(village, world) {
         // tile.neighbors // This gets neighbors
         const TICK = this.game.clockTick;  // assuming that each tick is a day
 

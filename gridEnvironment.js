@@ -9,39 +9,15 @@ class Village {
 
         this.organisms = [];
         this.organismsToAdd = [];
-        this.organismsToDelete = [];
 
         this.environment = 0;
-
-        const POPULATION = 20;
 
         this.populateVillage();
     }
 
-    // Raz & KDunn added for organism 
-    // Need to set an environment to determine vary the task parameters
-    setEnvironment() {
-        const TOTAL_ENVIRONMENTS = 5;
-
-        this.environment = Math.floor(Math.random() * TOTAL_ENVIRONMENTS);
-
-    }
-
-    // Raz & KDunn added for organism 
-    // Need to be able to determine which environment a task is in. 
-    getEnvironment() {
-        return this.environment;
-    }
-
-    
-    // Raz & KDunn added to populate the village with organisms 
     populateVillage() {
-        for(let i = 0; i < this.POPULATION; i++ ) {
-            this.organisms.push([]);
-        }
-
-        for(let i = 0; i < this.POPULATION; i++ ) {
-            this.organisms.push(new Organism(this));
+        for (let i = 0; i < this.POPULATION; i++ ) {
+            this.addOrganism(new Organism(this));
         }
     }
 
@@ -49,10 +25,7 @@ class Village {
         this.organismsToAdd.push(organism);
     }
 
-    // Raz & KDunn added for organism to "die"
-    removeOrganism(organism) {
-        this.organismsToDelete.push(organism);
-    }
+    removeOrganism(organism) { organism.removeFromWorld = true; }
 
     step() {
         // Organisms should only interact with those in their "village"
@@ -61,15 +34,7 @@ class Village {
         this.organisms.push(...this.organismsToAdd);
         this.organismsToAdd = [];
 
-        // Raz & KDunn added for organism to "die"
-        // take the organism out of the list of organisms
-        let index = 0;
-        for(let i = 0; i < this.organismsToDelete.length; i++ ){
-            index = this.organisms.indexOf(this.organismsToDelete[i]);  // find index of organims using indexOf() 
-            this.organisms.splice(index, 1);                            // then remove the index with splice(index);
-        }
-
-        this.organismsToDelete = []; // set the organismsToDelete to empty
+        this.organisms = this.organisms.filter(organism => !organism.removeFromWorld);
     }
 
     getTilesInRange(start, end) {
