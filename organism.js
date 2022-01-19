@@ -16,77 +16,21 @@ class Task {
      * @param {*} doTaskWith
      * @param {*} village
      */
-    constructor(doTaskWith, village) {
+    constructor(village, organism) {
         this.village = village;
-        this.doTaskWith = doTaskWith;    // we're not sure how to use this in a way that would benefit the program,
-                                         // because multiple organisms may have to complete the "same" task.
+        this.organism = organism;
 
-        this.reward = 0;        // what the organism gains if the task is completed
-        this.taskThresh = 0;   // the requirement to complete the task that is equal to the environment + gene + learn
-
-        this.taskSpecifics();
+        this.doTask();
     };
 
-    /**
-     * Specifies the reward from completing a task and the threshold that the organism
-     *  must be able to pass to receive the reward. Both are randomly assigned at this point.
-     */
-    taskSpecifics() {
+    doTask() {
+        for(const task in this.village.taskList){
+            
 
-        this.reward = Math.floor((Math.random()*5) + 1);                // randomly assign the reward
-        this.taskThresh = Math.floor((Math.random() * 5) + 1);          // randomly assign the task threshold
+        }
 
-        /** We might add this, but initially we thought random assignment would be sufficient.
-            // We are assuming within each grid box, there is an environment classifcation, and this classification will determine the characteristics of the tasks.
-            if(this.village.getEnvironment() === 0) {
-                this.reward = 3;        // what the organism gains if the task is completed
-                this.taskThresh = 5;   // the requirement to complete the task that is equal to the environment + gene + learn
-            }
-            else if(this.village.getEnvironment() === 1) {
-                this.reward = 2;
-                this.taskThresh = 2;
-            }
-            else if(this.village.getEnvironment() === 2) {
-                this.reward = 3;
-                this.taskThresh = 2;
-            }
-            else if(this.village.getEnvironment() === 3) {
-                this.reward = 4;
-                this.taskThresh = 1;
-            }
-            else {
-                this.reward = 2;
-                this.taskThresh = 4;
-            }
-        */
+        return null; // return the reward
     };
-
-    /**
-     * getReward function that just returns the reward for the task
-     * @returns the reward
-     */
-    getReward() {
-        return this.reward;
-    };
-
-    /**
-     * getTaskThresh function that returns the threshold requirded for the organism to
-     * get the reward assigned to the task.
-     * @returns the task threshold
-     */
-    getTaskThresh() {
-        return this.taskThresh;
-    };
-
-/*  Do we really need this? We want to set up tasks and then assign them to individual Organsims.
-    But can't two different Organisms have the same task.
-
-    doWith(organism) {
-
-        this.doTaskWith(organism);
-
-    };
-*/
 };
 
 /**
@@ -121,12 +65,10 @@ class Organism {
         }
 
         this.learn = 0;                 // how well the organism will learn
-        this.taskCapabiilty = 0;        // will be gene + learn
+        this.taskCapability = 0;        // will be gene + learn
                                         // *****************************************
                                         // We need to figure out how to get the current complete level of the gene
                                         // *****************************************
-
-        this.taskList = [];             // all the tasks that this organism can start in one day
 
         this.successes = 0;             // keep track of successes on the tasks
         this.failures = 0;              // will allow percentage calculation
@@ -135,7 +77,7 @@ class Organism {
         this.alive = TRUE;              // sets the organism to be alive
         this.days = 0;                  // the age of the organism in days.
 
-        this.createTaskList(NUM_TASKS);
+        this.createTaskList(NUM_TASKS); // put this in with the village?
 
     };
 
@@ -144,21 +86,11 @@ class Organism {
      * @returns the capability of the organism to complete a task
      */
     getTaskCapability() {
-        this.taskCapabiilty = this.learn + this.gene.get(); // this.gene.get() is in place of getting the level of the genes
-        return this.taskCapabiilty;
-    }
+        this.taskCapabiilty l=this.learn + this.gene.get(); // this.gene.get() is in place of getting the level of the genes
+        return this.taskCapabiilty;l
+   }
 
-    /**
-     * createTaskList:
-     * will create a list of the tasks that the organism will attempt in a tick.
-     * @param {*} num
-     */
-    createTaskList(num){
-        let task = new Task(this, village);
-        for(let i = 0; i < num; i++) {
-            this.addTask(task);   // adds the task to the task list.
-        }
-    };
+
 
     // TODO
     // Default to Asexual reproduction but should most likely be overridden
@@ -176,13 +108,7 @@ class Organism {
         }
     };
 
-    /**
-     * Add a task to the list of tasks that the organism will attempt in a tick
-     * @param {*} task
-     */
-    addTask(task) {
-        this.taskList.push(task);   // adds the task to the task list.
-    };
+
 
     /**
      * the organsim will attempt all the tasks in the task list
@@ -191,7 +117,7 @@ class Organism {
     doTasks(num) {
         //const successes = this.tasks.map(task => task.doWith(this));
         for(let i = 0; i < num; i++) {
-            if(this.taskCapabiilty >= this.taskList[i].getTaskThresh) {
+            if(this.taskCapabiilty l> this.taskList[i].getTaskThresh) {
                 this.successes++;
                 this.energy += this.taskList[i].getReward;
             } else {
@@ -210,6 +136,13 @@ class Organism {
         return this.successes / (this.successes + this.failures);
     };
 
+    /**
+     * Add in a soft population cap?
+     */
+    softPopulationCap() {
+
+    }
+
     // TODO
     // Determine how to update itself and interact with its environment (the tile)
 
@@ -217,10 +150,10 @@ class Organism {
 
     /**
      * step function will advance the organism by a day every tick
-     * @param {Village} village
-     * @param {World} world
+     * @param {*} tile
+     * @param {*} grid
      */
-    step(village, world) {
+    step(tile, grid) {
         // tile.neighbors // This gets neighbors
         const TICK = this.game.clockTick;  // assuming that each tick is a day
 
@@ -229,7 +162,7 @@ class Organism {
         // determines the lifespan of an organism
         if(this.days < 36500) { // this would be 100 "years" (365 days * 100 years)
             this.doTasks(NUM_TASKS);
-            this.reproduce(this); // right now we're working with asexual reproduction so I'm just returing this organism.
+            this.reproduce(); // right now we're working with asexual reproduction so sending this organism.
         } else {
             this.alive = FALSE;
             this.village.removeOrganism(this);

@@ -12,8 +12,25 @@ class Village {
 
         this.environment = 0;
 
+        this.taskList = [];             // all the tasks associated with the village
+        this.numTasks = 5;
+
+        this.createTaskList();
         this.populateVillage();
     }
+
+    /**
+     * createTaskList:
+     * will create a list of the tasks that the organism will attempt in a tick if they live in this village.
+     */
+    createTaskList() {
+        for(let i = 0; i < this.numTasks; i++) {
+            let task = {reward: 0, threshold: 0};
+            task.reward = getRandomInteger(1, 5);
+            task.threshold = getRandomInteger(1, 5);
+            this.taskList.push(task);   // adds the task to the task list.
+        }
+    };
 
     populateVillage() {
         for (let i = 0; i < this.POPULATION; i++ ) {
