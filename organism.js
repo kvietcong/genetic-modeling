@@ -89,6 +89,10 @@ class Task {
 */
 };
 
+// Constants associated with every Organisma
+const NUM_TASKS = 5;            // the number of tasks that the Organism has to do
+const REPRODUCTION_THRESH = 50; // assume this will be the same for every Organism
+
 /**
  * Organism class:
  * Creates a single organism
@@ -107,13 +111,9 @@ class Organism {
         this.village = village;         // the village that the Organism lives in
         this.parent = parent;           // the parent of the Organism
 
-        // Constants associated with every Organisma
-        const NUM_TASKS = 5;            // the number of tasks that the Organism has to do
-        const REPRODUCTION_THRESH = 50; // assume this will be the same for every Organism
-
         // Instance variables
         // Creation of the genes associated with the current organism
-        if (this.parent !== null) { // if there's a parent organism
+        if (this.parent) { // if there's a parent organism
             this.gene = new Gene().recombine(parent.gene, parent.gene); // we're sending two of the of the same
                                                                         // geneome to the recomboer.
         } else {
@@ -132,7 +132,7 @@ class Organism {
         this.failures = 0;              // will allow percentage calculation
         this.energy = 0;                // energy of the Organism
 
-        this.alive = TRUE;              // sets the organism to be alive
+        this.alive = true;              // sets the organism to be alive
         this.days = 0;                  // the age of the organism in days.
 
         this.createTaskList(NUM_TASKS);
@@ -154,7 +154,7 @@ class Organism {
      * @param {*} num
      */
     createTaskList(num){
-        let task = new Task(this, village);
+        let task = new Task(this, this.village);
         for(let i = 0; i < num; i++) {
             this.addTask(task);   // adds the task to the task list.
         }
@@ -222,7 +222,6 @@ class Organism {
      */
     step(village, world) {
         // tile.neighbors // This gets neighbors
-        const TICK = this.game.clockTick;  // assuming that each tick is a day
 
         this.days++; // increment the day/age
 

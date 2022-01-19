@@ -1,4 +1,5 @@
 params.stepsPerSecond = 60;
+params.population = 20;
 
 // This represents a "village"
 class Village {
@@ -11,12 +12,10 @@ class Village {
         this.organismsToAdd = [];
 
         this.environment = 0;
-
-        this.populateVillage();
     }
 
     populateVillage() {
-        for (let i = 0; i < this.POPULATION; i++ ) {
+        for (let i = 0; i < params.population; i++ ) {
             this.addOrganism(new Organism(this));
         }
     }
@@ -37,12 +36,12 @@ class Village {
         this.organisms = this.organisms.filter(organism => !organism.removeFromWorld);
     }
 
-    getTilesInRange(start, end) {
-        return this._grid.getTilesInRageFrom(this, start, end);
+    getVillagesInRange(start, end) {
+        return this._grid.getVillagesInRangeFrom(this, start, end);
     }
 
     get neighbors() {
-        return this.getTilesInRange(this, 1, 1)
+        return this.getVillagesInRange(this, 1, 1)
     }
 
     get x() { return this._pos.x; }
@@ -58,54 +57,56 @@ class World {
         this.width = width;
         this.height = height;
         this.timeSinceLastStep = 0;
-        this._tiles = [];               // list of villages
+        this._villages = [];
 
         // Indexing from top left
         for (let y = 0; y < width; y++) {
-            this._tiles[y] = [];
+            this._villages[y] = [];
             for (let x = 0; x < height; x++) {
-                this._tiles[y][x] = new Village(x, y);
+                const village = new Village(x, y, this);
+                village.populateVillage();
+                this._villages[y][x] = village;
             }
         }
     }
 
-    get tiles() { return this._tiles; }
+    get villages() { return this._villages; }
 
-    getTile(x, y) {
+    getVillage(x, y) {
         if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
-            throw new Error(`Tile out of bounds: ${x}, ${y}`);
+            throw new Error(`Village out of bounds: ${x}, ${y}`);
         }
-        return this.tiles[y]?.[x];
+        return this.villages[y]?.[x];
     }
 
     // Defaults to direct neighbors
-    getTilesInRageFrom(tile, start = 1, end = 1) {
+    getVillagesInRangeFrom(village, start = 1, end = 1) {
         const neighbors = [];
         for (let j = -end; j <= end; j++) {
             for (let i = -end; i <= end; i++) {
                 if (abs(j) < start && abs(i) < start) continue;
-                const n = this.getTile(tile.x + j, tile.y + i);
+                const n = this.getVillage(village.x + j, village.y + i);
                 if (n) neighbors.push(n);
             }
         }
         return neighbors;
     }
 
-    getRandomTile() {
+    getRandomVillage() {
         const x = randomInt(this.width);
         const y = randomInt(this.height);
-        return this.getTile(x, y);
+        return this.getVillage(x, y);
     }
 
-    getRandomNeighbor(tile) {
-        return chooseRandom(this.getAllNeighbors(tile));
+    getRandomNeighbor(village) {
+        return chooseRandom(this.getAllNeighbors(village));
     }
 
     // Step will be a time independent function that advances the sim
     step() {
-        for (const row of this.tiles) {
-            for (const tile of row) {
-                tile.step(this);
+        for (const row of this.villages) {
+            for (const village of row) {
+                village.step(this);
             }
         }
     }
@@ -128,9 +129,28 @@ class World {
         const drawWidth = size / this.width;
         const drawHeight = size / this.height;
 
+        let populationAverage = 0;
+        let populationMax = 0;
+        let populationMin = 0;
+        let populationTotal = 0;
+
+        for (const row of this.villages) {
+            for (const village of row) {
+                populationTotal += village.organisms.length;
+                populationAverage += village.organisms.length;
+                populationMax = max(populationMax, village.organisms.length);
+                populationMin = min(populationMin, village.organisms.length);
+            }
+        }
+
+        populationAverage = populationAverage / (this.width * this.height);
+
         for (let j = 0; j < this.width; j++) {
             for (let i = 0; i < this.height; i++) {
-                const village = this.tiles[i][j];
+                const village = this.villages[i][j];
+                const environment = village.environment;
+                const population = village.organisms.length;
+
                 ctx.fillStyle = "red";
                 ctx.fillRect(
                     drawWidth * j, drawHeight * i,
@@ -140,13 +160,28 @@ class World {
                 ctx.strokeRect(
                     drawWidth * j, drawHeight * i,
                     drawWidth, drawHeight);
+
+                const maxRadius = (min(drawWidth, drawHeight) / 2) * 0.8;
+                const radius = round(
+                    (population - populationMin)
+                    / (populationMax || 1)
+                    * maxRadius
+                );
+
+                const x = drawWidth * j + drawWidth / 2;
+                const y = drawHeight * i + drawHeight / 2;
+
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, 2 * PI);
+                ctx.fillStyle = "green";
+                ctx.fill();
             }
         }
     }
 
     toString() {
-        return this.tiles.map(row =>
-            row.map(tile => tile.toString()).join(" "))
+        return this.villages.map(row =>
+            row.map(village => village.toString()).join(" "))
             .join("\n");
     }
 }
