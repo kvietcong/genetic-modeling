@@ -16,6 +16,8 @@ class Village {
         this.taskList = [];             // all the tasks associated with the village
         this.numTasks = 5;
 
+        this.populationCap = 10000;
+
         this.createTaskList();
         this.populateVillage();
     }
@@ -47,12 +49,21 @@ class Village {
 
     step() {
         // Organisms should only interact with those in their "village"
-        this.organisms.forEach(organism => organism.step(this, this.grid));
+        console.log("org length " + this.organisms.length);
 
-        this.organisms.push(...this.organismsToAdd);
-        this.organismsToAdd = [];
+        if (this.organisms.length < this.populationCap) {
+            this.organisms.forEach(organism => organism.step(this, this.grid));
 
-        this.organisms = this.organisms.filter(organism => !organism.removeFromWorld);
+            this.organisms.push(...this.organismsToAdd);
+            this.organismsToAdd = [];
+
+            this.organisms = this.organisms.filter(organism => !organism.removeFromWorld);
+
+        } else {
+            console.log("stop game");
+            gameEngine.stop();
+        }
+
     }
 
     getVillagesInRange(start, end) {
@@ -170,7 +181,7 @@ class World {
                 const environment = village.environment;
                 const population = village.organisms.length;
 
-                ctx.fillStyle = "red";
+                ctx.fillStyle = "green";
                 ctx.fillRect(
                     drawWidth * j, drawHeight * i,
                     drawWidth, drawHeight);
@@ -192,7 +203,7 @@ class World {
 
                 ctx.beginPath();
                 ctx.arc(x, y, radius, 0, 2 * PI);
-                ctx.fillStyle = "green";
+                ctx.fillStyle = "black";
                 ctx.fill();
             }
         }
