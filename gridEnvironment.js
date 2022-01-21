@@ -60,8 +60,8 @@ class Village {
         } else {
             // statistic output
             console.log("stop game");
-            gameEngine.stop();
             this._grid.stats();
+            gameEngine.stop();
         }
 
     }
@@ -204,7 +204,6 @@ class World {
                 populationAverage += village.organisms.length;
                 populationMax = max(populationMax, village.organisms.length);
                 populationMin = min(populationMin, village.organisms.length);
-                console.log("row: " + row +  "  populationTotal: " + row.length);
             }
         }
 
