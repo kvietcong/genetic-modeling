@@ -118,20 +118,32 @@ class Organism {
      */
     step(tile, grid) {
         // determines the lifespan of an organism
-        if(this.days > 0 && this.days < 21900) { // this would be 20 (7300) - 60 "years" (365 days * 60 years)
+        let live = true;
+        if (getRandomInteger(1, 100) === 1) {
+            live = false;
+        }
+        
+        if(live === true) {                               
             this.successes += this.reward.successes;           // keep track of successes on the tasks
             this.failures += this.reward.failures;             // will allow percentage calculation
             this.energy += this.reward.energy;                 // energy of the Organism
             this.reproduce();
-        } else if (this.days >= 21900 && this.days < 29200) {  // this would be 60 - 80 - no reproduction
-            this.successes += this.reward.successes;           // keep track of successes on the tasks
-            this.failures += this.reward.failures;             // will allow percentage calculation
-            this.energy += this.reward.energy;                 // energy of the Organism
-        } else if (this.days >= 36500) {                        // if they are 100 or more they "die"
-            this.alive = FALSE;
+        } else {                                               // if they are 100 or more they "die"
+            this.alive = false;
             this.village.removeOrganism(this);
         }
 
-        this.days++; // increment the day/age
+        // Hard age cap
+        /* if(this.days < 36500 && live === true) {            // 100 year hard age cap
+            this.successes += this.reward.successes;           // keep track of successes on the tasks
+            this.failures += this.reward.failures;             // will allow percentage calculation
+            this.energy += this.reward.energy;                 // energy of the Organism
+            this.reproduce();
+        } else {                                               // if they are 100 or more they "die"
+            this.alive = false;
+            this.village.removeOrganism(this);
+        } */
+
+        // this.days++; // increment the day/age
     };
 };
