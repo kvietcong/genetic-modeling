@@ -49,7 +49,6 @@ class Village {
 
     step() {
         // Organisms should only interact with those in their "village"
-        console.log("org length " + this.organisms.length);
 
         if (this.organisms.length < this.populationCap) {
             this.organisms.forEach(organism => organism.step(this, this.grid));
@@ -60,6 +59,7 @@ class Village {
             this.organisms = this.organisms.filter(organism => !organism.removeFromWorld);
 
         } else {
+            // statistic output
             console.log("stop game");
             gameEngine.stop();
         }
@@ -170,6 +170,7 @@ class World {
                 populationAverage += village.organisms.length;
                 populationMax = max(populationMax, village.organisms.length);
                 populationMin = min(populationMin, village.organisms.length);
+                console.log("row: " + row +  "  populationTotal: " + row.length);
             }
         }
 
@@ -205,6 +206,8 @@ class World {
                 ctx.arc(x, y, radius, 0, 2 * PI);
                 ctx.fillStyle = "black";
                 ctx.fill();
+
+                ctx.fillText(population,x, y);
             }
         }
     }
