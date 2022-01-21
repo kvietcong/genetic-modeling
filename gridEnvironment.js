@@ -49,7 +49,6 @@ class Village {
 
     step() {
         // Organisms should only interact with those in their "village"
-
         if (this.organisms.length < this.populationCap) {
             this.organisms.forEach(organism => organism.step(this, this.grid));
 
@@ -62,6 +61,7 @@ class Village {
             // statistic output
             console.log("stop game");
             gameEngine.stop();
+            this._grid.stats();
         }
 
     }
@@ -88,6 +88,7 @@ class World {
         this.height = height;
         this.timeSinceLastStep = 0;
         this._villages = [];
+        this.days = 0;
 
         // Indexing from top left
         for (let y = 0; y < width; y++) {
@@ -139,6 +140,7 @@ class World {
                 village.step(this);
             }
         }
+        this.days++;
     }
 
     update(gameEngine) {
@@ -149,6 +151,38 @@ class World {
             this.timeSinceLastStep -= secondsPerStep;
             this.step();
         }
+    }
+
+    stats() {
+        let populationAverage = 0;
+        let populationMax = 0;
+        let populationMin = 0;
+        let populationTotal = 0;
+        let villagePopulations = [];
+
+        for (const row of this.villages) {
+            for (const village of row) {
+                populationTotal += village.organisms.length;
+                populationAverage += village.organisms.length;
+                populationMax = max(populationMax, village.organisms.length);
+                populationMin = min(populationMin, village.organisms.length);
+                villagePopulations.push(village.organisms.length);
+            }
+        }
+
+        populationAverage = populationAverage / (this.width * this.height);
+        console.log("Pop total: " + populationTotal);
+        console.log("Pop average: " + populationAverage);
+        console.log("Pop max: " + populationMax);
+        console.log("Pop min: " + populationMin);
+
+        let i = 1;
+        for (const population of villagePopulations) {
+            console.log("Village " + i + " population: " + population);
+            i++;
+        }
+
+        console.log("Time taken: " + this.days + " days")
     }
 
     // TODO
@@ -175,6 +209,9 @@ class World {
         }
 
         populationAverage = populationAverage / (this.width * this.height);
+
+        ctx.fillStyle = "White";
+        ctx.font = "18px 'Arial'";
 
         for (let j = 0; j < this.width; j++) {
             for (let i = 0; i < this.height; i++) {
@@ -206,10 +243,12 @@ class World {
                 ctx.arc(x, y, radius, 0, 2 * PI);
                 ctx.fillStyle = "black";
                 ctx.fill();
-
-                ctx.fillText(population,x, y);
+                ctx.fillText(population, x - 45, y + 40);
             }
         }
+        ctx.fillStyle = "White";
+        ctx.font = "60px 'Arial'";
+        ctx.fillText("Day " + this.days, 900, 50);
     }
 
     toString() {
