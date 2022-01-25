@@ -31,10 +31,8 @@ class Task {
         for(let task of this.village.taskList){
             if (task.threshold > this.organism.taskCapability) {
                 reward.failures++;
-                reward.successes--;
                 reward.energy -= task.threshold;
             } else if (task.threshold <= this.organism.taskCapability) {
-                reward.failures--;
                 reward.successes++;
                 reward.energy += task.threshold;
             }
