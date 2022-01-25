@@ -1,5 +1,17 @@
-params.stepsPerSecond = 60;
+params.stepsPerSecond = 10;
 params.population = 20;
+
+params.environments = {
+    snow: {
+        color: "white",
+    },
+    desert: {
+        color: "yellow",
+    },
+    forest: {
+        color: "green",
+    },
+};
 
 // This represents a "village"
 class Village {
@@ -11,12 +23,12 @@ class Village {
         this.organisms = [];
         this.organismsToAdd = [];
 
-        this.environment = 0;
+        this.environment = chooseRandom(Object.keys(params.environments));
 
         this.taskList = [];             // all the tasks associated with the village
         this.numTasks = 5;
 
-        this.populationCap = 10000;
+        this.populationCap = 800;
 
         this.createTaskList();
         this.populateVillage();
@@ -47,8 +59,9 @@ class Village {
 
     removeOrganism(organism) { organism.removeFromWorld = true; }
 
-    step() {
-        // Organisms should only interact with those in their "village"
+
+    // Organisms should only interact with those in their "village"
+    step(world) {
         if (this.organisms.length < this.populationCap) {
             this.organisms.forEach(organism => organism.step(this, this.grid));
 
@@ -59,9 +72,10 @@ class Village {
 
         } else {
             // statistic output
-            console.log("stop game");
-            this._grid.stats();
-            gameEngine.stop();
+            // console.log("stop game");
+            // this._grid.stats();
+            // gameEngine.stop();
+            world.stop(); // stop the game when the first village reaches 10k pop
         }
 
     }
@@ -133,13 +147,22 @@ class World {
         return chooseRandom(this.getAllNeighbors(village));
     }
 
+    stop() { this.stopped = true; }
+
     // Step will be a time independent function that advances the sim
-    step() {
+    step(gameEngine) {
+        if (this.stopped) {
+            gameEngine.stop();
+            this.printStats();
+            return;
+        };
+
         for (const row of this.villages) {
             for (const village of row) {
                 village.step(this);
             }
         }
+
         this.days++;
     }
 
@@ -149,28 +172,40 @@ class World {
 
         while (this.timeSinceLastStep > secondsPerStep) {
             this.timeSinceLastStep -= secondsPerStep;
-            this.step();
+            this.step(gameEngine);
         }
     }
 
-    stats() {
-        let populationAverage = 0;
+    get stats() {
         let populationMax = 0;
         let populationMin = 0;
         let populationTotal = 0;
-        let villagePopulations = [];
+        const villagePopulations = [];
 
         for (const row of this.villages) {
             for (const village of row) {
-                populationTotal += village.organisms.length;
-                populationAverage += village.organisms.length;
-                populationMax = max(populationMax, village.organisms.length);
-                populationMin = min(populationMin, village.organisms.length);
-                villagePopulations.push(village.organisms.length);
+                const villagePopulation = village.organisms.length;
+                populationTotal += villagePopulation;
+                populationMax = max(populationMax, villagePopulation);
+                populationMin = min(populationMin, villagePopulation);
+                villagePopulations.push(villagePopulation);
             }
         }
 
-        populationAverage = populationAverage / (this.width * this.height);
+        const populationAverage = populationTotal / (this.width * this.height);
+
+        return {
+            populationAverage, populationMax, populationMin,
+            populationTotal, villagePopulations,
+        };
+    }
+
+    printStats() {
+        const {
+            populationAverage, populationMax, populationMin,
+            populationTotal, villagePopulations
+        } = this.stats;
+
         console.log("Pop total: " + populationTotal);
         console.log("Pop average: " + populationAverage);
         console.log("Pop max: " + populationMax);
@@ -186,28 +221,13 @@ class World {
     }
 
     // TODO
-    // Draw the villages somehow (Maybe more opacity when more organisms?)
     draw(ctx) {
         const { width: ctxWidth, height: ctxHeight } = ctx.canvas;
         const size = min(ctxWidth, ctxHeight);
         const drawWidth = size / this.width;
         const drawHeight = size / this.height;
 
-        let populationAverage = 0;
-        let populationMax = 0;
-        let populationMin = 0;
-        let populationTotal = 0;
-
-        for (const row of this.villages) {
-            for (const village of row) {
-                populationTotal += village.organisms.length;
-                populationAverage += village.organisms.length;
-                populationMax = max(populationMax, village.organisms.length);
-                populationMin = min(populationMin, village.organisms.length);
-            }
-        }
-
-        populationAverage = populationAverage / (this.width * this.height);
+        const { populationMax, populationMin } = this.stats;
 
         ctx.fillStyle = "White";
         ctx.font = "18px 'Arial'";
@@ -218,7 +238,7 @@ class World {
                 const environment = village.environment;
                 const population = village.organisms.length;
 
-                ctx.fillStyle = "green";
+                ctx.fillStyle = params.environments[environment].color;
                 ctx.fillRect(
                     drawWidth * j, drawHeight * i,
                     drawWidth, drawHeight);
@@ -228,20 +248,18 @@ class World {
                     drawWidth * j, drawHeight * i,
                     drawWidth, drawHeight);
 
+                const ratio = (population - populationMin) / (populationMax || 1);
                 const maxRadius = (min(drawWidth, drawHeight) / 2) * 0.8;
-                const radius = round(
-                    (population - populationMin)
-                    / (populationMax || 1)
-                    * maxRadius
-                );
+                const radius = round(ratio * maxRadius);
 
                 const x = drawWidth * j + drawWidth / 2;
                 const y = drawHeight * i + drawHeight / 2;
 
                 ctx.beginPath();
                 ctx.arc(x, y, radius, 0, 2 * PI);
-                ctx.fillStyle = "black";
+                ctx.fillStyle = rgba(255, 0, 0, ratio + 0.2);
                 ctx.fill();
+                ctx.fillStyle = "black";
                 ctx.fillText(population, x - 45, y + 40);
             }
         }
