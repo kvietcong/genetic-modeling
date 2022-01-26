@@ -113,6 +113,13 @@ class Organism {
         return this.successes / (this.successes + this.failures);
     };
 
+    // ?????
+    improveLearning() {
+        // improve with every x successes?
+        // improve randomly (e.g., 1%)?
+        // learning similar to genetic architecture. Similar to cultural evolution
+    };
+
     /**
      * step function will advance the organism by a day every tick
      */
@@ -120,11 +127,12 @@ class Organism {
 
         let live = true;
 
+        // 1% chance of dying
         if (getRandomInteger(1, 100) === 1) {
             live = false;
         }
 
-        // soft age cap
+        // soft age cap using the "percentage" above
         if(live === true) { // this would be 20 (7300) - 60 "years" (365 days * 60 years)
             this.successes += this.reward.successes;           // keep track of successes on the tasks
             this.failures += this.reward.failures;             // will allow percentage calculation

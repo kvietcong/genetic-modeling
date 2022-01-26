@@ -41,8 +41,10 @@ class Village {
     createTaskList() {
         for(let i = 0; i < this.numTasks; i++) {
             let task = {reward: 0, threshold: 0};
-            task.reward = getRandomInteger(1, 5);
-            task.threshold = getRandomInteger(1, 5);
+            // task.reward = getRandomInteger(1, 5);    // reward for completing the task
+            task.reward = 1;    // reward for completing the task - each task is the same regardless of environment
+            // task.threshold = getRandomInteger(1, 5); // threshold for accomplishing the task
+            task.threshold = 5; // threshold for accomplishing the task - each task is the same regardless of environment
             this.taskList.push(task);   // adds the task to the task list.
         }
     };
@@ -73,7 +75,7 @@ class Village {
         } else {
             // statistic output
             // console.log("stop game");
-            // this._grid.stats();
+            this._grid.stats();
             // gameEngine.stop();
             world.stop(); // stop the game when the first village reaches 10k pop
         }
