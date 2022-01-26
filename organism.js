@@ -2,44 +2,9 @@
  *
  * Organism & Task classes
  * @author KV, Raz and Kumiko
- * @version Rev 2
+ * @version Rev 3 - 1/25/2022
  *
  */
-
-/**
- * Task class:
- * Creates a single task for an organism
- */
-class Task {
-    /**
-     * Task constructor
-     * @param {*} doTaskWith
-     * @param {*} village
-     */
-    constructor(village, organism) {
-        this.village = village;
-        this.organism = organism;
-    };
-
-    /**
-     * doTasks
-     * @returns the rewards object that includes the # successes and failures for all the tasks and the resulting energy
-     */
-    doTasks() {
-        let reward = {successes: 0, failures: 0, energy: 0};
-
-        for(let task of this.village.taskList){
-            if (task.threshold > this.organism.taskCapability) {
-                reward.failures++;
-                reward.energy -= task.threshold;
-            } else if (task.threshold <= this.organism.taskCapability) {
-                reward.successes++;
-                reward.energy += task.threshold;
-            }
-        }
-        return reward; // return the reward
-    };
-};
 
 // Constants associated with every Organism
 const NUM_TASKS = 5;            // the number of tasks that the Organism has to do
@@ -58,21 +23,29 @@ class Organism {
     constructor(village, parent) {
         this.village = village;         // the village that the Organism lives in
         this.parent = parent;           // the parent of the Organism
+        this.geneList = [];
 
         // Instance variables
         // Creation of the genes associated with the current organism
         if (this.parent) { // if there's a parent organism
-            this.gene = new Gene().recombine(parent.gene); // we're sending two of the of the same
-                                                                        // geneome to the recomboer.
-        } else {
-            this.gene = new Gene(); // if this is the first set of organisms created
-        }
+            for (let i = 0; i < 10; i++) {
+                this.geneList.push(new Gene().recombine(parent.geneList[i])); // we're sending two of the of the same
+            }                                                     // geneome to the recomboer.                                                            
+        } else { // if this is the first set of organisms created
+            for (let i = 0; i < 10; i++) {
+                this.geneList.push(new Gene()); 
+            } 
+        } 
 
-        this.learn = getRandomInteger(1,5);                 // how well the organism will learn
+        this.learnList = [];
+        for (let i = 0; i < 10; i++) {
+            this.learnList.push(getRandomInteger(1, 5));  // how well the organism will learn
+        } 
+           
+        this.taskCapabilities = [];
+        this.taskCapabilities = this.getTaskCapabilities();        // will be gene + learn
 
-        this.taskCapability = this.getTaskCapability();        // will be gene + learn
-
-        this.reward = new Task(this.village, this).doTasks();
+        this.reward = this.village.doTasks(this);
 
         this.successes = 0;             // keep track of successes on the tasks
         this.failures = 0;              // will allow percentage calculation
@@ -86,9 +59,12 @@ class Organism {
      * getTaskCapability function
      * @returns the capability of the organism to complete a task
      */
-    getTaskCapability() {
-        this.taskCapability = this.learn + this.gene.level; // this.gene.get() is in place of getting the level of the genes
-        return this.taskCapability;
+    getTaskCapabilities() {
+        // this.taskCapability = this.learn + this.gene.level; 
+        for (let i = 0; i < 10; i++) {
+            this.taskCapabilities.push(this.learnList[i] + this.geneList[i].level);
+        }
+        return this.taskCapabilities;
     }
 
     /**
@@ -121,7 +97,7 @@ class Organism {
             live = false;
         }
         
-        if(live === true) {                               
+        if(live === true) {   
             this.successes += this.reward.successes;           // keep track of successes on the tasks
             this.failures += this.reward.failures;             // will allow percentage calculation
             this.energy += this.reward.energy;                 // energy of the Organism

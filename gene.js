@@ -32,7 +32,7 @@
 
 /* Default Global Parameters related to Genes */
 params.cellSize = 2;
-params.fillToLevel = 0;
+params.fillToLevel = getRandomInteger(1, 5);
 params.partitionSize = 2;
 params.mutationChance = 0.3;
 params.initialPartitions = 5;

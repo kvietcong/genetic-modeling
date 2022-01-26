@@ -3,13 +3,22 @@ params.population = 20;
 
 params.environments = {
     snow: {
+        name: "snow",
         color: "white",
+        reward: 1,
+        threshold: 5
     },
     desert: {
+        name: "desert", 
         color: "yellow",
+        reward: 3,
+        threshold: 3
     },
     forest: {
+        name : "forest",
         color: "green",
+        reward: 5,
+        threshold: 1
     },
 };
 
@@ -26,7 +35,7 @@ class Village {
         this.environment = chooseRandom(Object.keys(params.environments));
 
         this.taskList = [];             // all the tasks associated with the village
-        this.numTasks = 5;
+        this.numTasks = 10;
 
         this.populationCap = 800;
 
@@ -41,10 +50,37 @@ class Village {
     createTaskList() {
         for(let i = 0; i < this.numTasks; i++) {
             let task = {reward: 0, threshold: 0};
-            task.reward = getRandomInteger(1, 5);
-            task.threshold = getRandomInteger(1, 5);
+            if (this.environment === "snow") {
+                task.reward = params.environments.snow.reward;
+                task.threshold = params.environments.snow.threshold;
+            } else if (this.environment === "desert") {
+                task.reward = params.environments.desert.reward;
+                task.threshold = params.environments.desert.threshold;
+            } else if (this.environment === "forest") {
+                task.reward = params.environments.forest.reward;
+                task.threshold = params.environments.forest.threshold;
+            }
+            console.log("reward/thres" , this.environment, task.reward, task.threshold);
+            
             this.taskList.push(task);   // adds the task to the task list.
         }
+    };
+
+    doTasks(organism) {
+        let reward = {successes: 0, failures: 0, energy: 0};
+        let i = 0;
+
+        for(let task of this.taskList){
+            if (task.threshold > organism.taskCapabilities[i]) {
+                reward.failures++;
+                reward.energy -= task.threshold;
+            } else if (task.threshold <= organism.taskCapabilities[i]) {
+                reward.successes++;
+                reward.energy += task.threshold;
+            }
+            i++;
+        }
+        return reward; // return the reward
     };
 
     populateVillage() {
