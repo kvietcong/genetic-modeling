@@ -9,6 +9,7 @@ const restart = gameEngine => {
 const gridExample = gameEngine => {
     const width = 8;
     const height = 8;
+    gameEngine.addEntity(testHistogram);
     gameEngine.addEntity(new World(width, height));
 };
 

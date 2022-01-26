@@ -1,6 +1,6 @@
 class Histogram {
     constructor(
-        categories, getCategory, data,
+        categories, getCategory, initialData,
         x = 0, y = 0, width = 640, height = 360,
     ) {
         this.getCategory = getCategory;
@@ -9,60 +9,69 @@ class Histogram {
         this.x = x; this.y = y;
         this.width = width; this.height = height;
 
+        this.drawLast = 50;
+        this.drawConsistent = true;
+
         this.customDrawer;
 
-        this._categoryCounts = {};
-        this.data = data;
+        this.allCounts = [];
+        this.pushData(initialData);
     }
 
-    _updateCategoryCounts() {
-        const categoryCounts = {};
-        this.categories.forEach(category => categoryCounts[category] = 0);
-        this._data.forEach(dataPoint => {
+    getCounts(data) {
+        const counts = { total: data.length };
+        this.categories.forEach(category => counts[category] = 0);
+        data.forEach(dataPoint => {
             const category = this.getCategory(dataPoint);
-            if (!(category in categoryCounts))
+            if (!(category in counts))
                 throw new Error(`Unknown category: ${category}`);
-            categoryCounts[category] += 1
+            counts[category] += 1
         });
-        this._categoryCounts = categoryCounts;
+        return counts;
     }
 
-    get data() { return this._data; }
-    set data(data) {
-        this._data = data;
-        this._updateCategoryCounts();
+    getRatios(counts) {
+        const total = counts.total;
+        return categories.reduce((accumulated, current) => {
+            accumulated[current] = counts[current] / total;
+            return accumulated;
+        }, {});
     }
 
-    get categoryCounts() { return this._categoryCounts;}
+    pushData(data) { this.allCounts.push(this.getCounts(data)); }
+
+    get currentCounts() { return this.allCounts[this.allCounts.length - 1]; }
 
     update(gameEngine) {}
 
     draw(ctx) {
         if (this.customDrawer) return this.customDrawer(this, ctx);
-
-        // TODO Draw Histogram (This was auto generated)
-        const counts = this.categoryCounts;
-        const totalCount = this.data.length;
-
-        const maxCount = max(...Object.values(counts));
-        const maxBarHeight = this.height - 30;
-        const barWidth = this.width / this.categories.length;
-
         ctx.fillStyle = "white";
         ctx.fillRect(this.x, this.y, this.width, this.height);
 
-        ctx.fillStyle = "black";
-        ctx.font = "14px Arial";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        this.categories.forEach((category, index) => {
-            const barHeight = maxBarHeight * this.categoryCounts[category] / maxCount;
-            ctx.fillStyle = "black";
-            ctx.fillRect(this.x + index * barWidth, this.y + this.height - barHeight, barWidth, barHeight);
-            ctx.fillStyle = "white";
-            ctx.fillText(`${category}: ${this.categoryCounts[category]} (${(this.categoryCounts[category] / totalCount * 100).toFixed(2)}%)`,
-                this.x + index * barWidth + barWidth / 2, this.y + this.height - barHeight / 2);
-        });
+        const drawLast = this.drawConsistent
+                       ? this.drawLast
+                       : min(this.drawLast, this.allCounts.length);
+        const barWidths = this.width / drawLast;
+        const barHeights = this.height / this.categories.length;
+
+        for (let i = this.allCounts.length - 1;
+             i >= this.allCounts.length - drawLast;
+             i--
+        ) {
+            if (i < 0) break;
+            const x = this.x + (i - this.allCounts.length + drawLast) * barWidths;
+            const counts = this.allCounts[i];
+            const ratios = this.getRatios(counts);
+            for (let j = 0; j < this.categories.length; j++) {
+                const category = this.categories[j];
+                const y = this.y + (j * barHeights);
+                let opacity = ratios[category];
+                // console.log(opacity = log(ratios[category] * 99 + 1) / log(100) * 512 / 1000);
+                ctx.fillStyle = rgba(0, 0, 0, opacity);
+                ctx.fillRect(x, y, barWidths, barHeights);
+            }
+        }
     }
 }
 
@@ -73,6 +82,17 @@ const getCategoryForHeight = height => {
     if (height <= 5) return "medium";
     return "tall";
 };
-const heightData = [ 3, 3, 3, 4, 4, 5, 5, 5, 5, 5, 6, 7 ];
+const initialHeightData = [ 3, 3, 3, 4, 4, 5, 5, 5, 5, 5, 6, 7 ];
 
-const testHistogram = new Histogram(categories, getCategoryForHeight, heightData);
+const testHistogram =
+    new Histogram(categories, getCategoryForHeight, initialHeightData);
+
+let dataCounter = 0;
+let intervalID = setInterval(() => {
+    if (dataCounter++ < 500) {
+        const newHeightData = initialHeightData.map(_ => getRandomInteger(3, 8));
+        testHistogram.pushData(newHeightData);
+    } else {
+        clearInterval(intervalID);
+    }
+}, 30);

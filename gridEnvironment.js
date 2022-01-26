@@ -160,6 +160,21 @@ class World {
         this.days++;
     }
 
+    get allOrganisms() {
+        return Object.freeze(this.villages.reduce((totalAccumulated, row) =>
+            totalAccumulated.concat(row.reduce((rowAccumulated, village) =>
+                rowAccumulated.concat(village.organisms), [])), []));
+    }
+
+    get totalPopulation() {
+        return this.allOrganisms.length;
+    }
+
+    get populationPerVillage() {
+        return Object.freeze(this.villages.map(row =>
+            row.map(village => village.organisms.length)));
+    }
+
     update(gameEngine) {
         const secondsPerStep = 1 / params.stepsPerSecond;
         this.timeSinceLastStep += gameEngine.deltaTime;
@@ -174,7 +189,6 @@ class World {
         let populationMax = 0;
         let populationMin = 0;
         let populationTotal = 0;
-        const villagePopulations = [];
 
         for (const row of this.villages) {
             for (const village of row) {
@@ -182,22 +196,19 @@ class World {
                 populationTotal += villagePopulation;
                 populationMax = max(populationMax, villagePopulation);
                 populationMin = min(populationMin, villagePopulation);
-                villagePopulations.push(villagePopulation);
             }
         }
 
         const populationAverage = populationTotal / (this.width * this.height);
 
         return {
-            populationAverage, populationMax, populationMin,
-            populationTotal, villagePopulations,
+            populationAverage, populationMax, populationMin, populationTotal
         };
     }
 
     printStats() {
         const {
-            populationAverage, populationMax, populationMin,
-            populationTotal, villagePopulations
+            populationAverage, populationMax, populationMin, populationTotal
         } = this.stats;
 
         console.log("Pop total: " + populationTotal);
@@ -205,11 +216,10 @@ class World {
         console.log("Pop max: " + populationMax);
         console.log("Pop min: " + populationMin);
 
-        let i = 1;
-        for (const population of villagePopulations) {
-            console.log("Village " + i + " population: " + population);
-            i++;
-        }
+        for (let i = 0; i < this.width; i++)
+            for (let j = 0; j < this.height; j++)
+                console.log(`Village @ (${i}, ${j}) has `
+                          + `${this.populationPerVillage[i][j]} Organisms`);
 
         console.log("Time taken: " + this.days + " days")
     }
