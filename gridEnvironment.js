@@ -5,11 +5,11 @@ params.environments = {
     snow: {
         name: "snow",
         color: "white",
-        reward: 1, 
+        reward: 1,
         threshold: 5
     },
     desert: {
-        name: "desert", 
+        name: "desert",
         color: "yellow",
         reward: 3,
         threshold: 3
@@ -37,7 +37,7 @@ class Village {
         this.taskList = [];             // all the tasks associated with the village
         this.numTasks = 10;
 
-        this.populationCap = 800;
+        this.populationCap = 500;
 
         this.createTaskList();
         this.populateVillage();
@@ -68,7 +68,6 @@ class Village {
         let reward = {successes: 0, failures: 0, energy: 0};
         let i = 0;
 
-
         for(let task of this.taskList){
             if (task.threshold > organism.taskCapabilities[i]) {
                 reward.failures++;
@@ -79,9 +78,6 @@ class Village {
             }
             i++;
 
-            if (this.environment === "desert") {
-                console.log("org cap; ", organism.taskCapabilities[i], "-- task thresh: ", task.threshold, "-- reward: ", reward)
-            }
         }
         return reward; // return the reward
     };
@@ -111,9 +107,6 @@ class Village {
 
         } else {
             // statistic output
-            // console.log("stop game");
-            this._grid.stats();
-            // gameEngine.stop();
             world.stop(); // stop the game when the first village reaches 10k pop
         }
 
@@ -215,6 +208,7 @@ class World {
         }
     }
 
+    // This notation: get functionName() indicates that what follows is a computed property.
     get stats() {
         let populationMax = 0;
         let populationMin = 0;

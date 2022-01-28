@@ -30,18 +30,19 @@ class Organism {
         if (this.parent) { // if there's a parent organism
             for (let i = 0; i < 10; i++) {
                 this.geneList.push(new Gene().recombine(parent.geneList[i])); // we're sending two of the of the same
-            }                                                     // geneome to the recomboer.                                                            
+            }                                                     // geneome to the recomboer.
         } else { // if this is the first set of organisms created
             for (let i = 0; i < 10; i++) {
-                this.geneList.push(new Gene()); 
-            } 
-        } 
+                this.geneList.push(new Gene());
+            }
+        }
 
         this.learnList = [];
         for (let i = 0; i < 10; i++) {
-            this.learnList.push(getRandomInteger(1, 5));  // how well the organism will learn
-        } 
-           
+            // this.learnList.push(getRandomInteger(1,5));  // how well the organism will learn
+            this.learnList.push(0);  // how well the organism will learn
+        }
+
         this.taskCapabilities = [];
         this.taskCapabilities = this.getTaskCapabilities();        // will be gene + learn
 
@@ -60,7 +61,7 @@ class Organism {
      * @returns the capability of the organism to complete a task
      */
     getTaskCapabilities() {
-        // this.taskCapability = this.learn + this.gene.level; 
+        // this.taskCapability = this.learn + this.gene.level;
         for (let i = 0; i < 10; i++) {
             this.taskCapabilities.push(this.learnList[i] + this.geneList[i].level);
         }
