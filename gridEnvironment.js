@@ -5,7 +5,7 @@ params.environments = {
     snow: {
         name: "snow",
         color: "white",
-        reward: 1,
+        reward: 1, 
         threshold: 5
     },
     desert: {
@@ -301,7 +301,8 @@ class World {
                 ctx.fillText(population, x - 45, y + 40);
             }
         }
-        ctx.fillStyle = "black";
+
+        ctx.fillStyle = "Black";
         ctx.font = "60px 'Arial'";
         ctx.fillText("Day " + this.days, 900, 50);
     }
