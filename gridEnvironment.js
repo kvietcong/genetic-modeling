@@ -120,6 +120,10 @@ class Village {
         return this.getVillagesInRange(this, 1, 1)
     }
 
+    getRandomOrganism() {
+        return this.organisms[getRandomInteger(0, this.organisms.length - 1)];
+    }
+
     get x() { return this._pos.x; }
     get y() { return this._pos.y; }
     get grid() { return this._grid; }
@@ -290,16 +294,18 @@ class World {
 
                 ctx.beginPath();
                 ctx.arc(x, y, radius, 0, 2 * PI);
-                ctx.fillStyle = rgba(255, 0, 0, ratio + 0.2);
+                ctx.fillStyle = rgba(0, 0, 0, ratio + 0.2);
                 ctx.fill();
                 ctx.fillStyle = "black";
                 ctx.fillText(population, x - 45, y + 40);
             }
         }
 
-        ctx.fillStyle = "Black";
+        ctx.fillStyle = "Green";
         ctx.font = "60px 'Arial'";
-        ctx.fillText("Day " + this.days, 900, 50);
+        ctx.fillText("Day " + this.days, 740, 50);
+        ctx.fillText("Migration: " + document.getElementById("migrationBox").checked, 740, 120);
+        ctx.fillText("Sexual repr: " + document.getElementById("sexualReproductionBox").checked, 740, 190);
     }
 
     toString() {

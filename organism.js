@@ -18,18 +18,24 @@ class Organism {
     /**
      * Constructor for the Organism
      * @param {*} village
-     * @param {*} parent
+     * @param {*} parent1
      */
-    constructor(village, parent) {
+    constructor(village, parent1, parent2 = false) {
         this.village = village;         // the village that the Organism lives in
-        this.parent = parent;           // the parent of the Organism
+        this.parent1 = parent1;           // the parent1 of the Organism
+        this.parent2 = parent2;
         this.geneList = [];
 
         // Instance variables
         // Creation of the genes associated with the current organism
-        if (this.parent) { // if there's a parent organism
+        if (this.parent1 && this.parent2) {
             for (let i = 0; i < 10; i++) {
-                this.geneList.push(new Gene().recombine(parent.geneList[i])); // we're sending two of the of the same
+                this.geneList.push(this.parent1.geneList[i].recombine(this.parent2.geneList[i])); 
+            }     
+        }
+        else if (this.parent1) { // if there's a parent1 organism
+            for (let i = 0; i < 10; i++) {
+                this.geneList.push(new Gene().recombine(this.parent1.geneList[i])); // we're sending two of the of the same
             }                                                     // geneome to the recomboer.
         } else { // if this is the first set of organisms created
             for (let i = 0; i < 10; i++) {
@@ -39,8 +45,8 @@ class Organism {
 
         this.learnList = [];
         for (let i = 0; i < 10; i++) {
-            // this.learnList.push(getRandomInteger(1,5));  // how well the organism will learn
-            this.learnList.push(0);  // how well the organism will learn
+            this.learnList.push(getRandomInteger(1,5));  // how well the organism will learn
+            // this.learnList.push(1);  // how well the organism will learn
         }
 
         this.taskCapabilities = [];
@@ -74,9 +80,29 @@ class Organism {
      * @param {*} otherOrganism
      */
     reproduce(otherOrganism = this) {
-        if(this.energy >= REPRODUCTION_THRESH) {
+        let migrationStatus = document.getElementById("migrationBox").checked;
+        let sexualReproductionStatus = document.getElementById("sexualReproductionBox").checked;
+
+        let migrationChance = getRandomInteger(1, 10);
+        let migrationThreshold = 5; // 50% chance of migration
+
+        if(this.energy >= REPRODUCTION_THRESH && otherOrganism.energy >= REPRODUCTION_THRESH) {
             this.energy -= REPRODUCTION_THRESH;
-            this.village.addOrganism(new Organism(this.village, this));
+            otherOrganism.energy -= REPRODUCTION_THRESH;
+            
+            if (!migrationStatus || migrationChance > migrationThreshold) { // no migration OR migration but the chance is
+                if (!sexualReproductionStatus) { 
+                    this.village.addOrganism(new Organism(this.village, this)); // asexual
+                } else {
+                    this.village.addOrganism(new Organism(this.village, this, otherOrganism)); // sexual
+                }
+            } else { // migration checked on and migration condition met
+                if (!sexualReproductionStatus) { 
+                    this.village.addOrganism(new Organism(this.village._grid.getRandomVillage()), this); // asexual
+                } else {
+                    this.village.addOrganism(new Organism(this.village._grid.getRandomVillage()), this, otherOrganism); // sexual
+                }
+            }
         }
     };
 
@@ -112,7 +138,7 @@ class Organism {
             this.successes += this.reward.successes;           // keep track of successes on the tasks
             this.failures += this.reward.failures;             // will allow percentage calculation
             this.energy += this.reward.energy;                 // energy of the Organism
-            this.reproduce();
+            this.reproduce(this.village.getRandomOrganism()); // changed from reproduce() to sexual reproduction
         } else {                        // if they are 100 or more they "die"
             this.alive = false;
             this.village.removeOrganism(this);
