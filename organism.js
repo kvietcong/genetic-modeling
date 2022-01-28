@@ -87,37 +87,48 @@ class Organism {
         return this.successes / (this.successes + this.failures);
     };
 
+    // ?????
+    improveLearning() {
+        // improve with every x successes?
+        // improve randomly (e.g., 1%)?
+        // learning similar to genetic architecture. Similar to cultural evolution
+    };
+
     /**
      * step function will advance the organism by a day every tick
      */
     step(tile, grid) {
-        // determines the lifespan of an organism
+
         let live = true;
+
+        // 1% chance of dying
         if (getRandomInteger(1, 100) === 1) {
             live = false;
         }
-        
-        if(live === true) {   
+
+        // soft age cap using the "percentage" above
+        if(live === true) { // this would be 20 (7300) - 60 "years" (365 days * 60 years)
             this.successes += this.reward.successes;           // keep track of successes on the tasks
             this.failures += this.reward.failures;             // will allow percentage calculation
             this.energy += this.reward.energy;                 // energy of the Organism
             this.reproduce();
-        } else {                                               // if they are 100 or more they "die"
+        } else {                        // if they are 100 or more they "die"
             this.alive = false;
             this.village.removeOrganism(this);
         }
 
         // Hard age cap
-        /* if(this.days < 36500 && live === true) {            // 100 year hard age cap
-            this.successes += this.reward.successes;           // keep track of successes on the tasks
-            this.failures += this.reward.failures;             // will allow percentage calculation
-            this.energy += this.reward.energy;                 // energy of the Organism
-            this.reproduce();
-        } else {                                               // if they are 100 or more they "die"
-            this.alive = false;
-            this.village.removeOrganism(this);
-        } */
+        // if(this.days < 36500) { // this would be 20 (7300) - 60 "years" (365 days * 60 years)
+        //     this.successes += this.reward.successes;           // keep track of successes on the tasks
+        //     this.failures += this.reward.failures;             // will allow percentage calculation
+        //     this.energy += this.reward.energy;                 // energy of the Organism
+        //     this.reproduce();
+        // } else {                        // if they are 100 or more they "die"
+        //     this.alive = false;
+        //     this.village.removeOrganism(this);
+        // }
 
         // this.days++; // increment the day/age
+
     };
 };

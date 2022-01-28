@@ -60,8 +60,6 @@ class Village {
                 task.reward = params.environments.forest.reward;
                 task.threshold = params.environments.forest.threshold;
             }
-            console.log("reward/thres" , this.environment, task.reward, task.threshold);
-            
             this.taskList.push(task);   // adds the task to the task list.
         }
     };
@@ -69,6 +67,7 @@ class Village {
     doTasks(organism) {
         let reward = {successes: 0, failures: 0, energy: 0};
         let i = 0;
+
 
         for(let task of this.taskList){
             if (task.threshold > organism.taskCapabilities[i]) {
@@ -79,6 +78,10 @@ class Village {
                 reward.energy += task.threshold;
             }
             i++;
+
+            if (this.environment === "desert") {
+                console.log("org cap; ", organism.taskCapabilities[i], "-- task thresh: ", task.threshold, "-- reward: ", reward)
+            }
         }
         return reward; // return the reward
     };
@@ -95,6 +98,8 @@ class Village {
 
     removeOrganism(organism) { organism.removeFromWorld = true; }
 
+
+    // Organisms should only interact with those in their "village"
     step(world) {
         if (this.organisms.length < this.populationCap) {
             this.organisms.forEach(organism => organism.step(this, this.grid));
@@ -105,6 +110,10 @@ class Village {
             this.organisms = this.organisms.filter(organism => !organism.removeFromWorld);
 
         } else {
+            // statistic output
+            // console.log("stop game");
+            this._grid.stats();
+            // gameEngine.stop();
             world.stop(); // stop the game when the first village reaches 10k pop
         }
 
