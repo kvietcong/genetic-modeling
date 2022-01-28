@@ -9,7 +9,7 @@ params.environments = {
         threshold: 5
     },
     desert: {
-        name: "desert", 
+        name: "desert",
         color: "yellow",
         reward: 3,
         threshold: 3
@@ -68,7 +68,6 @@ class Village {
         let reward = {successes: 0, failures: 0, energy: 0};
         let i = 0;
 
-
         for(let task of this.taskList){
             if (task.threshold > organism.taskCapabilities[i]) {
                 reward.failures++;
@@ -79,9 +78,9 @@ class Village {
             }
             i++;
 
-            if (this.environment === "desert") {
-                console.log("org cap; ", organism.taskCapabilities[i], "-- task thresh: ", task.threshold, "-- reward: ", reward)
-            }
+            // if (this.environment === "desert") {
+            //     console.log("org cap; ", organism.taskCapabilities[i], "-- task thresh: ", task.threshold, "-- reward: ", reward)
+            // }
         }
         return reward; // return the reward
     };
