@@ -30,8 +30,8 @@ class Organism {
         // Creation of the genes associated with the current organism
         if (this.parent1 && this.parent2) {
             for (let i = 0; i < 10; i++) {
-                this.geneList.push(this.parent1.geneList[i].recombine(this.parent2.geneList[i])); 
-            }     
+                this.geneList.push(this.parent1.geneList[i].recombine(this.parent2.geneList[i]));
+            }
         }
         else if (this.parent1) { // if there's a parent1 organism
             for (let i = 0; i < 10; i++) {
@@ -89,15 +89,15 @@ class Organism {
         if(this.energy >= REPRODUCTION_THRESH && otherOrganism.energy >= REPRODUCTION_THRESH) {
             this.energy -= REPRODUCTION_THRESH;
             otherOrganism.energy -= REPRODUCTION_THRESH;
-            
+
             if (!migrationStatus || migrationChance > migrationThreshold) { // no migration OR migration but the chance is
-                if (!sexualReproductionStatus) { 
+                if (!sexualReproductionStatus) {
                     this.village.addOrganism(new Organism(this.village, this)); // asexual
                 } else {
                     this.village.addOrganism(new Organism(this.village, this, otherOrganism)); // sexual
                 }
             } else { // migration checked on and migration condition met
-                if (!sexualReproductionStatus) { 
+                if (!sexualReproductionStatus) {
                     this.village.addOrganism(new Organism(this.village._grid.getRandomVillage()), this); // asexual
                 } else {
                     this.village.addOrganism(new Organism(this.village._grid.getRandomVillage()), this, otherOrganism); // sexual
