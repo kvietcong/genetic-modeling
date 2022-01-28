@@ -39,8 +39,8 @@ class Organism {
 
         this.learnList = [];
         for (let i = 0; i < 10; i++) {
-            this.learnList.push(getRandomInteger(1,5));  // how well the organism will learn
-            // this.learnList.push(1);  // how well the organism will learn
+            // this.learnList.push(getRandomInteger(1,5));  // how well the organism will learn
+            this.learnList.push(0);  // how well the organism will learn
         }
 
         this.taskCapabilities = [];
