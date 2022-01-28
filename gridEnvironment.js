@@ -3,13 +3,22 @@ params.population = 20;
 
 params.environments = {
     snow: {
+        name: "snow",
         color: "white",
+        reward: 1,
+        threshold: 5
     },
     desert: {
+        name: "desert",
         color: "yellow",
+        reward: 3,
+        threshold: 3
     },
     forest: {
+        name : "forest",
         color: "green",
+        reward: 5,
+        threshold: 1
     },
 };
 
@@ -26,9 +35,9 @@ class Village {
         this.environment = chooseRandom(Object.keys(params.environments));
 
         this.taskList = [];             // all the tasks associated with the village
-        this.numTasks = 5;
+        this.numTasks = 10;
 
-        this.populationCap = 800;
+        this.populationCap = 500;
 
         this.createTaskList();
         this.populateVillage();
@@ -41,10 +50,36 @@ class Village {
     createTaskList() {
         for(let i = 0; i < this.numTasks; i++) {
             let task = {reward: 0, threshold: 0};
-            task.reward = getRandomInteger(1, 5);
-            task.threshold = getRandomInteger(1, 5);
+            if (this.environment === "snow") {
+                task.reward = params.environments.snow.reward;
+                task.threshold = params.environments.snow.threshold;
+            } else if (this.environment === "desert") {
+                task.reward = params.environments.desert.reward;
+                task.threshold = params.environments.desert.threshold;
+            } else if (this.environment === "forest") {
+                task.reward = params.environments.forest.reward;
+                task.threshold = params.environments.forest.threshold;
+            }
             this.taskList.push(task);   // adds the task to the task list.
         }
+    };
+
+    doTasks(organism) {
+        let reward = {successes: 0, failures: 0, energy: 0};
+        let i = 0;
+
+        for(let task of this.taskList){
+            if (task.threshold > organism.taskCapabilities[i]) {
+                reward.failures++;
+                reward.energy -= task.threshold;
+            } else if (task.threshold <= organism.taskCapabilities[i]) {
+                reward.successes++;
+                reward.energy += task.threshold;
+            }
+            i++;
+
+        }
+        return reward; // return the reward
     };
 
     populateVillage() {
@@ -59,6 +94,8 @@ class Village {
 
     removeOrganism(organism) { organism.removeFromWorld = true; }
 
+
+    // Organisms should only interact with those in their "village"
     step(world) {
         if (this.organisms.length < this.populationCap) {
             this.organisms.forEach(organism => organism.step(this, this.grid));
@@ -69,6 +106,7 @@ class Village {
             this.organisms = this.organisms.filter(organism => !organism.removeFromWorld);
 
         } else {
+            // statistic output
             world.stop(); // stop the game when the first village reaches 10k pop
         }
 
@@ -80,6 +118,10 @@ class Village {
 
     get neighbors() {
         return this.getVillagesInRange(this, 1, 1)
+    }
+
+    getRandomOrganism() {
+        return this.organisms[getRandomInteger(0, this.organisms.length - 1)];
     }
 
     get x() { return this._pos.x; }
@@ -185,6 +227,7 @@ class World {
         }
     }
 
+    // This notation: get functionName() indicates that what follows is a computed property.
     get stats() {
         let populationMax = 0;
         let populationMin = 0;
@@ -261,16 +304,18 @@ class World {
 
                 ctx.beginPath();
                 ctx.arc(x, y, radius, 0, 2 * PI);
-                ctx.fillStyle = rgba(255, 0, 0, ratio + 0.2);
+                ctx.fillStyle = rgba(0, 0, 0, ratio + 0.2);
                 ctx.fill();
                 ctx.fillStyle = "black";
                 ctx.fillText(population, x - 45, y + 40);
             }
         }
 
-        ctx.fillStyle = "White";
+        ctx.fillStyle = "Green";
         ctx.font = "60px 'Arial'";
-        ctx.fillText("Day " + this.days, 900, 50);
+        ctx.fillText("Day " + this.days, 740, 50);
+        ctx.fillText("Migration: " + document.getElementById("migrationBox").checked, 740, 120);
+        ctx.fillText("Sexual repr: " + document.getElementById("sexualReproductionBox").checked, 740, 190);
     }
 
     toString() {

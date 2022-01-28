@@ -2,46 +2,9 @@
  *
  * Organism & Task classes
  * @author KV, Raz and Kumiko
- * @version Rev 2
+ * @version Rev 3 - 1/25/2022
  *
  */
-
-/**
- * Task class:
- * Creates a single task for an organism
- */
-class Task {
-    /**
-     * Task constructor
-     * @param {*} doTaskWith
-     * @param {*} village
-     */
-    constructor(village, organism) {
-        this.village = village;
-        this.organism = organism;
-    };
-
-    /**
-     * doTasks
-     * @returns the rewards object that includes the # successes and failures for all the tasks and the resulting energy
-     */
-    doTasks() {
-        let reward = {successes: 0, failures: 0, energy: 0};
-
-        for(let task of this.village.taskList){
-            if (task.threshold > this.organism.taskCapability) {
-                reward.failures++;
-                reward.successes--;
-                reward.energy -= task.threshold;
-            } else if (task.threshold <= this.organism.taskCapability) {
-                reward.failures--;
-                reward.successes++;
-                reward.energy += task.threshold;
-            }
-        }
-        return reward; // return the reward
-    };
-};
 
 // Constants associated with every Organism
 const NUM_TASKS = 5;            // the number of tasks that the Organism has to do
@@ -55,26 +18,41 @@ class Organism {
     /**
      * Constructor for the Organism
      * @param {*} village
-     * @param {*} parent
+     * @param {*} parent1
      */
-    constructor(village, parent) {
+    constructor(village, parent1, parent2 = false) {
         this.village = village;         // the village that the Organism lives in
-        this.parent = parent;           // the parent of the Organism
+        this.parent1 = parent1;           // the parent1 of the Organism
+        this.parent2 = parent2;
+        this.geneList = [];
 
         // Instance variables
         // Creation of the genes associated with the current organism
-        if (this.parent) { // if there's a parent organism
-            this.gene = new Gene().recombine(parent.gene); // we're sending two of the of the same
-                                                                        // geneome to the recomboer.
-        } else {
-            this.gene = new Gene(); // if this is the first set of organisms created
+        if (this.parent1 && this.parent2) {
+            for (let i = 0; i < 10; i++) {
+                this.geneList.push(this.parent1.geneList[i].recombine(this.parent2.geneList[i])); 
+            }     
+        }
+        else if (this.parent1) { // if there's a parent1 organism
+            for (let i = 0; i < 10; i++) {
+                this.geneList.push(new Gene().recombine(this.parent1.geneList[i])); // we're sending two of the of the same
+            }                                                     // geneome to the recomboer.
+        } else { // if this is the first set of organisms created
+            for (let i = 0; i < 10; i++) {
+                this.geneList.push(new Gene());
+            }
         }
 
-        this.learn = getRandomInteger(1,5);                 // how well the organism will learn
+        this.learnList = [];
+        for (let i = 0; i < 10; i++) {
+            this.learnList.push(getRandomInteger(1,5));  // how well the organism will learn
+            // this.learnList.push(1);  // how well the organism will learn
+        }
 
-        this.taskCapability = this.getTaskCapability();        // will be gene + learn
+        this.taskCapabilities = [];
+        this.taskCapabilities = this.getTaskCapabilities();        // will be gene + learn
 
-        this.reward = new Task(this.village, this).doTasks();
+        this.reward = this.village.doTasks(this);
 
         this.successes = 0;             // keep track of successes on the tasks
         this.failures = 0;              // will allow percentage calculation
@@ -88,9 +66,12 @@ class Organism {
      * getTaskCapability function
      * @returns the capability of the organism to complete a task
      */
-    getTaskCapability() {
-        this.taskCapability = this.learn + this.gene.level; // this.gene.get() is in place of getting the level of the genes
-        return this.taskCapability;
+    getTaskCapabilities() {
+        // this.taskCapability = this.learn + this.gene.level;
+        for (let i = 0; i < 10; i++) {
+            this.taskCapabilities.push(this.learnList[i] + this.geneList[i].level);
+        }
+        return this.taskCapabilities;
     }
 
     /**
@@ -99,9 +80,29 @@ class Organism {
      * @param {*} otherOrganism
      */
     reproduce(otherOrganism = this) {
-        if(this.energy >= REPRODUCTION_THRESH) {
+        let migrationStatus = document.getElementById("migrationBox").checked;
+        let sexualReproductionStatus = document.getElementById("sexualReproductionBox").checked;
+
+        let migrationChance = getRandomInteger(1, 10);
+        let migrationThreshold = 5; // 50% chance of migration
+
+        if(this.energy >= REPRODUCTION_THRESH && otherOrganism.energy >= REPRODUCTION_THRESH) {
             this.energy -= REPRODUCTION_THRESH;
-            this.village.addOrganism(new Organism(this.village, this));
+            otherOrganism.energy -= REPRODUCTION_THRESH;
+            
+            if (!migrationStatus || migrationChance > migrationThreshold) { // no migration OR migration but the chance is
+                if (!sexualReproductionStatus) { 
+                    this.village.addOrganism(new Organism(this.village, this)); // asexual
+                } else {
+                    this.village.addOrganism(new Organism(this.village, this, otherOrganism)); // sexual
+                }
+            } else { // migration checked on and migration condition met
+                if (!sexualReproductionStatus) { 
+                    this.village.addOrganism(new Organism(this.village._grid.getRandomVillage()), this); // asexual
+                } else {
+                    this.village.addOrganism(new Organism(this.village._grid.getRandomVillage()), this, otherOrganism); // sexual
+                }
+            }
         }
     };
 
@@ -113,37 +114,48 @@ class Organism {
         return this.successes / (this.successes + this.failures);
     };
 
+    // ?????
+    improveLearning() {
+        // improve with every x successes?
+        // improve randomly (e.g., 1%)?
+        // learning similar to genetic architecture. Similar to cultural evolution
+    };
+
     /**
      * step function will advance the organism by a day every tick
      */
     step(tile, grid) {
-        // determines the lifespan of an organism
+
         let live = true;
+
+        // 1% chance of dying
         if (getRandomInteger(1, 100) === 1) {
             live = false;
         }
-        
-        if(live === true) {                               
+
+        // soft age cap using the "percentage" above
+        if(live === true) { // this would be 20 (7300) - 60 "years" (365 days * 60 years)
             this.successes += this.reward.successes;           // keep track of successes on the tasks
             this.failures += this.reward.failures;             // will allow percentage calculation
             this.energy += this.reward.energy;                 // energy of the Organism
-            this.reproduce();
-        } else {                                               // if they are 100 or more they "die"
+            this.reproduce(this.village.getRandomOrganism()); // changed from reproduce() to sexual reproduction
+        } else {                        // if they are 100 or more they "die"
             this.alive = false;
             this.village.removeOrganism(this);
         }
 
         // Hard age cap
-        /* if(this.days < 36500 && live === true) {            // 100 year hard age cap
-            this.successes += this.reward.successes;           // keep track of successes on the tasks
-            this.failures += this.reward.failures;             // will allow percentage calculation
-            this.energy += this.reward.energy;                 // energy of the Organism
-            this.reproduce();
-        } else {                                               // if they are 100 or more they "die"
-            this.alive = false;
-            this.village.removeOrganism(this);
-        } */
+        // if(this.days < 36500) { // this would be 20 (7300) - 60 "years" (365 days * 60 years)
+        //     this.successes += this.reward.successes;           // keep track of successes on the tasks
+        //     this.failures += this.reward.failures;             // will allow percentage calculation
+        //     this.energy += this.reward.energy;                 // energy of the Organism
+        //     this.reproduce();
+        // } else {                        // if they are 100 or more they "die"
+        //     this.alive = false;
+        //     this.village.removeOrganism(this);
+        // }
 
         // this.days++; // increment the day/age
+
     };
 };

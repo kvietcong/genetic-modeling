@@ -27,6 +27,9 @@
         #simulations > li::marker {
             content: "Sim " counter(listcounter) ": ";
         }
+        body {
+            font-size: 24px;
+        }
     </style>
 </head>
 <body>
@@ -39,5 +42,11 @@
     </button>
     <ol id="buttons" style="position: fixed; top: 90px; right: 10px;">
     </ol>
+
+    <div> 
+        <br>
+        <input type="checkbox" id="migrationBox"> Offspring migration 
+        <input type="checkbox" id="sexualReproductionBox"> Sexual reproduction
+    </div>
 </body>
 </html>
