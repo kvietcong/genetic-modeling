@@ -84,6 +84,13 @@ window.requestAnimFrame = (() => {
  */
 const getRandomInteger = (min, max) => round(Math.random() * (max - min) + min);
 
+const average = args => {
+    if (!args.length) return 0;
+    return args.reduce((a, b) => a + b, 0) / args.length;
+}
+
+const range = (start, end) => [...Array(end - start + 1).keys()].map(i => i + start);
+
 /**
  * Random number between two numbers inclusively
  * @param {Number} min Lower bound
