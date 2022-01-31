@@ -7,9 +7,31 @@ const restart = gameEngine => {
 }
 
 const gridExample = gameEngine => {
+    // gameEngine.addEntity(testHistogram);
+
     const width = 8;
     const height = 8;
-    gameEngine.addEntity(new World(width, height));
+    const world = new World(width, height);
+    const histograms = [];
+    for (let i = 0; i < width; i++) {
+        histograms[i] = [];
+        for (let j = 0; j < height; j++) {
+            const histogram = new Histogram(
+                [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                organism => floor(average(organism.geneList.map(gene => gene.level))),
+                world.getVillage(i, j).organisms,
+                min(gameEngine.width, gameEngine.height), 250,
+                550, 460,
+                `Histogram for Village ${i}, ${j}`,
+                false
+            );
+            if (!i && !j) histogram.isDrawing = true;
+            histogram.setInfoGetter(() => world.getVillage(i, j).organisms, 10);
+            histograms[i][j] = histogram;
+            gameEngine.addEntity(histogram);
+        }
+    }
+    gameEngine.addEntity(world);
 };
 
 const geneExample = gameEngine => {
