@@ -231,6 +231,7 @@ class World {
     get stats() {
         const stats = {
             ...this.populationStats,
+            // ...this.geneStats,
         };
         return stats;
     }
