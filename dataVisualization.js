@@ -2,9 +2,11 @@ class Histogram {
     constructor(
         categories, getCategory, initialData,
         x = 0, y = 0, width = 840, height = 420,
+        title = "Histogram", isDrawing = true,
     ) {
         this.getCategory = getCategory;
         this.categories = categories;
+        this.title = title;
 
         this.x = x; this.y = y;
         this.width = width; this.height = height;
@@ -12,6 +14,7 @@ class Histogram {
         this.customDrawer;
         this.drawLast = 20;
         this.drawConsistent = true;
+        this.isDrawing = isDrawing;
 
         this._categoryCounts = {};
         this.allCounts = [];
@@ -34,7 +37,7 @@ class Histogram {
 
     getRatios(counts) {
         const total = counts.total;
-        return categories.reduce((accumulated, current) => {
+        return this.categories.reduce((accumulated, current) => {
             accumulated[current] = counts[current] / total;
             return accumulated;
         }, {});
@@ -79,6 +82,7 @@ class Histogram {
 
 
     draw(ctx) {
+        if (!this.isDrawing) return;
         if (this.customDrawer) return this.customDrawer(this, ctx);
         ctx.fillStyle = "white";
         ctx.fillRect(this.x, this.y, this.width, this.height);
@@ -89,12 +93,25 @@ class Histogram {
                        ? this.drawLast
                        : min(this.drawLast, this.allCounts.length);
 
+        ctx.fillStyle = "black";
+        ctx.font = "14px Arial";
         const longestCategory = this.categories.reduce((longest, current) =>
-            max(longest, current.length), 0);
-        const labelWidth = longestCategory * 15;
+            current.toString().length > longest.length
+                ? current.toString()
+                : longest, "");
+        const labelWidth = max(
+            ctx.measureText("100.0%").width,
+            ctx.measureText(longestCategory).width
+        ) + 10;
+
+        const titleHeight = 20;
 
         const barWidths = (this.width - labelWidth) / drawLast;
-        const barHeights = this.height / this.categories.length;
+        const barHeights = (this.height - titleHeight) / this.categories.length;
+
+        ctx.fillText(this.title,
+            this.x + this.width / 2 - ctx.measureText(this.title).width / 2,
+            this.y + this.height - titleHeight / 4);
 
         for (let i = this.allCounts.length - 1;
              i >= this.allCounts.length - drawLast;
@@ -107,18 +124,16 @@ class Histogram {
             // Labels
             if (i === this.allCounts.length - 1) {
                 this.categories.forEach((category, j) => {
-                    ctx.fillStyle = "black";
-                    ctx.font = "20px Arial";
                     // Category Label
                     ctx.fillText(category,
                         this.x + this.width - labelWidth + 5,
-                        this.y + (j + 0.425) * barHeights,
+                        this.y + (j + 0.3) * barHeights,
                         labelWidth + 5);
 
                     // Percentages of latest counts
-                    ctx.fillText(`${(ratios[category] * 100).toFixed(2)}%`,
+                    ctx.fillText(`${(ratios[category] * 100).toFixed(1)}%`,
                         this.x + this.width - labelWidth + 5,
-                        this.y + (j + 0.575) * barHeights,
+                        this.y + (j + 0.7) * barHeights,
                         labelWidth + 5);
                 });
             }
