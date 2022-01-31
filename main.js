@@ -16,6 +16,7 @@ const gridExample = gameEngine => {
     for (let i = 0; i < width; i++) {
         histograms[i] = [];
         for (let j = 0; j < height; j++) {
+            // TODO: MAKE INDEXING SANE! And fix lopsided grids.
             const histogram = new Histogram(
                 [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
                 organism => floor(average(organism.geneList.map(gene => gene.level))),
@@ -25,7 +26,7 @@ const gridExample = gameEngine => {
                 `Histogram for Village ${i}, ${j}`,
                 false
             );
-            if (!i && !j) histogram.isDrawing = true;
+            if (i === 1 && j === 1) histogram.isDrawing = true;
             histogram.setInfoGetter(() => world.getVillage(i, j).organisms, 10);
             histograms[i][j] = histogram;
             gameEngine.addEntity(histogram);

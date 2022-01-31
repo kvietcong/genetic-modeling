@@ -37,10 +37,11 @@ class Histogram {
 
     getRatios(counts) {
         const total = counts.total;
-        return this.categories.reduce((accumulated, current) => {
-            accumulated[current] = counts[current] / total;
+        const ratios = this.categories.reduce((accumulated, current) => {
+            accumulated[current] = counts[current] / (total || 1);
             return accumulated;
         }, {});
+        return ratios;
     }
 
     pushData(data) { this.allCounts.push(this.getCounts(data)); }
@@ -84,6 +85,7 @@ class Histogram {
     draw(ctx) {
         if (!this.isDrawing) return;
         if (this.customDrawer) return this.customDrawer(this, ctx);
+
         ctx.fillStyle = "white";
         ctx.fillRect(this.x, this.y, this.width, this.height);
         ctx.strokeStyle = "black";
@@ -110,7 +112,7 @@ class Histogram {
         const barHeights = (this.height - titleHeight) / this.categories.length;
 
         ctx.fillText(this.title,
-            this.x + this.width / 2 - ctx.measureText(this.title).width / 2,
+            this.x + (this.width - ctx.measureText(this.title).width) / 2,
             this.y + this.height - titleHeight / 4);
 
         for (let i = this.allCounts.length - 1;
