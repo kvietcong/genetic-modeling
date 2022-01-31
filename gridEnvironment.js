@@ -228,23 +228,42 @@ class World {
     }
 
     // This notation: get functionName() indicates that what follows is a computed property.
-    // TODO: Modularize this so that we don't have to do all complex calculations
-    // every update.
     get stats() {
+        const stats = {
+            ...this.populationStats,
+        };
+        return stats;
+    }
+
+    get populationStats() {
         let populationMax = 0;
         let populationMin = 0;
         let populationTotal = 0;
+
+        for (const row of this.villages) {
+            for (const village of row) {
+                const villagePopulation = village.organisms.length;
+                populationTotal += villagePopulation;
+                populationMax = max(populationMax, villagePopulation);
+                populationMin = min(populationMin, villagePopulation);
+            }
+        }
+
+        const populationAverage = populationTotal / (this.width * this.height);
+
+        const populationStats = {
+            populationAverage, populationMax, populationMin, populationTotal,
+        };
+        return populationStats;
+    }
+
+    get geneStats() {
         let geneLevelsAll = [];
         const geneLevelAveragesForTaskPerVillage = [];
 
         for (const [i, row] of this.villages.entries()) {
             geneLevelAveragesForTaskPerVillage[i] = [];
             for (const [j, village] of row.entries()) {
-                const villagePopulation = village.organisms.length;
-                populationTotal += villagePopulation;
-                populationMax = max(populationMax, villagePopulation);
-                populationMin = min(populationMin, villagePopulation);
-
                 const villageGenes = village.organisms
                     .map(organism => organism.geneList);
                 const geneAmount = villageGenes?.[0]?.length;
@@ -268,15 +287,13 @@ class World {
         const geneLevelAverage =  average(geneLevelsAll);
         const geneLevelAveragesPerVillage = geneLevelAveragesForTaskPerVillage
             .map(row => row.map(geneLevels => average(geneLevels)));
-        const populationAverage = populationTotal / (this.width * this.height);
 
-        const stats = {
-            populationAverage, populationMax, populationMin, populationTotal,
+        const geneStats = {
             geneLevelAverage, // Average gene level across all organisms (Regardless of Task)
             geneLevelAveragesForTaskPerVillage, // Average gene level for corresponding task per village
             geneLevelAveragesPerVillage, // Average gene level per village (Regardless of Task)
         };
-        return stats;
+        return geneStats;
     }
 
     printStats() {
