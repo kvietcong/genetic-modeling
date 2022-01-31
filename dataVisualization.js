@@ -1,7 +1,7 @@
 class Histogram {
     constructor(
         categories, getCategory, initialData,
-        x = 0, y = 0, width = 640, height = 360,
+        x = 0, y = 0, width = 840, height = 420,
     ) {
         this.getCategory = getCategory;
         this.categories = categories;
@@ -11,6 +11,7 @@ class Histogram {
 
         this.customDrawer;
         this.drawLast = 20;
+        this.drawConsistent = true;
 
         this._categoryCounts = {};
         this.allCounts = [];
@@ -81,11 +82,18 @@ class Histogram {
         if (this.customDrawer) return this.customDrawer(this, ctx);
         ctx.fillStyle = "white";
         ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.strokeStyle = "black";
+        ctx.strokeRect(this.x, this.y, this.width, this.height);
 
         const drawLast = this.drawConsistent
                        ? this.drawLast
                        : min(this.drawLast, this.allCounts.length);
-        const barWidths = this.width / drawLast;
+
+        const longestCategory = this.categories.reduce((longest, current) =>
+            max(longest, current.length), 0);
+        const labelWidth = longestCategory * 15;
+
+        const barWidths = (this.width - labelWidth) / drawLast;
         const barHeights = this.height / this.categories.length;
 
         for (let i = this.allCounts.length - 1;
@@ -93,17 +101,37 @@ class Histogram {
              i--
         ) {
             if (i < 0) break;
-            const x = this.x + (i - this.allCounts.length + drawLast) * barWidths;
             const counts = this.allCounts[i];
             const ratios = this.getRatios(counts);
-            for (let j = 0; j < this.categories.length; j++) {
-                const category = this.categories[j];
+
+            // Labels
+            if (i === this.allCounts.length - 1) {
+                this.categories.forEach((category, j) => {
+                    ctx.fillStyle = "black";
+                    ctx.font = "20px Arial";
+                    // Category Label
+                    ctx.fillText(category,
+                        this.x + this.width - labelWidth + 5,
+                        this.y + (j + 0.425) * barHeights,
+                        labelWidth + 5);
+
+                    // Percentages of latest counts
+                    ctx.fillText(`${(ratios[category] * 100).toFixed(2)}%`,
+                        this.x + this.width - labelWidth + 5,
+                        this.y + (j + 0.575) * barHeights,
+                        labelWidth + 5);
+                });
+            }
+
+            const x = this.x + (i - this.allCounts.length + drawLast) * barWidths;
+            this.categories.forEach((category, j) => {
                 const y = this.y + (j * barHeights);
                 let opacity = ratios[category];
+                // TODO: Get logarithmic scale working
                 // console.log(opacity = log(ratios[category] * 99 + 1) / log(100) * 512 / 1000);
                 ctx.fillStyle = rgba(0, 0, 0, opacity);
                 ctx.fillRect(x, y, barWidths, barHeights);
-            }
+            });
         }
     }
 }
@@ -125,8 +153,8 @@ const updater = (histogram, gameEngine) =>
 
 const infoGetter = (histogram, gameEngine) =>
     initialHeightData.map(_ => getRandomInteger(3, 8));
-// testHistogram.setInfoGetter(infoGetter, 12);
+testHistogram.setInfoGetter(infoGetter, 12);
 
-const individualUpdater = (histogram, gameEngine) =>
+const individualUpdater = histogram =>
     histogram.pushData(initialHeightData.map(_ => getRandomInteger(3, 8)));
 // testHistogram.setIndependentUpdater(individualUpdater, 12);
