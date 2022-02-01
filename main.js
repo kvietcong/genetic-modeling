@@ -1,4 +1,4 @@
-const assetManager = new AssetManager();
+            const assetManager = new AssetManager();
 let gameEngines = [];
 
 const restart = gameEngine => {
@@ -18,13 +18,13 @@ const gridExample = gameEngine => {
         for (let j = 0; j < height; j++) {
             // TODO: MAKE INDEXING SANE! And fix lopsided grids.
             const histogram = new Histogram(
-                [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-                organism => floor(average(organism.geneList.map(gene => gene.level))),
-                world.getVillage(i, j).organisms,
-                min(gameEngine.width, gameEngine.height), 250,
-                550, 460,
-                `Histogram for Village ${i}, ${j}`,
-                false
+                [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],                                         // categories
+                organism => floor(average(organism.geneList.map(gene => gene.level))),  // getCategory
+                world.getVillage(i, j).organisms,                                       // initialData
+                min(gameEngine.width, gameEngine.height), 250,                          // x = 0, y = 0,
+                550, 460,                                                               // width = 840, height = 420,
+                `Histogram for Village ${i}, ${j}`,                                     // title = "Histogram"
+                false                                                                   // isDrawing = true
             );
             if (i === 1 && j === 1) histogram.isDrawing = true;
             histogram.setInfoGetter(() => world.getVillage(i, j).organisms, 10);
