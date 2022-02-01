@@ -157,7 +157,7 @@ class World {
         if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
             throw new Error(`Village out of bounds: ${x}, ${y}`);
         }
-        return this.villages[y]?.[x];
+        return this.villages[y]?.[x];  // what does this mean?
     }
 
     // Defaults to direct neighbors
