@@ -82,7 +82,7 @@ window.requestAnimFrame = (() => {
  * @param {Number} min Lower bound
  * @param {Number} max Upper bound
  */
-const getRandomInteger = (min, max) => round(Math.random() * (max - min) + min);
+const getRandomInteger = (min, max) => round(random() * (max - min) + min);
 
 const average = args => {
     if (!args.length) return 0;
@@ -96,7 +96,7 @@ const range = (start, end) => [...Array(end - start + 1).keys()].map(i => i + st
  * @param {Number} min Lower bound
  * @param {Number} max Upper bound
  */
-const getRandomRange = (min, max) => Math.random() * (max - min) + min;
+const getRandomRange = (min, max) => random() * (max - min) + min;
 
 /**
  * Compute log with arbitrary base
