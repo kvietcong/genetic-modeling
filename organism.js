@@ -83,9 +83,18 @@ class Organism {
         let migrationStatus = document.getElementById("migrationBox").checked;
         let sexualReproductionStatus = document.getElementById("sexualReproductionBox").checked;
 
-        let migrationChance = getRandomInteger(1, 10);
-        let migrationThreshold = 5; // 50% chance of migration
+        // use real values math.random() will return 0-1
+        // let migrationChance = getRandomInteger(1, 10);
+        let migrationChance = random();
+        let migrationThreshold = .2; // 20% chance of migration
+                                     // adjust with different levels.
 
+
+        // cost to create offspring same with asexual and sexual reproduction.
+        // so split cost between 2 parents - equal (default) or unequal (similar to humans - if we do this, we might need two sexes)
+        // allow random asexual and sexual reproduction within a single sim (e.g., bacteria, some type of fish, plant world)
+        // Give the option for selection of three options
+        //
         if(this.energy >= REPRODUCTION_THRESH && otherOrganism.energy >= REPRODUCTION_THRESH) {
             this.energy -= REPRODUCTION_THRESH;
             otherOrganism.energy -= REPRODUCTION_THRESH;
@@ -98,9 +107,9 @@ class Organism {
                 }
             } else { // migration checked on and migration condition met
                 if (!sexualReproductionStatus) {
-                    this.village.addOrganism(new Organism(this.village._grid.getRandomVillage()), this); // asexual
+                    this.village.addOrganism(new Organism(this.village.getVillagesInRange(1, 1)), this); // asexual
                 } else {
-                    this.village.addOrganism(new Organism(this.village._grid.getRandomVillage()), this, otherOrganism); // sexual
+                    this.village.addOrganism(new Organism(this.village.getVillagesInRange(1, 1)), this, otherOrganism); // sexual
                 }
             }
         }
@@ -138,6 +147,8 @@ class Organism {
             this.successes += this.reward.successes;           // keep track of successes on the tasks
             this.failures += this.reward.failures;             // will allow percentage calculation
             this.energy += this.reward.energy;                 // energy of the Organism
+            let other = this.village.getRandomOrganism();
+            // if (this.energy >= REPRODUCTION_THRESH && other.energy >= REPRODUCTION_THRESH) {}
             this.reproduce(this.village.getRandomOrganism()); // changed from reproduce() to sexual reproduction
         } else {                        // if they are 100 or more they "die"
             this.alive = false;

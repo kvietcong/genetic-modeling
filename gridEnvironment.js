@@ -1,11 +1,13 @@
 params.stepsPerSecond = 10;
 params.population = 20;
 
+
+// play with environments.
 params.environments = {
     snow: {
         name: "snow",
         color: "white",
-        reward: 1,
+        reward: 1,  // want an array of task in each environment with different values
         threshold: 5
     },
     desert: {
@@ -69,12 +71,12 @@ class Village {
         let i = 0;
 
         for(let task of this.taskList){
-            if (task.threshold > organism.taskCapabilities[i]) {
+            if (task.threshold > organism.taskCapabilities[i]) { // doesn't meet threshold
                 reward.failures++;
-                reward.energy -= task.threshold;
+                //reward.energy -= task.reward; // no penalty should be included (options: penalty is threshold or arbitrary)
             } else if (task.threshold <= organism.taskCapabilities[i]) {
                 reward.successes++;
-                reward.energy += task.threshold;
+                reward.energy += task.reward;
             }
             i++;
 
@@ -112,7 +114,9 @@ class Village {
 
     }
 
-    getVillagesInRange(start, end) {
+    // use this one with (1,1)
+    // wrapper function
+    getVillagesInRange(start, end) {                                    // zero includes the current village
         return this._grid.getVillagesInRangeFrom(this, start, end);
     }
 
@@ -123,6 +127,13 @@ class Village {
     getRandomOrganism() {
         return this.organisms[getRandomInteger(0, this.organisms.length - 1)];
     }
+
+    // get organisms that meet the reproduction thresholds
+    // use a helper function that splits into parents and non parents -- do this in the update()
+    // so that it occurs once a tick.
+    // getAppropriateOrganism(){
+
+    // }
 
     get x() { return this._pos.x; }
     get y() { return this._pos.y; }
@@ -161,7 +172,8 @@ class World {
     }
 
     // Defaults to direct neighbors
-    getVillagesInRangeFrom(village, start = 1, end = 1) {
+    // DO NOT USE THIS ONE
+    getVillagesInRangeFrom(village, start = 1, end = 1) { 
         const neighbors = [];
         for (let j = -end; j <= end; j++) {
             for (let i = -end; i <= end; i++) {
