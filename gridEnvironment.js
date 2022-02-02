@@ -33,14 +33,12 @@ class Village {
         this.organisms = [];
         this.organismsToAdd = [];
 
-        this.fitOrganisms = [];
-
         this.environment = chooseRandom(Object.keys(params.environments));
 
         this.taskList = [];             // all the tasks associated with the village
-        this.numTasks = 10;
+        this.numTasks = 5;
 
-        this.populationCap = 500;
+        this.populationCap = 1000;
 
         this.createTaskList();
         this.populateVillage();
@@ -65,6 +63,7 @@ class Village {
                 task.reward = params.environments.forest.reward;
                 task.threshold = params.environments.forest.threshold[i];
             }
+
             this.taskList.push(task);   // adds the task to the task list.
         }
     };
@@ -76,7 +75,6 @@ class Village {
         for(let task of this.taskList){
             if (task.threshold > organism.taskCapabilities[i]) { // doesn't meet threshold
                 reward.failures++;
-                //reward.energy -= task.reward; // no penalty should be included (options: penalty is threshold or arbitrary)
             } else if (task.threshold <= organism.taskCapabilities[i]) {
                 reward.successes++;
                 reward.energy += task.reward;
@@ -99,14 +97,10 @@ class Village {
 
     removeOrganism(organism) { organism.removeFromWorld = true; }
 
+    get fitOrganisms() { return this.organisms.filter(organism => organism.energy > REPRODUCTION_THRESH); }
 
     // Organisms should only interact with those in their "village"
     step(world) {
-        for(let i = 0; i < this.organisms.length; i++) {
-            if (this.organisms[i].energy > REPRODUCTION_THRESH) {
-                this.fitOrganisms.push(this.organisms[i]);
-            }
-        }
 
         if (this.organisms.length < this.populationCap) {
             this.organisms.forEach(organism => organism.step(this, this.grid));
@@ -123,14 +117,12 @@ class Village {
 
     }
 
-    // use this one with (1,1)
-    // wrapper function
     getVillagesInRange(start, end) {                                    // zero includes the current village
         return this._grid.getVillagesInRangeFrom(this, start, end);
     }
 
     get neighbors() {
-        return this.getVillagesInRange(this, 1, 1)
+        return this.getVillagesInRange(this, 1, 1);
     }
 
     getRandomOrganism() { return chooseRandom(this.organisms); }
@@ -138,8 +130,6 @@ class Village {
     getRandomNeighbor() { return chooseRandom(this.neighbors); }
 
     // get organisms that meet the reproduction thresholds
-    // use a helper function that splits into parents and non parents -- do this in the update()
-    // so that it occurs once a tick.
     getFitOrganism(){
         return this.fitOrganisms[getRandomInteger(0, this.fitOrganisms.length - 1)];
     }
@@ -180,22 +170,6 @@ class World {
         return this.villages[i][j];
     }
 
-    // Defaults to direct neighbors
-    // DO NOT USE THIS ONE
-    // getVillagesInRangeFrom(village, start = 1, end = 1) { 
-    //     const neighbors = [];
-    //     for (let j = -end; j <= end; j++) {
-    //         for (let i = -end; i <= end; i++) {
-    //             if (abs(j) < start && abs(i) < start) continue;
-
-
-    //             const n = this.getVillage(village.x + j, village.y + i);
-    //             if (n) neighbors.push(n);
-    //         }
-    //     }
-    //     return neighbors;
-    // }
-    // Defaults to direct neighbors
     // Defaults to direct neighbors
     getVillagesInRangeFrom(village, start = 1, end = 1) {
         const neighbors = [];

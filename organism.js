@@ -2,7 +2,7 @@
  *
  * Organism & Task classes
  * @author KV, Raz and Kumiko
- * @version Rev 3 - 1/25/2022
+ * @version Rev 4 - 2/1/2022
  *
  */
 
@@ -88,14 +88,9 @@ class Organism {
         // let sexualReproductionStatus = document.getElementById("sexualReproductionBox").checked;
 
         let migrationChance = random(); // random value between 0 and 1
-        let migrationThreshold = 0.2;   // 20% chance of migration
+        let migrationThreshold = 1.0;   // 20% chance of migration
                                         // adjust with different levels.
 
-        // cost to create offspring same with asexual and sexual reproduction.
-        // so split cost between 2 parents - equal (default) or unequal (similar to humans - if we do this, we might need two sexes)
-        // allow random asexual and sexual reproduction within a single sim (e.g., bacteria, some type of fish, plant world)
-        // Give the option for selection of three options
-        //
         if(this.energy >= REPRODUCTION_THRESH && otherOrganism.energy >= REPRODUCTION_THRESH) {
             this.energy -= REPRODUCTION_THRESH / 2; // this.parent1 25
             otherOrganism.energy -= REPRODUCTION_THRESH / 2; // this.parent1 25
@@ -104,9 +99,6 @@ class Organism {
                     this.village.addOrganism(new Organism(this.village, this, otherOrganism));
             } else { // migration checked on and migration condition met
                     let ranVillage = this.village.getRandomNeighbor();
-
-                    console.log(this.village.toString(), ranVillage, this.village.neighbors);
-
                     this.village.addOrganism(new Organism(ranVillage, this, otherOrganism));
             }
         }
@@ -139,7 +131,7 @@ class Organism {
         }
 
         let sexualReproChance = random();   // random value between 0 and 1
-        let sexualReproThreshold = 0.5;     // 50% chance of sexual reproduction
+        let sexualReproThreshold = 1.0;     // 50% chance of sexual reproduction
                                             // adjust with different levels.
 
         // soft age cap using the "percentage" above
