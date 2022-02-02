@@ -1,26 +1,29 @@
 class Histogram {
     constructor(
-        categories, getCategory, initialData,
-        x = 0, y = 0, width = 840, height = 420,
-        title = "Histogram", isDrawing = true,
+        categories, getCategory,
+        x, y, width, height,
+        title, initialData
     ) {
         this.getCategory = getCategory;
         this.categories = categories;
-        this.title = title;
 
-        this.x = x; this.y = y;
-        this.width = width; this.height = height;
+        this.x = x ?? 0; this.y = y ?? 0;
+        this.width = width ?? 820; this.height = height ?? 420;
 
         this.customDrawer;
         this.drawLast = 20;
         this.drawConsistent = true;
-        this.isDrawing = isDrawing;
+        this.isDrawing = true;
+        this.title = title ?? "Histogram";
 
         this._categoryCounts = {};
         this.allCounts = [];
-        this.pushData(initialData);
+        if (initialData) this.pushData(initialData);
 
         this.timeSinceLastUpdate = 0;
+
+        this.onTickTime = false;
+        this.ticksSinceLastUpdate = 0;
     }
 
     getCounts(data) {
@@ -57,26 +60,37 @@ class Histogram {
         if (this.intervalID) clearInterval(this.intervalID);
     }
 
-    setInfoGetter(getter, updatesPerSecond) {
-        this.setUpdate((histogram, gameEngine) => {
-            histogram.pushData(getter(histogram, gameEngine));
-        }, updatesPerSecond);
+    // Shorthand for pushing data directly
+    setGetter(getter, updatesPerSecond) {
+        this.setUpdater(histogram =>
+            histogram.pushData(getter(histogram)), updatesPerSecond);
     }
 
-    setUpdate(updater, updatesPerSecond) {
+    setUpdater(updater, unitTimePerUpdate) {
         this.updater = updater;
-        this.updatesPerSecond = updatesPerSecond;
+        this.unitTimePerUpdate = unitTimePerUpdate;
     }
 
-    stopUpdate() { this.updater = null; this.updatesPerSecond = 0; }
+    stopUpdate() { this.updater = null; this.unitTimePerUpdate = 0; }
+
+    step() {
+        this.ticksSinceLastUpdate += 1;
+        if (this.ticksSinceLastUpdate >= this.unitTimePerUpdate) {
+            this.ticksSinceLastUpdate -= this.unitTimePerUpdate;
+            this.updater(this);
+        }
+    }
 
     update(gameEngine) {
-        if (!this.updater) return;
-        this.timeSinceLastUpdate += gameEngine.deltaTime;
-        const updateFrequency = 1 / this.updatesPerSecond;
+        if (!this.updater || this.onTickTime) {
+            this.timeSinceLastUpdate = 0;
+            return;
+        }
 
-        if (this.timeSinceLastUpdate > updateFrequency) {
-            this.timeSinceLastUpdate -= updateFrequency;
+        this.timeSinceLastUpdate += gameEngine.deltaTime;
+
+        if (this.timeSinceLastUpdate > this.unitTimePerUpdate) {
+            this.timeSinceLastUpdate -= this.unitTimePerUpdate;
             this.updater(this, gameEngine);
         }
     }
@@ -112,8 +126,21 @@ class Histogram {
         const barHeights = (this.height - titleHeight) / this.categories.length;
 
         ctx.fillText(this.title,
-            this.x + (this.width - ctx.measureText(this.title).width) / 2,
+            this.x + 5,
             this.y + this.height - titleHeight / 4);
+
+        const sampleSize =
+            `Current Total: ${this.currentCounts?.total ?? 0}`;
+        ctx.fillText(sampleSize,
+            this.x + this.width - ctx.measureText(sampleSize).width - 5,
+            this.y + this.height - titleHeight / 4);
+
+        // Category Labels
+        this.categories.forEach((category, j) =>
+            ctx.fillText(category,
+                this.x + this.width - labelWidth + 5,
+                this.y + (j + 0.3) * barHeights,
+                labelWidth + 5));
 
         for (let i = this.allCounts.length - 1;
              i >= this.allCounts.length - drawLast;
@@ -123,22 +150,14 @@ class Histogram {
             const counts = this.allCounts[i];
             const ratios = this.getRatios(counts);
 
-            // Labels
-            if (i === this.allCounts.length - 1) {
-                this.categories.forEach((category, j) => {
-                    // Category Label
-                    ctx.fillText(category,
-                        this.x + this.width - labelWidth + 5,
-                        this.y + (j + 0.3) * barHeights,
-                        labelWidth + 5);
-
-                    // Percentages of latest counts
+            // Label Percentages of latest counts
+            if (i === this.allCounts.length - 1)
+                this.categories.forEach((category, j) =>
                     ctx.fillText(`${(ratios[category] * 100).toFixed(1)}%`,
                         this.x + this.width - labelWidth + 5,
                         this.y + (j + 0.7) * barHeights,
-                        labelWidth + 5);
-                });
-            }
+                        labelWidth + 5));
+
 
             const x = this.x + (i - this.allCounts.length + drawLast) * barWidths;
             this.categories.forEach((category, j) => {
@@ -160,18 +179,19 @@ const getCategoryForHeight = height => {
     if (height <= 5) return "medium";
     return "tall";
 };
-const initialHeightData = [ 3, 3, 3, 4, 4, 5, 5, 5, 5, 5, 6, 7 ];
+const testHeightData = [ 3, 3, 3, 4, 4, 5, 5, 5, 5, 5, 6, 7 ];
 
-const testHistogram = new Histogram(categories, getCategoryForHeight, initialHeightData);
+const testHistogram = new Histogram(categories, getCategoryForHeight);
+testHistogram.title = "Height Histogram";
 
-const updater = (histogram, gameEngine) =>
-    histogram.pushData(initialHeightData.map(_ => getRandomInteger(3, 8)));
-// testHistogram.setUpdate(updater, 12);
+const updater = histogram =>
+    histogram.pushData(testHeightData.map(_ => getRandomInteger(3, 8)));
+// testHistogram.setUpdate(updater, 1/12);
 
-const infoGetter = (histogram, gameEngine) =>
-    initialHeightData.map(_ => getRandomInteger(3, 8));
-testHistogram.setInfoGetter(infoGetter, 12);
+const getter = histogram =>
+    testHeightData.map(_ => getRandomInteger(3, 8));
+testHistogram.setGetter(getter, 1/12);
 
 const individualUpdater = histogram =>
-    histogram.pushData(initialHeightData.map(_ => getRandomInteger(3, 8)));
-// testHistogram.setIndependentUpdater(individualUpdater, 12);
+    histogram.pushData(testHeightData.map(_ => getRandomInteger(3, 8)));
+// testHistogram.setIndependentUpdater(individualUpdater, 1/12);

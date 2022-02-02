@@ -24,10 +24,9 @@ params.environments = {
 
 // This represents a "village"
 class Village {
-    constructor(x, y, grid) {
-
+    constructor(i, j, grid) {
         this._grid = grid;
-        this._pos = Object.freeze({ x, y });
+        this._pos = Object.freeze({ i, j });
 
         this.organisms = [];
         this.organismsToAdd = [];
@@ -120,67 +119,68 @@ class Village {
         return this.getVillagesInRange(this, 1, 1)
     }
 
-    getRandomOrganism() {
-        return this.organisms[getRandomInteger(0, this.organisms.length - 1)];
-    }
+    getRandomOrganism() { return chooseRandom(this.organisms); }
 
-    get x() { return this._pos.x; }
-    get y() { return this._pos.y; }
+    get i() { return this._pos.i; }
+    get j() { return this._pos.j; }
     get grid() { return this._grid; }
 
-    toString() { return `(${this.x}, ${this.y})`; }
+    toString() { return `(${this.i}, ${this.j})`; }
 }
 
 // This represents the "villages"
 class World {
-    constructor(width, height) {
-        this.width = width;
-        this.height = height;
+    constructor(rows, columns) {
+        this.rows = rows;
+        this.columns = columns;
         this.timeSinceLastStep = 0;
         this._villages = [];
         this.days = 0;
+        this.syncedEntities = [];
 
         // Indexing from top left
-        for (let y = 0; y < width; y++) {
-            this._villages[y] = [];
-            for (let x = 0; x < height; x++) {
-                const village = new Village(x, y, this);
+        for (let i = 0; i < rows; i++) {
+            this._villages[i] = [];
+            for (let j = 0; j < columns; j++) {
+                const village = new Village(i, j, this);
                 village.populateVillage();
-                this._villages[y][x] = village;
+                this._villages[i][j] = village;
             }
         }
     }
 
     get villages() { return this._villages; }
 
-    getVillage(x, y) {
-        if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
-            throw new Error(`Village out of bounds: ${x}, ${y}`);
-        }
-        return this.villages[y]?.[x];  // what does this mean?
+    getVillage(i, j) {
+        if (i < 0 || i >= this.rows || j < 0 || j >= this.columns)
+            throw new Error(`Village out of bounds: ${i}, ${j}`);
+        return this.villages[i][j];
     }
 
     // Defaults to direct neighbors
     getVillagesInRangeFrom(village, start = 1, end = 1) {
         const neighbors = [];
-        for (let j = -end; j <= end; j++) {
-            for (let i = -end; i <= end; i++) {
-                if (abs(j) < start && abs(i) < start) continue;
-                const n = this.getVillage(village.x + j, village.y + i);
-                if (n) neighbors.push(n);
+        for (let i = -end; i <= end; i++) {
+            for (let j = -end; j <= end; j++) {
+                if (abs(i) < start && abs(j) < start) continue;
+                try {
+                    const neighbor =
+                        this.getVillage(village.i + i, village.j + j);
+                    neighbors.push(neighbor);
+                } catch (error) { }
             }
         }
         return neighbors;
     }
 
     getRandomVillage() {
-        const x = randomInt(this.width);
-        const y = randomInt(this.height);
-        return this.getVillage(x, y);
+        const i = randomInt(this.rows);
+        const j = randomInt(this.columns);
+        return this.getVillage(i, j);
     }
 
     getRandomNeighbor(village) {
-        return chooseRandom(this.getAllNeighbors(village));
+        return chooseRandom(this.getVillagesInRangeFrom(village));
     }
 
     stop() { this.stopped = true; }
@@ -224,6 +224,8 @@ class World {
         while (this.timeSinceLastStep > secondsPerStep) {
             this.timeSinceLastStep -= secondsPerStep;
             this.step(gameEngine);
+            this.syncedEntities.forEach(entity =>
+                entity.step(this, gameEngine, secondsPerStep));
         }
     }
 
@@ -250,7 +252,7 @@ class World {
             }
         }
 
-        const populationAverage = populationTotal / (this.width * this.height);
+        const populationAverage = populationTotal / (this.rows * this.columns);
 
         const populationStats = {
             populationAverage, populationMax, populationMin, populationTotal,
@@ -307,8 +309,8 @@ class World {
         console.log("Pop max: " + populationMax);
         console.log("Pop min: " + populationMin);
 
-        for (let i = 0; i < this.width; i++)
-            for (let j = 0; j < this.height; j++)
+        for (let i = 0; i < this.rows; i++)
+            for (let j = 0; j < this.columns; j++)
                 console.log(`Village @ (${i}, ${j}) has `
                           + `${this.populationPerVillage[i][j]} Organisms`);
 
@@ -319,16 +321,16 @@ class World {
     draw(ctx) {
         const { width: ctxWidth, height: ctxHeight } = ctx.canvas;
         const size = min(ctxWidth, ctxHeight);
-        const drawWidth = size / this.width;
-        const drawHeight = size / this.height;
+        const drawWidth = size / this.columns;
+        const drawHeight = size / this.rows;
 
         const { populationMax, populationMin } = this.stats;
 
         ctx.fillStyle = "White";
         ctx.font = "18px 'Arial'";
 
-        for (let j = 0; j < this.width; j++) {
-            for (let i = 0; i < this.height; i++) {
+        for (let i = 0; i < this.rows; i++) {
+            for (let j = 0; j < this.columns; j++) {
                 const village = this.villages[i][j];
                 const environment = village.environment;
                 const population = village.organisms.length;

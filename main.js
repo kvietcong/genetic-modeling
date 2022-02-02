@@ -9,30 +9,73 @@ const restart = gameEngine => {
 const gridExample = gameEngine => {
     // gameEngine.addEntity(testHistogram);
 
-    const width = 8;
-    const height = 8;
-    const world = new World(width, height);
+    const rows = 8;
+    const columns = 8;
+    const world = new World(rows, columns);
+
+    class HistogramManager {
+        constructor(histograms) {
+            this.histograms = histograms;
+            this.selected = { i: 0, j: 0 };
+        }
+
+        update(gameEngine) {
+            const size = min(gameEngine.width, gameEngine.height);
+            const { x, y } = gameEngine.mouse ?? { x: 0, y: 0 };
+            const rows = this.histograms.length;
+            const cols = this.histograms[0].length;
+
+            const iHover = floor(y / size * rows);
+            const jHover = floor(x / size * cols);
+
+            const { i: iOld, j: jOld } = this.selected;
+            this.histograms[iOld][jOld].isDrawing = false;
+            this.selected = iHover >= 0 && iHover < rows
+                                && jHover >= 0 && jHover < cols
+                          ? { i: iHover, j: jHover }
+                          : { i: iOld, j: jOld };
+            const { i, j } = this.selected;
+            this.histograms[i][j].isDrawing = true;
+        }
+
+        draw(ctx) {}
+    }
+
     const histograms = [];
-    for (let i = 0; i < width; i++) {
+    for (let i = 0; i < rows; i++) {
         histograms[i] = [];
-        for (let j = 0; j < height; j++) {
-            // TODO: MAKE INDEXING SANE! And fix lopsided grids.
-            const histogram = new Histogram(
-                [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],                                         // categories
-                organism => floor(average(organism.geneList.map(gene => gene.level))),  // getCategory
-                world.getVillage(i, j).organisms,                                       // initialData
-                min(gameEngine.width, gameEngine.height), 250,                          // x = 0, y = 0,
-                550, 460,                                                               // width = 840, height = 420,
-                `Histogram for Village ${i}, ${j}`,                                     // title = "Histogram"
-                false                                                                   // isDrawing = true
+        for (let j = 0; j < columns; j++) {
+            // This histogram helper function can be found in `util.js`
+            // More information about parameters is there too.
+            const histogram = createOrganismHistogram(
+
+                // Average Gene Level Histogram
+                [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                organism =>
+                    floor(average(organism.geneList.map(gene => gene.level))),
+
+                // Average Learn Level Histogram
+                // [1, 2, 3, 4, 5],
+                // organism => round(average(organism.learnList)),
+
+                // Where To Draw
+                min(gameEngine.width, gameEngine.height), 250,
+                550, 460,
+
+                `Histogram for Village ${i}, ${j}`, // Title
+
+                // Updating variables
+                world.getVillage(i, j), 2
             );
-            if (i === 1 && j === 1) histogram.isDrawing = true;
-            histogram.setInfoGetter(() => world.getVillage(i, j).organisms, 10);
+            histogram.isDrawing = false;
+
             histograms[i][j] = histogram;
-            gameEngine.addEntity(histogram);
+            gameEngine.addEntity(histogram); // For Draw Calls
+            world.syncedEntities.push(histogram); // For synced stepping
         }
     }
     gameEngine.addEntity(world);
+    gameEngine.addEntity(new HistogramManager(histograms));
 };
 
 const geneExample = gameEngine => {
