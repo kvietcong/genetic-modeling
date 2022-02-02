@@ -6,10 +6,6 @@ class GameEngine {
         // Documentation: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D
         this.ctx = null;
 
-        // Context dimensions
-        this.surfaceWidth = null;
-        this.surfaceHeight = null;
-
         // Everything that will be updated and drawn each frame
         this.entities = [];
         // Entities to be added at the end of each update
@@ -29,8 +25,6 @@ class GameEngine {
 
     init(ctx) {
         this.ctx = ctx;
-        this.surfaceWidth = this.ctx.canvas.width;
-        this.surfaceHeight = this.ctx.canvas.height;
         this.startInput();
         this.timer = new Timer();
     };
@@ -97,7 +91,7 @@ class GameEngine {
 
     draw() {
         // Clear the whole canvas
-        this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        this.ctx.clearRect(0, 0, this.width, this.height);
         // Draw latest things first
         this.entities.reduceRight((_, entity) => entity.draw(this.ctx, this), null);
     };
@@ -113,7 +107,9 @@ class GameEngine {
         this.entitiesToAdd = [];
     };
 
-    get["deltaTime"]() { return this.clockTick; }
+    get deltaTime() { return this.clockTick; }
+    get width() { return this.ctx.canvas.width; }
+    get height() { return this.ctx.canvas.height; }
 
     loop() {
         this.clockTick = this.timer.tick();

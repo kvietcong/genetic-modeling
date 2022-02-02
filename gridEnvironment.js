@@ -180,7 +180,7 @@ class World {
         if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
             throw new Error(`Village out of bounds: ${x}, ${y}`);
         }
-        return this.villages[y]?.[x];
+        return this.villages[y]?.[x];  // what does this mean?
     }
 
     // Defaults to direct neighbors
@@ -244,6 +244,21 @@ class World {
         this.days++;
     }
 
+    get allOrganisms() {
+        return Object.freeze(this.villages.reduce((totalAccumulated, row) =>
+            totalAccumulated.concat(row.reduce((rowAccumulated, village) =>
+                rowAccumulated.concat(village.organisms), [])), []));
+    }
+
+    get totalPopulation() {
+        return this.allOrganisms.length;
+    }
+
+    get populationPerVillage() {
+        return Object.freeze(this.villages.map(row =>
+            row.map(village => village.organisms.length)));
+    }
+
     update(gameEngine) {
         const secondsPerStep = 1 / params.stepsPerSecond;
         this.timeSinceLastStep += gameEngine.deltaTime;
@@ -256,10 +271,17 @@ class World {
 
     // This notation: get functionName() indicates that what follows is a computed property.
     get stats() {
+        const stats = {
+            ...this.populationStats,
+            // ...this.geneStats,
+        };
+        return stats;
+    }
+
+    get populationStats() {
         let populationMax = 0;
         let populationMin = 0;
         let populationTotal = 0;
-        const villagePopulations = [];
 
         for (const row of this.villages) {
             for (const village of row) {
@@ -267,22 +289,59 @@ class World {
                 populationTotal += villagePopulation;
                 populationMax = max(populationMax, villagePopulation);
                 populationMin = min(populationMin, villagePopulation);
-                villagePopulations.push(villagePopulation);
             }
         }
 
         const populationAverage = populationTotal / (this.width * this.height);
 
-        return {
-            populationAverage, populationMax, populationMin,
-            populationTotal, villagePopulations,
+        const populationStats = {
+            populationAverage, populationMax, populationMin, populationTotal,
         };
+        return populationStats;
+    }
+
+    get geneStats() {
+        let geneLevelsAll = [];
+        const geneLevelAveragesForTaskPerVillage = [];
+
+        for (const [i, row] of this.villages.entries()) {
+            geneLevelAveragesForTaskPerVillage[i] = [];
+            for (const [j, village] of row.entries()) {
+                const villageGenes = village.organisms
+                    .map(organism => organism.geneList);
+                const geneAmount = villageGenes?.[0]?.length;
+                if (!geneAmount) continue;
+
+                const villageGeneLevels = villageGenes
+                    .map(geneList => geneList.map(gene => gene.level));
+                const villageGeneAverages = range(0, geneAmount - 1)
+                    .map(k =>
+                        villageGeneLevels.reduce((accumulated, geneLevels) =>
+                            accumulated + geneLevels[k], 0)
+                    );
+
+                geneLevelAveragesForTaskPerVillage[i][j] = villageGeneAverages;
+                geneLevelsAll = geneLevelsAll.concat(villageGeneLevels
+                    .reduce((accumulated, geneLevels) =>
+                        accumulated.concat(geneLevels), []));
+            }
+        }
+
+        const geneLevelAverage =  average(geneLevelsAll);
+        const geneLevelAveragesPerVillage = geneLevelAveragesForTaskPerVillage
+            .map(row => row.map(geneLevels => average(geneLevels)));
+
+        const geneStats = {
+            geneLevelAverage, // Average gene level across all organisms (Regardless of Task)
+            geneLevelAveragesForTaskPerVillage, // Average gene level for corresponding task per village
+            geneLevelAveragesPerVillage, // Average gene level per village (Regardless of Task)
+        };
+        return geneStats;
     }
 
     printStats() {
         const {
-            populationAverage, populationMax, populationMin,
-            populationTotal, villagePopulations
+            populationAverage, populationMax, populationMin, populationTotal
         } = this.stats;
 
         console.log("Pop total: " + populationTotal);
@@ -290,11 +349,10 @@ class World {
         console.log("Pop max: " + populationMax);
         console.log("Pop min: " + populationMin);
 
-        let i = 1;
-        for (const population of villagePopulations) {
-            console.log("Village " + i + " population: " + population);
-            i++;
-        }
+        for (let i = 0; i < this.width; i++)
+            for (let j = 0; j < this.height; j++)
+                console.log(`Village @ (${i}, ${j}) has `
+                          + `${this.populationPerVillage[i][j]} Organisms`);
 
         console.log("Time taken: " + this.days + " days")
     }
