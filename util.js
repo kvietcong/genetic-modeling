@@ -156,136 +156,21 @@ const initCanvas = options => {
     return context;
 };
 
-/** A class to represent a 2D vector */
-class Vector {
-    x; y;
-
-    constructor(x = 0, y = 0) {
-        this.x = x; this.y = y;
-    }
-
-    clone() { return new Vector(this.x, this.y); }
-
-    static detectInput(...input) {
-        if (input.length === 1 && input[0] instanceof Vector) {
-            return { x: input[0].x, y: input[0].y };
-        }
-        if (input.length === 2
-            && typeof input[0] === "number"
-            && typeof input[1] === "number"
-        ) {
-            return { x: input[0], y: input[1] };
-        }
-        throw new Error("Invalid input");
-    }
-
-    set(...input) {
-        const { x, y } = Vector.detectInput(...input);
-        this.x = x; this.y = y; return this;
-    }
-
-    add(...input) {
-        const { x, y } = Vector.detectInput(...input);
-        return this.clone().addInPlace(x, y);
-    }
-
-    addInPlace(...input) {
-        const { x, y } = Vector.detectInput(...input);
-        this.x += x; this.y += y; return this;
-    }
-
-    subtract(...input) {
-        const { x, y } = Vector.detectInput(...input);
-        return this.clone().subtractInPlace(x, y);
-    }
-
-    subtractInPlace(...input) {
-        const { x, y } = Vector.detectInput(...input);
-        this.x -= x; this.y -= y; return this;
-    }
-
-    scale(scaleFactor) {
-        return this.clone().scaleInPlace(scaleFactor);
-    }
-
-    scaleInPlace(scaleFactor) {
-        this.x *= scaleFactor; this.y *= scaleFactor; return this;
-    }
-
-    lerpTo(destinationVector, t) {
-        return this.clone().lerpInPlace(destinationVector, t);
-    }
-
-    lerpToInPlace(destinationVector, t) {
-        return this.addInPlace(destinationVector.subtract(this).scale(t));
-    }
-
-    dot(vector) {
-        return this.x * vector.x + this.y * vector.y;
-    }
-
-    angleTo(vector) {
-        return Vector.angleBetween(this, vector);
-    }
-
-    rotate(angle) {
-        return this.clone().rotateInPlace(angle);
-    }
-
-    rotateInPlace(angle) {
-        const { x, y } = this;
-        const cosVal = cos(angle); const sinVal = sin(angle);
-        this.x = x * cosVal - y * sinVal; this.y = x * sinVal + y * cosVal;
-        return this;
-    }
-
-    rotateTo(vector) {
-        return this.clone().rotateToInPlace(vector);
-    }
-
-    rotateToInPlace(vector) {
-        return this.rotateInPlace(this.angleTo(vector));
-    }
-
-    setUnit() { return this.set(this.unit); }
-
-    get["magnitude"]() { return getDistance(0, 0, this.x, this.y); }
-
-    get["unit"]() {
-        const length = sqrt(sq(this.x) + sq(this.y));
-        if (length === 0) return new Vector(0, 0);
-        return new Vector(this.x / length, this.y / length);
-    }
-
-    static angleBetween(vector1, vector2) {
-        return acos(
-            vector1.dot(vector2)
-            / (vector1.magnitude * vector2.magnitude)
-        );
-    }
-
-    static angleToUnitVector(angle) {
-        return new Vector(cos(angle / 180 * PI), sin(angle / 180 * PI));
-    }
-
-    static radToUnitVector(rad) {
-        return new Vector(cos(rad), sin(rad));
-    }
-
-    static randomUnitVector() {
-        const randomDirection = random() * 2 * PI;
-        return Vector.radToUnitVector(randomDirection);
-    }
-
-    static lerp(vector1, vector2, t) {
-        return vector1.add(vector2.subtract(vector1).scale(t));
-    }
-
-    static coordinatesToVector(x1, y1, x2, y2) {
-        return new Vector(x2 - x1, y2 - y1);
-    }
-
-    static pointsToVector(p1, p2) {
-        return Vector.coordinatesToVector(p1.x, p1.y, p2.x, p2.y);
-    }
+// Helper function to create a basic organism histogram
+const createOrganismHistogram = (
+    categories, getCategoryFromOrganism,
+    x, y, width, height, title,
+    villageReference, updatesPerTick,
+) => {
+    const histogram = new Histogram(
+        categories,
+        getCategoryFromOrganism,
+        x, y, width, height,
+        title,
+    );
+    histogram.onTickTime = true;
+    // Can't use direct organism reference as the pointer can change in the code
+    histogram.setGetter(() =>
+        villageReference.organisms, updatesPerTick);
+    return histogram;
 }

@@ -45,26 +45,33 @@ const gridExample = gameEngine => {
     for (let i = 0; i < rows; i++) {
         histograms[i] = [];
         for (let j = 0; j < columns; j++) {
-            // TODO: MAKE INDEXING SANE! And fix lopsided grids.
-            const histogram = new Histogram(
+            // This histogram helper function can be found in `util.js`
+            // More information about parameters is there too.
+            const histogram = createOrganismHistogram(
 
                 // Average Gene Level Histogram
                 [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-                organism => floor(average(organism.geneList.map(gene => gene.level))),
+                organism =>
+                    floor(average(organism.geneList.map(gene => gene.level))),
 
                 // Average Learn Level Histogram
                 // [1, 2, 3, 4, 5],
                 // organism => round(average(organism.learnList)),
 
-                world.getVillage(i, j).organisms,
+                // Where To Draw
                 min(gameEngine.width, gameEngine.height), 250,
                 550, 460,
-                `Histogram for Village ${i}, ${j}`,
-                false
+
+                `Histogram for Village ${i}, ${j}`, // Title
+
+                // Updating variables
+                world.getVillage(i, j), 2
             );
-            histogram.setInfoGetter(() => world.getVillage(i, j).organisms, 10);
+            histogram.isDrawing = false;
+
             histograms[i][j] = histogram;
-            gameEngine.addEntity(histogram);
+            gameEngine.addEntity(histogram); // For Draw Calls
+            world.syncedEntities.push(histogram); // For synced stepping
         }
     }
     gameEngine.addEntity(world);

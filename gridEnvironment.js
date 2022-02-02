@@ -139,6 +139,7 @@ class World {
         this.timeSinceLastStep = 0;
         this._villages = [];
         this.days = 0;
+        this.syncedEntities = [];
 
         // Indexing from top left
         for (let i = 0; i < rows; i++) {
@@ -223,6 +224,8 @@ class World {
         while (this.timeSinceLastStep > secondsPerStep) {
             this.timeSinceLastStep -= secondsPerStep;
             this.step(gameEngine);
+            this.syncedEntities.forEach(entity =>
+                entity.step(this, gameEngine, secondsPerStep));
         }
     }
 
