@@ -22,9 +22,6 @@ params.environments = {
     },
 };
 
-// const organisms = ["..."];
-// const reproducing = organisms.filter(organism => organism.energy > REPRODUCTION_THRESH);
-
 // This represents a "village"
 class Village {
     constructor(i, j, grid) {
@@ -166,8 +163,11 @@ class World {
         for (let i = -end; i <= end; i++) {
             for (let j = -end; j <= end; j++) {
                 if (abs(i) < start && abs(j) < start) continue;
-                const n = this.getVillage(village.i + i, village.j + j);
-                if (n) neighbors.push(n);
+                try {
+                    const neighbor =
+                        this.getVillage(village.i + i, village.j + j);
+                    neighbors.push(neighbor);
+                } catch (error) { }
             }
         }
         return neighbors;
@@ -180,7 +180,7 @@ class World {
     }
 
     getRandomNeighbor(village) {
-        return chooseRandom(this.getAllNeighbors(village));
+        return chooseRandom(this.getVillagesInRangeFrom(village));
     }
 
     stop() { this.stopped = true; }
