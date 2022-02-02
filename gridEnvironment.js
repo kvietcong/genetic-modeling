@@ -7,20 +7,20 @@ params.environments = {
     snow: {
         name: "snow",
         color: "white",
-        reward: 1,  // want an array of task in each environment with different values
-        threshold: 5
+        reward: 1,          // want an array of task in each environment with different values
+        threshold: [1, 2, 3, 4, 5]
     },
-    desert: {
-        name: "desert",
-        color: "yellow",
-        reward: 3,
-        threshold: 3
-    },
+    // desert: {
+    //     name: "desert",
+    //     color: "yellow",
+    //     reward: 3,
+    //     threshold: 3
+    // },
     forest: {
         name : "forest",
         color: "green",
-        reward: 5,
-        threshold: 1
+        reward: 1,
+        threshold: [0, 1, 2, 3, 4]
     },
 };
 
@@ -33,6 +33,8 @@ class Village {
 
         this.organisms = [];
         this.organismsToAdd = [];
+
+        this.fitOrganisms = [];
 
         this.environment = chooseRandom(Object.keys(params.environments));
 
@@ -54,13 +56,15 @@ class Village {
             let task = {reward: 0, threshold: 0};
             if (this.environment === "snow") {
                 task.reward = params.environments.snow.reward;
-                task.threshold = params.environments.snow.threshold;
-            } else if (this.environment === "desert") {
-                task.reward = params.environments.desert.reward;
-                task.threshold = params.environments.desert.threshold;
-            } else if (this.environment === "forest") {
+                task.threshold = params.environments.snow.threshold[i];
+            }
+                // else if (this.environment === "desert") {
+            //     task.reward = params.environments.desert.reward;
+            //     task.threshold = params.environments.desert.threshold;
+            // }
+            else if (this.environment === "forest") {
                 task.reward = params.environments.forest.reward;
-                task.threshold = params.environments.forest.threshold;
+                task.threshold = params.environments.forest.threshold[i];
             }
             this.taskList.push(task);   // adds the task to the task list.
         }
@@ -99,6 +103,12 @@ class Village {
 
     // Organisms should only interact with those in their "village"
     step(world) {
+        for(let i = 0; i < this.organisms.length; i++) {
+            if (this.organisms[i].energy > REPRODUCTION_THRESH) {
+                this.fitOrganisms.push(this.organisms[i]);
+            }
+        }
+
         if (this.organisms.length < this.populationCap) {
             this.organisms.forEach(organism => organism.step(this, this.grid));
 
@@ -128,12 +138,14 @@ class Village {
         return this.organisms[getRandomInteger(0, this.organisms.length - 1)];
     }
 
+    getRandomNeighbor() { return chooseRandom(this.neighbors); }
+
     // get organisms that meet the reproduction thresholds
     // use a helper function that splits into parents and non parents -- do this in the update()
     // so that it occurs once a tick.
-    // getAppropriateOrganism(){
-
-    // }
+    getFitOrganism(){
+        return this.fitOrganisms[getRandomInteger(0, this.fitOrganisms.length - 1)];
+    }
 
     get x() { return this._pos.x; }
     get y() { return this._pos.y; }
@@ -173,13 +185,31 @@ class World {
 
     // Defaults to direct neighbors
     // DO NOT USE THIS ONE
-    getVillagesInRangeFrom(village, start = 1, end = 1) { 
+    // getVillagesInRangeFrom(village, start = 1, end = 1) { 
+    //     const neighbors = [];
+    //     for (let j = -end; j <= end; j++) {
+    //         for (let i = -end; i <= end; i++) {
+    //             if (abs(j) < start && abs(i) < start) continue;
+
+
+    //             const n = this.getVillage(village.x + j, village.y + i);
+    //             if (n) neighbors.push(n);
+    //         }
+    //     }
+    //     return neighbors;
+    // }
+    // Defaults to direct neighbors
+    // Defaults to direct neighbors
+    getVillagesInRangeFrom(village, start = 1, end = 1) {
         const neighbors = [];
-        for (let j = -end; j <= end; j++) {
-            for (let i = -end; i <= end; i++) {
-                if (abs(j) < start && abs(i) < start) continue;
-                const n = this.getVillage(village.x + j, village.y + i);
-                if (n) neighbors.push(n);
+        for (let i = -end; i <= end; i++) {
+            for (let j = -end; j <= end; j++) {
+                if (abs(i) < start && abs(j) < start) continue;
+                let neighbor;
+                try {
+                    neighbor = this.getVillage(village.i + i, village.j + j);
+                    neighbors.push(neighbor);
+                } catch (error) { }
             }
         }
         return neighbors;

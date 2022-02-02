@@ -7,7 +7,7 @@
  */
 
 // Constants associated with every Organism
-const NUM_TASKS = 5;            // the number of tasks that the Organism has to do
+const ARR_LEN = 5;            // the number of tasks/genes/learning that the Organism has to do
 const REPRODUCTION_THRESH = 50; // assume this will be the same for every Organism
 
 /**
@@ -29,24 +29,27 @@ class Organism {
         // Instance variables
         // Creation of the genes associated with the current organism
         if (this.parent1 && this.parent2) {
-            for (let i = 0; i < 10; i++) {
-                this.geneList.push(this.parent1.geneList[i].recombine(this.parent2.geneList[i]));
+            for (let i = 0; i < ARR_LEN; i++) {
+                const newGene = this.parent1.geneList[i].recombine(this.parent2.geneList[i]);
+                newGene.mutate();
+                this.geneList.push(newGene);
             }
         }
         else if (this.parent1) { // if there's a parent1 organism
-            for (let i = 0; i < 10; i++) {
-                this.geneList.push(new Gene().recombine(this.parent1.geneList[i])); // we're sending two of the of the same
+            for (let i = 0; i < ARR_LEN; i++) {
+                const newGene = this.parent1.geneList[i].recombine(this.parent1.geneList[i]);
+                newGene.mutate();
+                this.geneList.push(newGene);
             }                                                     // geneome to the recomboer.
         } else { // if this is the first set of organisms created
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < ARR_LEN; i++) {
                 this.geneList.push(new Gene());
             }
         }
 
         this.learnList = [];
-        for (let i = 0; i < 10; i++) {
-            this.learnList.push(getRandomInteger(1,5));  // how well the organism will learn
-            // this.learnList.push(1);  // how well the organism will learn
+        for (let i = 0; i < ARR_LEN; i++) {
+            this.learnList.push(0);  // how well the organism will start with no learning
         }
 
         this.taskCapabilities = [];
@@ -67,8 +70,7 @@ class Organism {
      * @returns the capability of the organism to complete a task
      */
     getTaskCapabilities() {
-        // this.taskCapability = this.learn + this.gene.level;
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < ARR_LEN; i++) {
             this.taskCapabilities.push(this.learnList[i] + this.geneList[i].level);
         }
         return this.taskCapabilities;
@@ -81,14 +83,13 @@ class Organism {
      */
     reproduce(otherOrganism = this) {
         let migrationStatus = document.getElementById("migrationBox").checked;
-        let sexualReproductionStatus = document.getElementById("sexualReproductionBox").checked;
 
-        // use real values math.random() will return 0-1
-        // let migrationChance = getRandomInteger(1, 10);
-        let migrationChance = random();
-        let migrationThreshold = .2; // 20% chance of migration
-                                     // adjust with different levels.
+        // we might add input where we can put in 0 - 1 values for the percent chance of sexual reproduction or migration.
+        // let sexualReproductionStatus = document.getElementById("sexualReproductionBox").checked;
 
+        let migrationChance = random(); // random value between 0 and 1
+        let migrationThreshold = 0.2;   // 20% chance of migration
+                                        // adjust with different levels.
 
         // cost to create offspring same with asexual and sexual reproduction.
         // so split cost between 2 parents - equal (default) or unequal (similar to humans - if we do this, we might need two sexes)
@@ -96,21 +97,17 @@ class Organism {
         // Give the option for selection of three options
         //
         if(this.energy >= REPRODUCTION_THRESH && otherOrganism.energy >= REPRODUCTION_THRESH) {
-            this.energy -= REPRODUCTION_THRESH;
-            otherOrganism.energy -= REPRODUCTION_THRESH;
+            this.energy -= REPRODUCTION_THRESH / 2; // this.parent1 25
+            otherOrganism.energy -= REPRODUCTION_THRESH / 2; // this.parent1 25
 
-            if (!migrationStatus || migrationChance > migrationThreshold) { // no migration OR migration but the chance is
-                if (!sexualReproductionStatus) {
-                    this.village.addOrganism(new Organism(this.village, this)); // asexual
-                } else {
-                    this.village.addOrganism(new Organism(this.village, this, otherOrganism)); // sexual
-                }
+            if (!migrationStatus || migrationChance >= migrationThreshold) { // no migration OR migration but the chance is
+                    this.village.addOrganism(new Organism(this.village, this, otherOrganism));
             } else { // migration checked on and migration condition met
-                if (!sexualReproductionStatus) {
-                    this.village.addOrganism(new Organism(this.village.getVillagesInRange(1, 1)), this); // asexual
-                } else {
-                    this.village.addOrganism(new Organism(this.village.getVillagesInRange(1, 1)), this, otherOrganism); // sexual
-                }
+                    let ranVillage = this.village.getRandomNeighbor();
+
+                    console.log(this.village.toString(), ranVillage, this.village.neighbors);
+
+                    this.village.addOrganism(new Organism(ranVillage, this, otherOrganism));
             }
         }
     };
@@ -135,22 +132,29 @@ class Organism {
      */
     step(tile, grid) {
 
-        let live = true;
-
         // 1% chance of dying
-        if (getRandomInteger(1, 100) === 1) {
+        let live = true;
+        if (random() < 0.01) {
             live = false;
         }
 
+        let sexualReproChance = random();   // random value between 0 and 1
+        let sexualReproThreshold = 0.5;     // 50% chance of sexual reproduction
+                                            // adjust with different levels.
+
         // soft age cap using the "percentage" above
         if(live === true) { // this would be 20 (7300) - 60 "years" (365 days * 60 years)
-            this.successes += this.reward.successes;           // keep track of successes on the tasks
-            this.failures += this.reward.failures;             // will allow percentage calculation
-            this.energy += this.reward.energy;                 // energy of the Organism
-            let other = this.village.getRandomOrganism();
-            // if (this.energy >= REPRODUCTION_THRESH && other.energy >= REPRODUCTION_THRESH) {}
-            this.reproduce(this.village.getRandomOrganism()); // changed from reproduce() to sexual reproduction
-        } else {                        // if they are 100 or more they "die"
+            this.successes += this.reward.successes;            // keep track of successes on the tasks
+            this.failures += this.reward.failures;              // will allow percentage calculation
+            this.energy += this.reward.energy;                  // energy of the Organism
+
+            if (sexualReproChance < sexualReproThreshold) {     //sexual
+                this.reproduce(this.village.getFitOrganism());
+            } else { // asexual
+                this.reproduce();
+            }
+
+        } else {                                                // if they are 100 or more they "die"
             this.alive = false;
             this.village.removeOrganism(this);
         }

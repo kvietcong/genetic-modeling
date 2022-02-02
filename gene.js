@@ -33,7 +33,7 @@
 /* Default Global Parameters related to Genes */
 params.cellSize = 2;
 params.fillToLevel = 0; //getRandomInteger(1,3);
-params.partitionSize = 2;
+params.partitionSize = 1; // it was set at 2 but Chris might want this at 2
 params.mutationChance = 0.3;
 params.initialPartitions = 5;
 
@@ -58,8 +58,7 @@ const libGene = (() => {
         },
     };
     /** Default Partitioning Tools */
-    _.partitionTooling = _.partitionTools.quadratic;
-
+    _.partitionTooling = _.partitionTools.constant; // change to quadratic if want to have a harder gene growth
 
     /** Different functions to initialize a Gene's cells */
     _.initializers = {
