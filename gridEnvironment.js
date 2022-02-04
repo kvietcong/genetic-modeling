@@ -10,17 +10,17 @@ params.environments = {
         reward: 1,          // want an array of task in each environment with different values
         threshold: [1, 2, 3, 4, 5]
     },
-    // desert: {
-    //     name: "desert",
-    //     color: "yellow",
-    //     reward: 3,
-    //     threshold: 3
-    // },
+    desert: {
+        name: "desert",
+        color: "yellow",
+        reward: 1,
+        threshold: [0, 1, 2, 3, 4]
+    },
     forest: {
         name : "forest",
         color: "green",
         reward: 1,
-        threshold: [0, 1, 2, 3, 4]
+        threshold: [0, 0, 1, 2, 3]
     },
 };
 
@@ -38,7 +38,7 @@ class Village {
         this.taskList = [];             // all the tasks associated with the village
         this.numTasks = 5;
 
-        this.populationCap = 1000;
+        this.populationCap = 500;
 
         this.createTaskList();
         this.populateVillage();
@@ -55,10 +55,10 @@ class Village {
                 task.reward = params.environments.snow.reward;
                 task.threshold = params.environments.snow.threshold[i];
             }
-                // else if (this.environment === "desert") {
-            //     task.reward = params.environments.desert.reward;
-            //     task.threshold = params.environments.desert.threshold;
-            // }
+            else if (this.environment === "desert") {
+                 task.reward = params.environments.desert.reward;
+                 task.threshold = params.environments.desert.threshold[i];
+            }
             else if (this.environment === "forest") {
                 task.reward = params.environments.forest.reward;
                 task.threshold = params.environments.forest.threshold[i];
@@ -375,10 +375,11 @@ class World {
         }
 
         ctx.fillStyle = "Green";
-        ctx.font = "60px 'Arial'";
+        ctx.font = "25px 'Arial'";
         ctx.fillText("Day " + this.days, 740, 50);
-        ctx.fillText("Migration: " + document.getElementById("migrationBox").checked, 740, 120);
-        ctx.fillText("Sexual repr: " + document.getElementById("sexualReproductionBox").checked, 740, 190);
+        ctx.fillText("Sexual Reproduction Chance: " + document.getElementById("sexualRepSlider").value, 740, 90);
+        ctx.fillText("Offspring Migration Chance   : " + document.getElementById("migrationSlider").value, 740, 120);
+        ctx.fillText("Initial Learning Ability             : " + document.getElementById("learningSlider").value, 740, 150);
     }
 
     toString() {

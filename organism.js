@@ -49,7 +49,7 @@ class Organism {
 
         this.learnList = [];
         for (let i = 0; i < ARR_LEN; i++) {
-            this.learnList.push(0);  // how well the organism will start with no learning
+            this.learnList.push(document.getElementById("learningSlider").value);  // how well the organism will start with no learning
         }
 
         this.taskCapabilities = [];
@@ -82,20 +82,19 @@ class Organism {
      * @param {*} otherOrganism
      */
     reproduce(otherOrganism = this) {
-        let migrationStatus = document.getElementById("migrationBox").checked;
+        
 
         // we might add input where we can put in 0 - 1 values for the percent chance of sexual reproduction or migration.
         // let sexualReproductionStatus = document.getElementById("sexualReproductionBox").checked;
 
         let migrationChance = random(); // random value between 0 and 1
-        let migrationThreshold = 1.0;   // 20% chance of migration
-                                        // adjust with different levels.
+        let migrationThreshold = document.getElementById("migrationSlider").value;
 
         if(this.energy >= REPRODUCTION_THRESH && otherOrganism.energy >= REPRODUCTION_THRESH) {
             this.energy -= REPRODUCTION_THRESH / 2; // this.parent1 25
             otherOrganism.energy -= REPRODUCTION_THRESH / 2; // this.parent1 25
 
-            if (!migrationStatus || migrationChance >= migrationThreshold) { // no migration OR migration but the chance is
+            if (migrationChance >= migrationThreshold) { // no migration OR migration but the chance is
                     this.village.addOrganism(new Organism(this.village, this, otherOrganism));
             } else { // migration checked on and migration condition met
                     let ranVillage = this.village.getRandomNeighbor();
@@ -125,31 +124,29 @@ class Organism {
     step(tile, grid) {
 
         // 1% chance of dying
-        let live = true;
-        if (random() < 0.01) {
-            live = false;
+        if (this.alive && random() < 0.01) {
+            this.alive = false;
+            this.village.removeOrganism(this);
         }
 
         let sexualReproChance = random();   // random value between 0 and 1
-        let sexualReproThreshold = 0.5;     // 50% chance of sexual reproduction
-                                            // adjust with different levels.
+        let sexualReproThreshold = document.getElementById("sexualRepSlider").value;
 
         // soft age cap using the "percentage" above
-        if(live === true) { // this would be 20 (7300) - 60 "years" (365 days * 60 years)
+        if (this.alive) { // this would be 20 (7300) - 60 "years" (365 days * 60 years)
             this.successes += this.reward.successes;            // keep track of successes on the tasks
             this.failures += this.reward.failures;              // will allow percentage calculation
-            this.energy += this.reward.energy;                  // energy of the Organism
+            this.energy += this.reward.energy;
+            if (this.village.organisms.length > 100) {
+                this.energy -= Math.floor(this.village.organisms.length/100);
+            }
 
             if (sexualReproChance < sexualReproThreshold) {     //sexual
                 this.reproduce(this.village.getFitOrganism());
             } else { // asexual
                 this.reproduce();
             }
-
-        } else {                                                // if they are 100 or more they "die"
-            this.alive = false;
-            this.village.removeOrganism(this);
-        }
+        } 
 
         // Hard age cap
         // if(this.days < 36500) { // this would be 20 (7300) - 60 "years" (365 days * 60 years)
