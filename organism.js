@@ -82,8 +82,6 @@ class Organism {
      * @param {*} otherOrganism
      */
     reproduce(otherOrganism = this) {
-        
-
         // we might add input where we can put in 0 - 1 values for the percent chance of sexual reproduction or migration.
         // let sexualReproductionStatus = document.getElementById("sexualReproductionBox").checked;
 
@@ -146,7 +144,7 @@ class Organism {
             } else { // asexual
                 this.reproduce();
             }
-        } 
+        }
 
         // Hard age cap
         // if(this.days < 36500) { // this would be 20 (7300) - 60 "years" (365 days * 60 years)

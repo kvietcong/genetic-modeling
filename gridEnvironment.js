@@ -4,23 +4,35 @@ params.population = 20;
 
 // play with environments.
 params.environments = {
-    snow: {
-        name: "snow",
+    polarice: {
+        name: "polarice",
         color: "white",
         reward: 1,          // want an array of task in each environment with different values
-        threshold: [1, 2, 3, 4, 5]
+        threshold: [4,4,4,4,4]
     },
     desert: {
         name: "desert",
         color: "yellow",
         reward: 1,
-        threshold: [0, 1, 2, 3, 4]
+        threshold: [3,3,3,3,3]
     },
-    forest: {
-        name : "forest",
+    mountains: {
+        name : "mountains",
+        color: "brown",
+        reward: 1,
+        threshold: [2,2,2,2,2]
+    },
+    mediterranean: {
+        name: "mediterranean",
+        color: "blue",
+        reward: 1,          // want an array of task in each environment with different values
+        threshold: [1,1,1,1,1]
+    },
+    rainforest: {
+        name : "rainforest",
         color: "green",
         reward: 1,
-        threshold: [0, 0, 1, 2, 3]
+        threshold: [0, 0,0,0,0]
     },
 };
 
@@ -38,7 +50,7 @@ class Village {
         this.taskList = [];             // all the tasks associated with the village
         this.numTasks = 5;
 
-        this.populationCap = 500;
+        this.populationCap = 1000;
 
         this.createTaskList();
         this.populateVillage();
@@ -51,18 +63,25 @@ class Village {
     createTaskList() {
         for(let i = 0; i < this.numTasks; i++) {
             let task = {reward: 0, threshold: 0};
-            if (this.environment === "snow") {
-                task.reward = params.environments.snow.reward;
-                task.threshold = params.environments.snow.threshold[i];
+            if (this.environment === "polarice") {
+                task.reward = params.environments.polarice.reward;
+                task.threshold = params.environments.polarice.threshold[i];
             }
             else if (this.environment === "desert") {
                  task.reward = params.environments.desert.reward;
                  task.threshold = params.environments.desert.threshold[i];
             }
-            else if (this.environment === "forest") {
-                task.reward = params.environments.forest.reward;
-                task.threshold = params.environments.forest.threshold[i];
-            }
+            else if (this.environment === "mountains") {
+                task.reward = params.environments.mountains.reward;
+                task.threshold = params.environments.mountains.threshold[i];
+            } else if (this.environment === "mediterranean") {
+                task.reward = params.environments.mediterranean.reward;
+                task.threshold = params.environments.mediterranean.threshold[i];
+           }
+           else if (this.environment === "rainforest") {
+               task.reward = params.environments.rainforest.reward;
+               task.threshold = params.environments.rainforest.threshold[i];
+           }
 
             this.taskList.push(task);   // adds the task to the task list.
         }
