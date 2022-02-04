@@ -131,7 +131,7 @@ class Organism {
         }
 
         let sexualReproChance = random();   // random value between 0 and 1
-        let sexualReproThreshold = 1.0;     // 50% chance of sexual reproduction
+        let sexualReproThreshold = 0.5;     // 50% chance of sexual reproduction
                                             // adjust with different levels.
 
         // soft age cap using the "percentage" above
