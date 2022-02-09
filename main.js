@@ -74,7 +74,7 @@ const gridExample = gameEngine => {
                 // j * 300, i * 250,
                 // 300, 250,
 
-                `Histogram for Village ${i}, ${j}`, // Title
+                `Village ${i}, ${j}`, // Title
 
                 // Updating variables
                 world.getVillage(i, j), 10

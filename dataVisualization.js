@@ -126,12 +126,16 @@ class Histogram {
         const barWidths = (this.width - labelWidth) / drawLast;
         const barHeights = (this.height - titleHeight) / this.categories.length;
 
+        const totals = this.allCounts.map(count => count.total);
+        const [minTotal, maxTotal] = minMax(totals);
+
         ctx.fillText(this.title,
             this.x + 5,
             this.y + this.height - titleHeight / 4);
 
-        const sampleSize =
-            `Current Total: ${this.currentCounts?.total ?? 0}`;
+        const sampleSize = `Min: ${minTotal} `
+                         + `Max: ${maxTotal} `
+                         + `Now: ${totals[totals.length - 1] ?? 0}`;
         ctx.fillText(sampleSize,
             this.x + this.width - ctx.measureText(sampleSize).width - 5,
             this.y + this.height - titleHeight / 4);
@@ -174,8 +178,6 @@ class Histogram {
         // Draw totals over time. Needs its own scope for now. Will clean later
         {
             const drawLast = this.allCounts.length;
-            const totals = this.allCounts.map(count => count.total);
-            const maxTotal = max(...totals);
             const barWidths = this.width / drawLast;
 
             ctx.beginPath();

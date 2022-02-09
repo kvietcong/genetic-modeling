@@ -53,7 +53,7 @@ class Village {
 
         this.createTaskList();
         this.populateVillage();
-        
+
     }
 
     /**
@@ -233,7 +233,7 @@ class World {
         }
         this.days++;
         this.TICK = gameEngine.clockTick;
-        
+
     }
 
     get getTick() {

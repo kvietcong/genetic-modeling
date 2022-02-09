@@ -62,6 +62,9 @@ const rgba = (r, g, b, a) => `rgba(${r}, ${g}, ${b}, ${a})`;
  */
 const hsl = (h, s, l) => `hsl(${h}, ${s}, ${l})`;
 
+const minMax = array => array.reduce(
+    ([min, max], x) => [x < min ? x : min, x > max ? x : max], [0, 0]);
+
 /** Creates an alias for requestAnimationFrame for backwards compatibility */
 window.requestAnimFrame = (() => {
     return window.requestAnimationFrame ||
