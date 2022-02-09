@@ -105,12 +105,13 @@ class Histogram {
         ctx.strokeStyle = "black";
         ctx.strokeRect(this.x, this.y, this.width, this.height);
 
+        ctx.fillStyle = "black";
+        ctx.font = "14px Arial";
+
         const drawLast = this.drawConsistent
                        ? this.drawLast
                        : min(this.drawLast, this.allCounts.length);
 
-        ctx.fillStyle = "black";
-        ctx.font = "14px Arial";
         const longestCategory = this.categories.reduce((longest, current) =>
             current.toString().length > longest.length
                 ? current.toString()
@@ -168,6 +169,31 @@ class Histogram {
                 ctx.fillStyle = rgba(0, 0, 0, opacity);
                 ctx.fillRect(x, y, barWidths, barHeights);
             });
+        }
+
+        // Draw totals over time. Needs its own scope for now. Will clean later
+        {
+            const drawLast = this.allCounts.length;
+            const totals = this.allCounts.map(count => count.total);
+            const maxTotal = max(...totals);
+            const barWidths = this.width / drawLast;
+
+            ctx.beginPath();
+            ctx.strokeStyle = "red";
+            for (let i = this.allCounts.length - 1;
+                i >= this.allCounts.length - drawLast;
+                i--
+            ) {
+                const x = this.x + (i - this.allCounts.length + drawLast) * barWidths;
+                const total = totals[i];
+                const ratio = total / maxTotal;
+
+                if (i == this.allCounts.length - 1)
+                    ctx.moveTo(x, this.y + this.height * (1 - ratio));
+                else ctx.lineTo(x, this.y + this.height * (1 - ratio));
+
+            }
+            ctx.stroke();
         }
     }
 }
