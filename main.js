@@ -60,9 +60,7 @@ const gridExample = gameEngine => {
 
                 // Where To Draw
                 min(gameEngine.width, gameEngine.height), 250,
-                550, 460,
-
-                `Histogram for Village ${i}, ${j}`, // Title
+                550, 460, `Histogram for Village ${i}, ${j}`, // Title
 
                 // Updating variables
                 world.getVillage(i, j), 2 // the 2 is the number of ticks before it draws
@@ -72,6 +70,8 @@ const gridExample = gameEngine => {
             histograms[i][j] = histogram;
             gameEngine.addEntity(histogram); // For Draw Calls
             world.syncedEntities.push(histogram); // For synced stepping
+
+            console.log(gameEngine.deltaTime);
         }
     }
     gameEngine.addEntity(world);
