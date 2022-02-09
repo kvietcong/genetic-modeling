@@ -50,7 +50,7 @@ const gridExample = gameEngine => {
             const histogram = createOrganismHistogram(
 
                 // Average Gene Level Histogram
-                [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                [0, 1, 2, 3, 4, 5, 6],
                 organism =>
                     floor(average(organism.geneList.map(gene => gene.level))),
 
@@ -61,6 +61,8 @@ const gridExample = gameEngine => {
                 // Where To Draw
                 min(gameEngine.width, gameEngine.height), 250,
                 550, 460,
+                // j * 300, i * 250,
+                // 300, 250,
 
                 `Histogram for Village ${i}, ${j}`, // Title
 

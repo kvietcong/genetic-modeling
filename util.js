@@ -3,6 +3,8 @@ const params = {
     // Maybe use for toggle-able logging?
     isDebugging: true,
     canvas: {
+        // width: 3840,
+        // height: 2160,
         width: 1280,
         height: 720,
         backgroundColor: "white",
