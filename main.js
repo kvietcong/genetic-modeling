@@ -80,8 +80,6 @@ const gridExample = gameEngine => {
             histograms[i][j] = histogram;
             gameEngine.addEntity(histogram); // For Draw Calls
             world.syncedEntities.push(histogram); // For synced stepping
-
-            console.log(gameEngine.deltaTime);
         }
     }
     gameEngine.addEntity(world);

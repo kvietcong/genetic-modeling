@@ -54,6 +54,7 @@ class Village {
 
         this.createTaskList();
         this.populateVillage();
+        
     }
 
     /**
@@ -169,6 +170,7 @@ class World {
         this._villages = [];
         this.days = 0;
         this.syncedEntities = [];
+        this.TICK = 0;
 
         // Indexing from top left
         for (let i = 0; i < rows; i++) {
@@ -230,8 +232,13 @@ class World {
                 village.step(this);
             }
         }
-
         this.days++;
+        this.TICK = gameEngine.clockTick;
+        
+    }
+
+    get getTick() {
+        return this.TICK;
     }
 
     get allOrganisms() {

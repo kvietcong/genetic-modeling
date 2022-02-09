@@ -67,6 +67,8 @@ class Organism {
         this.days = 0;                  // the age of the organism in days.
 
         this.count = 0;
+
+        this.TICK = 0;
     };
 
     /**
@@ -120,8 +122,6 @@ class Organism {
 
         // mutate one Gene in learnList
         chooseRandom(this.learnList).mutate();
-        console.log("ind");
-
     };
 
     // social learning
@@ -129,7 +129,6 @@ class Organism {
         let index = getRandomInteger(0, 4);
         // Recombinging learn gene at index with learn gene at index of a random villager (teacher)
         this.learnList[index].recombine(this.village.getRandomOrganism().learnList[index]);
-        console.log("soc");
     }
 
     /**
@@ -138,9 +137,8 @@ class Organism {
     step(tile, grid) {
         this.count++;
 
-        // Look into using ticks for learing instead
-            // this.time = gameEngine.width;
-            // console.log(this.time);
+        // Look into using ticks for learning instead
+        this.time = this.village.grid.getTick;
 
         // 1% chance of dying
         if (this.alive && random() < 0.01) {
@@ -168,14 +166,14 @@ class Organism {
 
             // 5% chance of individual learning every tick (mutating one learnList gene)
             // if (random() < 1) {
-            //     this.indLearning(); 
+            //     this.indLearning();
             // }
- 
-            // 5% chance of social learning 
+
+            // 5% chance of social learning
             // requires at least 2 organisms in the village
             if (random() < 0.05 && this.village.organisms.length > 1) {
-                this.socLearning();  
-            } 
+                this.socLearning();
+            }
 
             // indLearning every 5 ticks
             if (this.count % 5 === 0)
