@@ -1,4 +1,4 @@
-            const assetManager = new AssetManager();
+const assetManager = new AssetManager();
 let gameEngines = [];
 
 const restart = gameEngine => {
@@ -65,7 +65,7 @@ const gridExample = gameEngine => {
                 `Histogram for Village ${i}, ${j}`, // Title
 
                 // Updating variables
-                world.getVillage(i, j), 2
+                world.getVillage(i, j), 10
             );
             histogram.isDrawing = false;
 
