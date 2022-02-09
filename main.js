@@ -53,8 +53,18 @@ const gridExample = gameEngine => {
                 [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],  // need to give categories
                 organism =>
                     floor(average(organism.geneList.map(gene => gene.level))), // need to give it a function
+                
 
-                // Average Learn Level Histogram
+                // Average gene-based learn Level Histogram
+                
+                /*
+                [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],  // need to give categories
+                organism =>
+                    floor(average(organism.learnList.map(gene => gene.level))), // need to give it a function
+                */
+                
+
+                // Average integer-based Learn Level Histogram
                 // [1, 2, 3, 4, 5],
                 // organism => round(average(organism.learnList)),
 

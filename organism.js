@@ -1,8 +1,8 @@
 /**
  *
  * Organism & Task classes
- * @author KV, Raz and Kumiko
- * @version Rev 4 - 2/1/2022
+ * @author Raz and Kumiko
+ * @version Rev 6 - 2/8/2022
  *
  */
 
@@ -49,7 +49,9 @@ class Organism {
 
         this.learnList = [];
         for (let i = 0; i < ARR_LEN; i++) {
-            this.learnList.push(document.getElementById("learningSlider").value);  // how well the organism will start with no learning
+            let meme = new Gene()
+            // this.learnList.push(document.getElementById("learningSlider").value);  // how well the organism will start with no learning
+            this.learnList.push(meme);
         }
 
         this.taskCapabilities = [];
@@ -63,6 +65,8 @@ class Organism {
 
         this.alive = true;              // sets the organism to be alive
         this.days = 0;                  // the age of the organism in days.
+
+        this.count = 0;
     };
 
     /**
@@ -71,7 +75,7 @@ class Organism {
      */
     getTaskCapabilities() {
         for (let i = 0; i < ARR_LEN; i++) {
-            this.taskCapabilities.push(this.learnList[i] + this.geneList[i].level);
+            this.taskCapabilities.push(this.learnList[i].level + this.geneList[i].level);
         }
         return this.taskCapabilities;
     }
@@ -109,17 +113,34 @@ class Organism {
         return this.successes / (this.successes + this.failures);
     };
 
-    // ?????
-    improveLearning() {
-        // improve with every x successes?
-        // improve randomly (e.g., 1%)?
-        // learning similar to genetic architecture. Similar to cultural evolution
+    // individual learning
+    indLearning() {
+        // (not) Chance to mutate every "x" successes
+        // very low chance of indLearning every tick
+
+        // mutate one Gene in learnList
+        chooseRandom(this.learnList).mutate();
+        console.log("ind");
+
     };
+
+    // social learning
+    socLearning() {
+        let index = getRandomInteger(0, 4);
+        // Recombinging learn gene at index with learn gene at index of a random villager (teacher)
+        this.learnList[index].recombine(this.village.getRandomOrganism().learnList[index]);
+        console.log("soc");
+    }
 
     /**
      * step function will advance the organism by a day every tick
      */
     step(tile, grid) {
+        this.count++;
+
+        // Look into using ticks for learing instead
+            // this.time = gameEngine.width;
+            // console.log(this.time);
 
         // 1% chance of dying
         if (this.alive && random() < 0.01) {
@@ -143,6 +164,23 @@ class Organism {
                 this.reproduce(this.village.getFitOrganism());
             } else { // asexual
                 this.reproduce();
+            }
+
+            // 5% chance of individual learning every tick (mutating one learnList gene)
+            // if (random() < 1) {
+            //     this.indLearning(); 
+            // }
+ 
+            // 5% chance of social learning 
+            // requires at least 2 organisms in the village
+            if (random() < 0.05 && this.village.organisms.length > 1) {
+                this.socLearning();  
+            } 
+
+            // indLearning every 5 ticks
+            if (this.count % 5 === 0)
+            {
+                this.indLearning();
             }
         }
 
