@@ -1,6 +1,5 @@
-params.stepsPerSecond = 10;  // NUMBERS OF TICKS PER SECOND
+params.stepsPerSecond = 20;
 params.population = 20;
-
 
 // play with environments.
 params.environments = {
