@@ -135,9 +135,10 @@ class Organism {
      * step function will advance the organism by a day every tick
      */
     step(tile, grid) {
-        this.count++;
+        
 
-        // Look into using ticks for learning instead
+        // Figure out how to use this.time instead of the count or if it is necessary.
+        this.count++;
         this.time = this.village.grid.getTick;
 
         // 1% chance of dying
