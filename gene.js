@@ -35,7 +35,7 @@ params.cellSize = 2;
 params.fillToLevel = 0;     //getRandomInteger(1,3);
 params.partitionSize = 1;   // it was set at 2 but Chris might want this at 1
 params.mutationChance = 0.3;
-params.initialPartitions = 5;
+params.initialPartitions = 10; // cap of the number of gene levels possible
 
 /** Library of Gene related values and functions */
 const libGene = (() => {
@@ -46,12 +46,12 @@ const libGene = (() => {
 
     /** Different sets of functions to change partition sizes */
     _.partitionTools = {
-        constant: {
+        constant: {  // linear growth
             indexToLevel: index => floor(index / params.partitionSize),
             levelToIndex: level => params.partitionSize * level,
             partitionSize: () => params.partitionSize,
         },
-        quadratic: {
+        quadratic: {   // exponential growth
             indexToLevel: index => index === 0 ? 0 : floor(lg(index)) + 1,
             levelToIndex: level => level === 0 ? 0 : pow(2, level - 1),
             partitionSize: level => level < 2 ? 1 : pow(2, level - 1),

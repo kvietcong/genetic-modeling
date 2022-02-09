@@ -50,9 +50,9 @@ const gridExample = gameEngine => {
             const histogram = createOrganismHistogram(
 
                 // Average Gene Level Histogram
-                [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],  // need to give categories
                 organism =>
-                    floor(average(organism.geneList.map(gene => gene.level))),
+                    floor(average(organism.geneList.map(gene => gene.level))), // need to give it a function
 
                 // Average Learn Level Histogram
                 // [1, 2, 3, 4, 5],
@@ -65,7 +65,7 @@ const gridExample = gameEngine => {
                 `Histogram for Village ${i}, ${j}`, // Title
 
                 // Updating variables
-                world.getVillage(i, j), 2
+                world.getVillage(i, j), 2 // the 2 is the number of ticks before it draws
             );
             histogram.isDrawing = false;
 

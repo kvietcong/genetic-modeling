@@ -188,8 +188,8 @@ const updater = histogram =>
     histogram.pushData(testHeightData.map(_ => getRandomInteger(3, 8)));
 // testHistogram.setUpdate(updater, 1/12);
 
-const getter = histogram =>
-    testHeightData.map(_ => getRandomInteger(3, 8));
+const getter = histogram =>  // get's random integers and pushes it into the histogram
+    testHeightData.map(_ => getRandomInteger(3, 8));  // probably won't use this? goes through every element in an array and puts a random integer in it
 testHistogram.setGetter(getter, 1/12);
 
 const individualUpdater = histogram =>

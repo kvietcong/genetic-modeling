@@ -1,4 +1,4 @@
-params.stepsPerSecond = 10;
+params.stepsPerSecond = 10;  // NUMBERS OF TICKS PER SECOND
 params.population = 20;
 
 
