@@ -46,12 +46,12 @@ const libGene = (() => {
 
     /** Different sets of functions to change partition sizes */
     _.partitionTools = {
-        constant: {
+        constant: {  // linear growth
             indexToLevel: index => floor(index / params.partitionSize),
             levelToIndex: level => params.partitionSize * level,
             partitionSize: () => params.partitionSize,
         },
-        quadratic: {
+        quadratic: {   // exponential growth
             indexToLevel: index => index === 0 ? 0 : floor(lg(index)) + 1,
             levelToIndex: level => level === 0 ? 0 : pow(2, level - 1),
             partitionSize: level => level < 2 ? 1 : pow(2, level - 1),
