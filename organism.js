@@ -28,6 +28,7 @@ class Organism {
 
         // Instance variables
         // Creation of the genes associated with the current organism
+
         if (this.parent1 && this.parent2) {
             for (let i = 0; i < ARR_LEN; i++) {
                 const newGene = this.parent1.geneList[i].recombine(this.parent2.geneList[i]);
@@ -127,19 +128,25 @@ class Organism {
     // social learning
     socLearning() {
         let index = getRandomInteger(0, 4);
+
+
         // Recombinging learn gene at index with learn gene at index of a random villager (teacher)
         this.learnList[index].recombine(this.village.getRandomOrganism().learnList[index]);
+
+        if(this.parent1 != undefined) {
+            console.log("entered parent1 != undefined");
+        }
     }
 
     /**
      * step function will advance the organism by a day every tick
      */
     step(tile, grid) {
-        
+
 
         // Figure out how to use this.time instead of the count or if it is necessary.
         this.count++;
-        this.time = this.village.grid.getTick;
+        // this.time = this.village.grid.getTick;
 
         // 1% chance of dying
         if (this.alive && random() < 0.01) {
@@ -165,10 +172,6 @@ class Organism {
                 this.reproduce();
             }
 
-            // 5% chance of individual learning every tick (mutating one learnList gene)
-            // if (random() < 1) {
-            //     this.indLearning();
-            // }
 
             // 5% chance of social learning
             // requires at least 2 organisms in the village
@@ -181,6 +184,12 @@ class Organism {
             {
                 this.indLearning();
             }
+
+            
+            // 5% chance of individual learning every tick (mutating one learnList gene)
+            // if (random() < 1) {
+            //     this.indLearning();
+            // }
         }
 
         // Hard age cap
