@@ -170,15 +170,12 @@ class Organism {
             // 2) Parent
             if (this.parent1 === this.parent2) { // comes from asexual repr
                 this.learnList[index].recombine(this.parent1.learnList[index]);
-                console.log("asexual");
             } else if (this.parent1 != this.parent2) { // comes from sexual repr
                 let parentIndex = getRandomInteger(0, 1);
                 if (parentIndex === 0) {
                     this.learnList[index].recombine(this.parent1.learnList[index]);
-                    console.log("sexual p1");
                 } else { 
                     this.learnList[index].recombine(this.parent2.learnList[index]);
-                    console.log("sexual p2")
                 }
             }
         } 
