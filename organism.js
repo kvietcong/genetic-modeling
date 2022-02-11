@@ -9,6 +9,8 @@
 // Constants associated with every Organism
 const ARR_LEN = 5;            // the number of tasks/genes/learning that the Organism has to do
 const REPRODUCTION_THRESH = 50; // assume this will be the same for every Organism
+const ELDER_THRESH = 50; // Organism is considered Elder after 50 days old
+const LEARN_THRESH = 15;
 
 /**
  * Organism class:
@@ -20,11 +22,30 @@ class Organism {
      * @param {*} village
      * @param {*} parent1
      */
-    constructor(village, parent1, parent2 = false) {
+    constructor(village, parent1, parent2) {
         this.village = village;         // the village that the Organism lives in
         this.parent1 = parent1;           // the parent1 of the Organism
         this.parent2 = parent2;
         this.geneList = [];
+
+        /* if (parent1 === undefined && parent2 === undefined) {
+            console.log("spawned");
+        } else if (parent1 != undefined && parent1 === parent2) {
+            console.log("asexual");
+        } else if (parent1 != parent2) {
+            console.log("sexual");
+        } */
+
+        /*
+        this.origin = "";
+        if (parent1 === undefined) {
+            this.origin = "spawned";
+        } else if (parent1 == parent2) {
+            this.origin = "asexual";
+        } else {
+            this.origin = "sexual";
+        } 
+        */
 
         // Instance variables
         // Creation of the genes associated with the current organism
@@ -67,9 +88,7 @@ class Organism {
         this.alive = true;              // sets the organism to be alive
         this.days = 0;                  // the age of the organism in days.
 
-        this.count = 0;
-
-        this.TICK = 0;
+        // this.TICK = 0;
     };
 
     /**
@@ -81,6 +100,14 @@ class Organism {
             this.taskCapabilities.push(this.learnList[i].level + this.geneList[i].level);
         }
         return this.taskCapabilities;
+    }
+
+    get learnCapability() {
+        let sum = 0;
+        for (let i = 0; i < ARR_LEN; i++) {
+            sum += this.learnList[i].level;
+        }
+        return sum;
     }
 
     /**
@@ -125,16 +152,48 @@ class Organism {
         chooseRandom(this.learnList).mutate();
     };
 
-    // social learning
+    // social learning - recombining one learn gene
     socLearning() {
         let index = getRandomInteger(0, 4);
+        let option = 0; // 0 - 4: Change depending on which socLearning method 
 
+        if (option === 0) {
+            // Random 1-4
+            option = getRandomInteger(1, 4);
+        }
 
-        // Recombinging learn gene at index with learn gene at index of a random villager (teacher)
-        this.learnList[index].recombine(this.village.getRandomOrganism().learnList[index]);
-
-        if(this.parent1 != undefined) {
-            console.log("entered parent1 != undefined");
+        if (option === 1) {
+            // 1) Random villager as teacher
+            // Recombinging learn gene at index with learn gene at index of a random villager (teacher)
+            this.learnList[index].recombine(this.village.getRandomOrganism().learnList[index]);
+        } else if (option === 2 && this.parent1 != undefined) {
+            // 2) Parent
+            if (this.parent1 === this.parent2) { // comes from asexual repr
+                this.learnList[index].recombine(this.parent1.learnList[index]);
+                console.log("asexual");
+            } else if (this.parent1 != this.parent2) { // comes from sexual repr
+                let parentIndex = getRandomInteger(0, 1);
+                if (parentIndex === 0) {
+                    this.learnList[index].recombine(this.parent1.learnList[index]);
+                    console.log("sexual p1");
+                } else { 
+                    this.learnList[index].recombine(this.parent2.learnList[index]);
+                    console.log("sexual p2")
+                }
+            }
+        } 
+        else if (option === 3 && this.days < ELDER_THRESH) {
+            // 3) Elder (age is  over 50 ticks)
+            let elder = this.village.getElderOrganism();
+            if (elder != undefined) {
+                this.learnList[index].recombine(elder.learnList[index]);
+            }
+        } else if (option === 4) {
+            // 4) Smart people
+            let smart = this.village.getSmartOrganism();
+            if (smart != undefined) {
+                this.learnList[index].recombine(smart.learnList[index]);
+            }
         }
     }
 
@@ -145,7 +204,7 @@ class Organism {
 
 
         // Figure out how to use this.time instead of the count or if it is necessary.
-        this.count++;
+        this.days++;
         // this.time = this.village.grid.getTick;
 
         // 1% chance of dying
@@ -167,11 +226,19 @@ class Organism {
             }
 
             if (sexualReproChance < sexualReproThreshold) {     //sexual
-                this.reproduce(this.village.getFitOrganism());
+                let otherParent = this.village.getFitOrganism();
+                let countVillagers = 0;
+                while (otherParent === this && countVillagers < this.village.organisms.length) {
+                    otherParent = this.village.getFitOrganism();
+                    countVillagers++;
+                }
+
+                if (this != otherParent) {
+                    this.reproduce(otherParent);
+                } 
             } else { // asexual
                 this.reproduce();
             }
-
 
             // 5% chance of social learning
             // requires at least 2 organisms in the village
@@ -180,12 +247,11 @@ class Organism {
             }
 
             // indLearning every 5 ticks
-            if (this.count % 5 === 0)
+            if (this.days % 5 === 0)
             {
                 this.indLearning();
             }
 
-            
             // 5% chance of individual learning every tick (mutating one learnList gene)
             // if (random() < 1) {
             //     this.indLearning();
