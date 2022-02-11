@@ -117,6 +117,8 @@ class Village {
     removeOrganism(organism) { organism.removeFromWorld = true; }
 
     get fitOrganisms() { return this.organisms.filter(organism => organism.energy > REPRODUCTION_THRESH); }
+    get elderOrganisms() { return this.organisms.filter(organism => organism.days > ELDER_THRESH); }
+    get smartOrganisms() { return this.organisms.filter(organism => organism.learnCapability > LEARN_THRESH); }
 
     // Organisms should only interact with those in their "village"
     step(world) {
@@ -151,6 +153,14 @@ class Village {
     // get organisms that meet the reproduction thresholds
     getFitOrganism(){
         return this.fitOrganisms[getRandomInteger(0, this.fitOrganisms.length - 1)];
+    }
+
+    getElderOrganism() {
+        return this.elderOrganisms[getRandomInteger(0, this.elderOrganisms.length - 1)];
+    }
+
+    getSmartOrganism() {
+        return this.smartOrganisms[getRandomInteger(0, this.smartOrganisms.length - 1)];
     }
 
     get i() { return this._pos.i; }
