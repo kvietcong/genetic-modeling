@@ -131,7 +131,15 @@ const deleteSim = simID => {
 const scrollToSim = simID => {
     const simulations = document.getElementById("simulations");
     simulations.children[simID].scrollIntoView({behavior: "smooth"});
-}
+};
+
+const pausePlayEngine = simID => gameEngines[simID].isPaused = !gameEngines[simID].isPaused;
+;
+
+const pausePlaySim = simID => gameEngines[simID]
+    .entities
+    .filter(e => e instanceof World)
+    .forEach(world => world.isPaused = !world.isPaused);
 
 const regenerateButtons = () => {
     const buttonList = document.getElementById("buttons");
@@ -143,6 +151,14 @@ const regenerateButtons = () => {
         deletionButton.innerText = `Delete Sim ${id + 1}`;
         deletionButton.onclick = () => deleteSim(id);
 
+        const pausePlayEngineButton = document.createElement("button");
+        pausePlayEngineButton.innerText = `Pause/Play Engine ${id + 1}`;
+        pausePlayEngineButton.onclick = () => pausePlayEngine(id);
+
+        const pausePlaySimButton = document.createElement("button");
+        pausePlaySimButton.innerText = `Pause/Play Sim ${id + 1}`;
+        pausePlaySimButton.onclick = () => pausePlaySim(id);
+
         const scrollToButton = document.createElement("button");
         scrollToButton.innerText = `Scroll To Sim ${id + 1}`;
         scrollToButton.onclick = () => scrollToSim(id);
@@ -150,6 +166,8 @@ const regenerateButtons = () => {
         const li = document.createElement("li");
         li.appendChild(deletionButton);
         li.appendChild(scrollToButton);
+        li.appendChild(pausePlayEngineButton);
+        li.appendChild(pausePlaySimButton);
         buttonList.appendChild(li);
     });
 };

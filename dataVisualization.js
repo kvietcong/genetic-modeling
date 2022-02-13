@@ -133,9 +133,8 @@ class Histogram {
             this.x + 5,
             this.y + this.height - titleHeight / 4);
 
-        const sampleSize = `Min: ${minTotal} `
-                         + `Max: ${maxTotal} `
-                         + `Now: ${totals[totals.length - 1] ?? 0}`;
+        const sampleSize = `{${minTotal}, ${maxTotal}} `
+                         + ` ${totals[totals.length - 1] ?? 0}`;
         ctx.fillText(sampleSize,
             this.x + this.width - ctx.measureText(sampleSize).width - 5,
             this.y + this.height - titleHeight / 4);
