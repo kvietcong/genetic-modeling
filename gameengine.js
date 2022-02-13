@@ -93,15 +93,14 @@ class GameEngine {
         // Clear the whole canvas
         this.ctx.clearRect(0, 0, this.width, this.height);
         // Draw latest things first
-        this.entities.reduceRight((_, entity) => entity.draw(this.ctx, this), null);
+        this.entities.reduceRight((_, entity) => entity.draw?.(this.ctx, this), null);
     };
 
     update() {
-        // Update Entities
-        this.entities.forEach(entity =>
-            !entity.removeFromWorld && entity.update(this));
         // Remove dead things
         this.entities = this.entities.filter(entity => !entity.removeFromWorld);
+        // Update Entities
+        this.entities.forEach(entity => entity.update?.(this));
         // Add new things
         this.entities = this.entities.concat(this.entitiesToAdd);
         this.entitiesToAdd = [];

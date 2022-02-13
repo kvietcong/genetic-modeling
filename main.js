@@ -37,8 +37,6 @@ const gridExample = gameEngine => {
             const { i, j } = this.selected;
             this.histograms[i][j].isDrawing = true;
         }
-
-        draw(ctx) {}
     }
 
     const histograms = [];
