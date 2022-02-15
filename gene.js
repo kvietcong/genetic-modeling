@@ -35,7 +35,7 @@ params.cellSize = 2;
 params.fillToLevel = 0;     //getRandomInteger(1,3);
 params.partitionSize = 1;   // it was set at 2 but Chris might want this at 1
 params.mutationChance = 0.3;
-params.initialPartitions = 6;
+params.initialPartitions = 10; // TODO: Find out why we can't level beyond 4
 
 /** Library of Gene related values and functions */
 const libGene = (() => {
@@ -95,7 +95,6 @@ const libGene = (() => {
         _.initializers.perCell.template(gene,
                                         _.initializers.perCell.fillToLevel,
                                         params.fillToLevel);
-
     /**
      * @param {Array2D} cells Array of cells
      * @param {Array2D} newPartition Array of replacements
@@ -215,7 +214,7 @@ const libGene = (() => {
                     gene.cells[i][j] = mutator(gene.cells[i][j], i, j, gene);
         },
         flip: currentState =>
-            random() <= params.mutationChance
+            Math.random() <= params.mutationChance
                 ? (currentState + 1) % 2
                 : currentState,
         rejuvenate: () => 1,
