@@ -50,9 +50,9 @@ const gridExample = gameEngine => {
             const histogram = createOrganismHistogram(
 
                 // Average Gene Level Histogram
-                [0, 1, 2, 3, 4, 5, 6],
-                organism =>
-                    floor(average(organism.geneList.map(gene => gene.level))), // need to give it a function
+                // [0, 1, 2, 3, 4, 5, 6],
+                // organism =>
+                //     floor(average(organism.geneList.map(gene => gene.level))), // need to give it a function
 
 
                 // Average gene-based learn Level Histogram
@@ -65,8 +65,8 @@ const gridExample = gameEngine => {
 
 
                 // Average integer-based Learn Level Histogram
-                // [1, 2, 3, 4, 5],
-                // organism => round(average(organism.learnList)),
+                [0, 1, 2, 3, 4],
+                organism => floor(average(organism.learnList.map(gene => gene.level))), // need to give it a function
 
                 // Where To Draw
                 min(gameEngine.width, gameEngine.height), 250,
