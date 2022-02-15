@@ -180,6 +180,7 @@ class World {
         this.days = 0;
         this.syncedEntities = [];
         this.TICK = 0;
+        this.isPaused = false;
 
         // Indexing from top left
         for (let i = 0; i < rows; i++) {
@@ -266,6 +267,8 @@ class World {
     }
 
     update(gameEngine) {
+        if (this.isPaused) return;
+
         const secondsPerStep = 1 / params.stepsPerSecond;
         this.timeSinceLastStep += gameEngine.deltaTime;
 

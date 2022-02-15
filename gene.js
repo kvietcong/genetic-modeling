@@ -95,7 +95,6 @@ const libGene = (() => {
         _.initializers.perCell.template(gene,
                                         _.initializers.perCell.fillToLevel,
                                         params.fillToLevel);
-
     /**
      * @param {Array2D} cells Array of cells
      * @param {Array2D} newPartition Array of replacements

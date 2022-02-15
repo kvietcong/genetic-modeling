@@ -17,7 +17,9 @@ class GameEngine {
         this.wheel = null;
 
         // THE KILL SWITCH
-        this.running = false;
+        this.isRunning = false;
+
+        this.isPaused = false;
 
         // Options and the Details
         this.options = options || params.defaultGameEngineOptions;
@@ -30,10 +32,10 @@ class GameEngine {
     };
 
     start() {
-        this.running = true;
+        this.isRunning = true;
         const gameLoop = () => {
             this.loop();
-            if (this.running) {
+            if (this.isRunning) {
                 requestAnimFrame(gameLoop, this.ctx.canvas);
             }
         };
@@ -41,7 +43,7 @@ class GameEngine {
     };
 
     stop() {
-        this.running = false;
+        this.isRunning = false;
     }
 
     startInput() {
@@ -93,15 +95,32 @@ class GameEngine {
         // Clear the whole canvas
         this.ctx.clearRect(0, 0, this.width, this.height);
         // Draw latest things first
-        this.entities.reduceRight((_, entity) => entity.draw(this.ctx, this), null);
+        this.entities.reduceRight((_, entity) => entity.draw?.(this.ctx, this), null);
+
+        if (this.isPaused) {
+            this.ctx.fillStyle = rgba(0, 0, 0, 0.5);
+            this.ctx.fillRect(0, 0, this.width, this.height);
+            const pauseText = "Game Engine Paused";
+            const pauseTextWidth = this.ctx.measureText(pauseText).width;
+            this.ctx.fillStyle = "red";
+            this.ctx.font = "bold 50px Arial";
+            // TODO: Find out why the text is not centered
+            this.ctx.fillText(
+                pauseText,
+                this.width / 2 - pauseTextWidth / 2,
+                this.height / 2,
+                this.width
+            );
+        }
     };
 
     update() {
-        // Update Entities
-        this.entities.forEach(entity =>
-            !entity.removeFromWorld && entity.update(this));
+        if (this.isPaused) return;
+
         // Remove dead things
         this.entities = this.entities.filter(entity => !entity.removeFromWorld);
+        // Update Entities
+        this.entities.forEach(entity => entity.update?.(this));
         // Add new things
         this.entities = this.entities.concat(this.entitiesToAdd);
         this.entitiesToAdd = [];
