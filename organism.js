@@ -7,9 +7,9 @@
  */
 
 // Constants associated with every Organism
-const ARR_LEN = 5;            // the number of tasks/genes/learning that the Organism has to do
+const ARR_LEN = 5;              // the number of tasks/genes/learning that the Organism has to do
 const REPRODUCTION_THRESH = 50; // assume this will be the same for every Organism
-const ELDER_THRESH = 50; // Organism is considered Elder after 50 days old
+const ELDER_THRESH = 50;        // Organism is considered Elder after 50 days old
 const LEARN_THRESH = 15;
 
 /**
@@ -155,13 +155,13 @@ class Organism {
     // social learning - recombining one learn gene
     socLearning() {
         let index = getRandomInteger(0, 4);
-        let option = 0; // 0 - 4: Change depending on which socLearning method 
+        let option = 0; // 0 - 5: Change depending on which socLearning method
+
 
         if (option === 0) {
             // Random 1-4
             option = getRandomInteger(1, 4);
         }
-
         if (option === 1) {
             // 1) Random villager as teacher
             // Recombinging learn gene at index with learn gene at index of a random villager (teacher)
@@ -174,11 +174,11 @@ class Organism {
                 let parentIndex = getRandomInteger(0, 1);
                 if (parentIndex === 0) {
                     this.learnList[index].recombine(this.parent1.learnList[index]);
-                } else { 
+                } else {
                     this.learnList[index].recombine(this.parent2.learnList[index]);
                 }
             }
-        } 
+        }
         else if (option === 3 && this.days < ELDER_THRESH) {
             // 3) Elder (age is  over 50 ticks)
             let elder = this.village.getElderOrganism();
@@ -232,7 +232,7 @@ class Organism {
 
                 if (this != otherParent) {
                     this.reproduce(otherParent);
-                } 
+                }
             } else { // asexual
                 this.reproduce();
             }
