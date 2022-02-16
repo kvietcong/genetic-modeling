@@ -5,6 +5,8 @@
     <meta charset="utf-8">
     <title>Genetic Modeling</title>
 
+    <link rel="stylesheet" type="text/css" href="./style.css"></link>
+
     <script type="text/javascript" src="./assetmanager.js"></script>
     <script type="text/javascript" src="./timer.js"></script>
     <script type="text/javascript" src="./gameengine.js"></script>
@@ -53,18 +55,69 @@
     <ol id="buttons" style="position: fixed; top: 90px; right: 10px;">
     </ol>
 
+    <!--
     <div>
         <br>
-        <!-- <input type="checkbox" id="migrationBox"> Offspring migration -->
-        <!-- <input type="checkbox" id="sexualReproductionBox"> Sexual reproduction -->
+        <!- - <input type="checkbox" id="migrationBox"> Offspring migration - ->
+        <!- - <input type="checkbox" id="sexualReproductionBox"> Sexual reproduction - ->
         Sexual Reproduction Chance (0-100%) <input type="range" id="sexualRepSlider" min="0" max="1" value="0.5" step="0.05">
         <br><br>
         Offspring Migration Chance (0-100%) <input type="range" id="migrationSlider" min="0" max="1" value="0.5" step="0.05">
         <br><br>
         Initial Learning Ability (0 - 4) <input type="range" id="learningSlider" min="0" max="4" value="0" step="1">
         <br><br>
-        <!-- Population Cap ( - 4) <input type="range" id="learningSlider" min="0" max="4" value="0" step="1">  -->
+        <!- - Population Cap ( - 4) <input type="range" id="learningSlider" min="0" max="4" value="0" step="1">  - ->
+    </div> -->
+
+    <!-- <div id = "tasksDiv">
+        <p> Tasks </p>
+        <input type="text" id="num_tasks_in" value="5" />Number of tasks<br />
+    </div> -->
+
+    <div id = "geneDiv">
+        <p> Gene </p>
+        <!-- <input type="text" id="numGenes" value="5" /> Number of genes<br /> -->
+        <input type="text" id="sizeOfLevelIn" value="1" /> Size of level<br />
+        <input type="text" id="fillToLevelIn" value="1" /> Fill to level<br />
+
+        <input type="radio" id = "flip" name = "recomboType" value = "flip" checked>
+        <label for = "flip"> Flip </label>
+
+        <input type="radio" id = "rejuvenate" name = "recomboType" value = "rejuvenate">
+        <label for = "rejuvenate"> Rejuvenate </label>
     </div>
 
+    <div id = "reproductionDiv">
+        <p> Reproduction </p>
+        <input type="text" id="sexualRepChance" value="0.5" /> Sexual Reproduction Chance (0 - 1)<br />
+        <input type="text" id="migrationChance" value="0.5" /> Migration Chance (0 - 1)<br />
+    </div>
+
+    <div id = "learningDiv">
+        <p> Learning </p>
+        <input type="checkbox" id="noIndividual"> No individual learning or<br>
+        <input type="text" id="indPercent" value="0.05" /> Individual Learning Chance (0 - 1) or<br />
+        <input type="text" id="indDays" value="0" /> # days between ind. learning<br /><br>
+
+        <input type="checkbox" id="noSocial"> No social learning or<br>
+        <input type="text" id="socialPercent" value="0.05" /> Social Learning Chance (0 - 1) or<br />
+        <input type="text" id="socialDays" value="0" /> # days between soc. learning<br><br>
+        
+        Social learning from: <br>
+        <input type="radio" name = "socialType"checked>
+        <label for = "random"> Random of all the above </label>  <br>
+
+        <input type="radio" name = "socialType">
+        <label for = "villager"> Random Villager </label> <br>
+
+        <input type="radio" name = "socialType">
+        <label for = "parent"> Parent </label> <br>
+
+        <input type="radio" name = "socialType">
+        <label for = "elder"> Elder </label> <br>
+
+        <input type="radio" name = "socialType">
+        <label for = "wise"> Wise </label> <br>
+    </div>
 </body>
 </html>

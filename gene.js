@@ -32,8 +32,8 @@
 
 /* Default Global Parameters related to Genes */
 params.cellSize = 2;
-params.fillToLevel = 0;     //getRandomInteger(1,3);
-params.partitionSize = 1;   // it was set at 2 but Chris might want this at 1
+params.fillToLevel = 1 // document.getElementById("fillToLevelIn").value;    //getRandomInteger(1,3);
+params.partitionSize = 1 // document.getElementById("sizeOfLevelIn").value;   // it was set at 2 but Chris might want this at 1
 params.mutationChance = 0.3;
 params.initialPartitions = 10; // TODO: Find out why we can't level beyond 4
 
@@ -221,9 +221,12 @@ const libGene = (() => {
         destroy: () => 0,
     }
     /** Default mutator for genes */
-    _.mutator = gene =>
-        _.mutators.currentLevel.template(gene, _.mutators.currentLevel.flip);
+    _.mutator = gene => {
 
+
+        _.mutators.currentLevel.template(gene, _.mutators.currentLevel.flip);
+    }
+        
     /** Different functions to draw a Gene's cells */
     _.drawers = {
         /**

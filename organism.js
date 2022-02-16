@@ -120,7 +120,7 @@ class Organism {
         // let sexualReproductionStatus = document.getElementById("sexualReproductionBox").checked;
 
         let migrationChance = random(); // random value between 0 and 1
-        let migrationThreshold = document.getElementById("migrationSlider").value;
+        let migrationThreshold = document.getElementById("migrationChance").value;
 
         if(this.energy >= REPRODUCTION_THRESH && otherOrganism.energy >= REPRODUCTION_THRESH) {
             this.energy -= REPRODUCTION_THRESH / 2; // this.parent1 25
@@ -154,9 +154,16 @@ class Organism {
 
     // social learning - recombining one learn gene
     socLearning() {
+        let radios = document.getElementsByName("socialType");
         let index = getRandomInteger(0, 4);
-        let option = 0; // 0 - 5: Change depending on which socLearning method
+        let option;
 
+        if (radios[0].checked) option = 0;
+        else if (radios[1].checked) option = 1;
+        else if (radios[2].checked) option = 2;
+        else if (radios[3].checked) option = 3;
+        else if (radios[4].checked) option = 4;
+        
 
         if (option === 0) {
             // Random 1-4
@@ -211,7 +218,7 @@ class Organism {
         }
 
         let sexualReproChance = random();   // random value between 0 and 1
-        let sexualReproThreshold = document.getElementById("sexualRepSlider").value;
+        let sexualReproThreshold = document.getElementById("sexualRepChance").value;
 
         // soft age cap using the "percentage" above
         if (this.alive) { // this would be 20 (7300) - 60 "years" (365 days * 60 years)
@@ -237,17 +244,33 @@ class Organism {
                 this.reproduce();
             }
 
-            // 5% chance of social learning
+            // social learning
             // requires at least 2 organisms in the village
-            if (random() < 0.05 && this.village.organisms.length > 1) {
-                this.socLearning();
+            if (!document.getElementById("noSocial").checked) {
+                let socialChance = document.getElementById("socialPercent").value;
+                let socialDays = document.getElementById("socialDays").value;
+                if (socialChance != 0 && random() < socialChance && this.village.organisms.length > 1) {
+                    this.socLearning();
+                } 
+                if (socialDays != 0 && this.days % socialDays === 0) {
+                    this.socLearning();
+                }
+
+                console.log(socialChance, socialDays);
             }
 
-            // indLearning every 5 ticks
-            if (this.days % 5 === 0)
-            {
-                this.indLearning();
+            // individual learning 
+            if (!document.getElementById("noIndividual").checked) {
+                let indChance = document.getElementById("indPercent").value;
+                let indDays = document.getElementById("indDays").value;
+                if (indChance != 0 && random() < indChance && this.village.organisms.length > 1) {
+                    this.indLearning();
+                } 
+                if (indDays != 0 && this.days % indDays === 0) {
+                    this.indLearning();
+                }
             }
+            
 
             // 5% chance of individual learning every tick (mutating one learnList gene)
             // if (random() < 1) {

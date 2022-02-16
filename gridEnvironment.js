@@ -415,9 +415,9 @@ class World {
         ctx.fillStyle = "Green";
         ctx.font = "25px 'Arial'";
         ctx.fillText("Day " + this.days, 740, 50);
-        ctx.fillText("Sexual Reproduction Chance: " + document.getElementById("sexualRepSlider").value, 740, 90);
-        ctx.fillText("Offspring Migration Chance   : " + document.getElementById("migrationSlider").value, 740, 120);
-        ctx.fillText("Initial Learning Ability             : " + document.getElementById("learningSlider").value, 740, 150);
+        ctx.fillText("Sexual Reproduction Chance: " + document.getElementById("sexualRepChance").value, 740, 90);
+        ctx.fillText("Offspring Migration Chance   : " + document.getElementById("migrationChance").value, 740, 120);
+        // ctx.fillText("Initial Learning Ability             : " + document.getElementById("learningSlider").value, 740, 150);
     }
 
     toString() {
