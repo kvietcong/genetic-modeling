@@ -69,10 +69,7 @@ class Village {
             }
         } else {  // randomly set the village configuration
             this.environment = chooseRandom(Object.keys(params.environments));
-
         }
-
-        console.log(this.environment);
 
         this.taskList = [];             // all the tasks associated with the village
         this.numTasks = 5;
