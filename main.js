@@ -9,8 +9,8 @@ const restart = gameEngine => {
 const gridExample = gameEngine => {
     // gameEngine.addEntity(testHistogram);
 
-    const rows = 8;
-    const columns = 8;
+    const rows = 8;         // change the number of villages in the world
+    const columns = 8;      // change the number of villages in the world
     const world = new World(rows, columns);
 
     class HistogramManager {

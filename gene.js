@@ -32,7 +32,7 @@
 
 /* Default Global Parameters related to Genes */
 params.cellSize = 2;
-params.fillToLevel = 1 // document.getElementById("fillToLevelIn").value;    //getRandomInteger(1,3);
+params.fillToLevel = 0 // document.getElementById("fillToLevelIn").value;    //getRandomInteger(1,3);
 params.partitionSize = 1 // document.getElementById("sizeOfLevelIn").value;   // it was set at 2 but Chris might want this at 1
 params.mutationChance = 0.3;
 params.initialPartitions = 10; // TODO: Find out why we can't level beyond 4

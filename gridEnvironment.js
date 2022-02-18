@@ -44,7 +44,35 @@ class Village {
         this.organisms = [];
         this.organismsToAdd = [];
 
-        this.environment = chooseRandom(Object.keys(params.environments));
+        if (document.getElementsByName("worldType")[0].checked) { // set the world village configuration
+            if((i === 3 || i === 4) && (j === 3 || j === 4)) { // middle rainforest
+
+                this.environment = "rainforest";
+
+            } else if ((i > 1 && i < 6) && (j > 1 && j < 6)) { // 1 out from center mediterranean
+
+                this.environment = "mediterranean";
+
+            } else if ((i > 0 && i < 7) && (j > 0 && j < 7)) { // 2 out from center mountains
+
+                this.environment = "mountains";
+
+            } else { // outer ring desert or polarice randomly
+
+                let randNum = getRandomInteger(0,1);
+
+                if(randNum === 0) {
+                    this.environment = "desert";
+                } else {
+                    this.environment = "polarice";
+                }
+            }
+        } else {  // randomly set the village configuration
+            this.environment = chooseRandom(Object.keys(params.environments));
+
+        }
+
+        console.log(this.environment);
 
         this.taskList = [];             // all the tasks associated with the village
         this.numTasks = 5;

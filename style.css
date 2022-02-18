@@ -38,6 +38,20 @@
     margin: 10px;
 }
 
+#worldConfig {
+    font-size: 15px;
+    width: 320px;
+    border: 2px solid darkgreen;
+    margin: auto;
+    font-family: Arial;
+    color: darkgreen;
+    background-color: lightgreen;
+    display:inline-block;
+    text-align:left;
+    margin: 10px;
+}
+
+
 div input {
     width: 30px;
 }
