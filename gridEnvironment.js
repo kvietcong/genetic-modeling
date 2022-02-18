@@ -1,4 +1,4 @@
-params.stepsPerSecond = 20;
+params.stepsPerSecond = 60;
 params.population = 20;
 
 // play with environments.
@@ -368,57 +368,58 @@ class World {
         console.log("Time taken: " + this.days + " days")
     }
 
-    // TODO
-    draw(ctx) {
-        const { width: ctxWidth, height: ctxHeight } = ctx.canvas;
-        const size = min(ctxWidth, ctxHeight);
-        const drawWidth = size / this.columns;
-        const drawHeight = size / this.rows;
+    // // TODO
+    // draw(ctx) {
+    //     const { width: ctxWidth, height: ctxHeight } = ctx.canvas;
+    //     const size = min(ctxWidth, ctxHeight);
+    //     const drawWidth = size / this.columns;
+    //     const drawHeight = size / this.rows;
 
-        const { populationMax, populationMin } = this.stats;
+    //     const { populationMax, populationMin } = this.stats;
 
-        ctx.fillStyle = "White";
-        ctx.font = "18px 'Arial'";
+    //     ctx.fillStyle = "White";
+    //     ctx.font = "18px 'Arial'";
 
-        for (let i = 0; i < this.rows; i++) {
-            for (let j = 0; j < this.columns; j++) {
-                const village = this.villages[i][j];
-                const environment = village.environment;
-                const population = village.organisms.length;
+    //     for (let i = 0; i < this.rows; i++) {
+    //         for (let j = 0; j < this.columns; j++) {
+    //             const village = this.villages[i][j];
+    //             const environment = village.environment;
+    //             const population = village.organisms.length;
 
-                ctx.fillStyle = params.environments[environment].color;
-                ctx.fillRect(
-                    drawWidth * j, drawHeight * i,
-                    drawWidth, drawHeight);
+    //             ctx.fillStyle = params.environments[environment].color;
+    //             ctx.fillRect(
+    //                 drawWidth * j, drawHeight * i,
+    //                 drawWidth, drawHeight);
 
-                ctx.strokeStyle = "black";
-                ctx.strokeRect(
-                    drawWidth * j, drawHeight * i,
-                    drawWidth, drawHeight);
+    //             ctx.strokeStyle = "black";
+    //             ctx.strokeRect(
+    //                 drawWidth * j, drawHeight * i,
+    //                 drawWidth, drawHeight);
 
-                const ratio = (population - populationMin) / (populationMax || 1);
-                const maxRadius = (min(drawWidth, drawHeight) / 2) * 0.8;
-                const radius = round(ratio * maxRadius);
+    //             const ratio = (population - populationMin) / (populationMax || 1);
+    //             const maxRadius = (min(drawWidth, drawHeight) / 2) * 0.8;
+    //             const radius = round(ratio * maxRadius);
 
-                const x = drawWidth * j + drawWidth / 2;
-                const y = drawHeight * i + drawHeight / 2;
+    //             const x = drawWidth * j + drawWidth / 2;
+    //             const y = drawHeight * i + drawHeight / 2;
 
-                ctx.beginPath();
-                ctx.arc(x, y, radius, 0, 2 * PI);
-                ctx.fillStyle = rgba(0, 0, 0, ratio + 0.2);
-                ctx.fill();
-                ctx.fillStyle = "black";
-                ctx.fillText(population, x - 45, y + 40);
-            }
-        }
+    //             ctx.beginPath();
+    //             ctx.arc(x, y, radius, 0, 2 * PI);
+    //             ctx.fillStyle = rgba(0, 0, 0, ratio + 0.2);
+    //             ctx.fill();
+    //             ctx.fillStyle = "black";
+    //             ctx.fillText(population, x - 45, y + 40);
+    //         }
+    //     }
 
-        ctx.fillStyle = "Green";
-        ctx.font = "25px 'Arial'";
-        ctx.fillText("Day " + this.days, 740, 50);
-        ctx.fillText("Sexual Reproduction Chance: " + document.getElementById("sexualRepChance").value, 740, 90);
-        ctx.fillText("Offspring Migration Chance   : " + document.getElementById("migrationChance").value, 740, 120);
-        // ctx.fillText("Initial Learning Ability             : " + document.getElementById("learningSlider").value, 740, 150);
-    }
+    //     ctx.fillStyle = "Green";
+    //     ctx.font = "25px 'Arial'";
+    //     ctx.fillText("Day " + this.days, 740, 50);
+    //     ctx.fillText("Sexual Reproduction Chance: " + document.getElementById("sexualRepChance").value, 740, 90);
+    //     ctx.fillText("Offspring Migration Chance   : " + document.getElementById("migrationChance").value, 740, 120);
+    //     // ctx.fillText("Initial Learning Ability             : " + document.getElementById("learningSlider").value, 740, 150);
+    // }
+    draw(ctx) { }
 
     toString() {
         return this.villages.map(row =>
