@@ -31,7 +31,7 @@ params.environments = {
         name : "rainforest",
         color: "green",
         reward: 1,
-        threshold: [0, 0,0,0,0]
+        threshold: [0,0,0,0,0]
     },
 };
 
