@@ -41,11 +41,15 @@ const gridExample = gameEngine => {
                 `Village ${i}, ${j}`, // Title
 
                 // Updating variables
-                village, 10
+                village, 1
             );
             // histogram.tint(params.environments[village.environment].color);
             // histogram.backgroundColor = params.environments[village.environment].color;
             histogram.backgroundColor = { color: params.environments[village.environment].color, opacity: 0.1 };
+
+            // Drawing speed testing
+            // if (i < 2 && j < 2) histogram.isDrawing = true;
+            // else histogram.isDrawing = false;
 
             histograms[i][j] = histogram;
             gameEngine.addEntity(histogram); // For Draw Calls
