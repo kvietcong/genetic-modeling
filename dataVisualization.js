@@ -27,6 +27,8 @@ class Histogram {
 
         this.tintInfo = null;
         this.backgroundColor = "white";
+        this.timeLast = [Date.now(), Date.now()];
+        this.elapsedTime = [0, 0];
     }
 
     untint() { this.tintInfo = null; }
@@ -84,11 +86,17 @@ class Histogram {
     stopUpdate() { this.updater = null; this.unitTimePerUpdate = 0; }
 
     step() {
+        // const currentTime = Date.now();
+
         this.ticksSinceLastUpdate += 1;
         if (this.ticksSinceLastUpdate >= this.unitTimePerUpdate) {
             this.ticksSinceLastUpdate -= this.unitTimePerUpdate;
             this.updater(this);
         }
+
+        // const newTime = Date.now();
+        // console.log(newTime, currentTime)
+        // console.log("update", newTime - currentTime);
     }
 
     update(gameEngine) {
@@ -106,7 +114,9 @@ class Histogram {
     }
 
 
-    draw(ctx) {
+    draw(ctx, gameEngine) {
+        // const currentTime = Date.now();
+
         if (!this.isDrawing) return;
         if (this.customDrawer) return this.customDrawer(this, ctx);
 
@@ -218,6 +228,10 @@ class Histogram {
 
         ctx.drawImage(offscreenCanvas, this.x, this.y);
         offscreenContext.clearRect(0, 0, this.width, this.height);
+
+        // const newTime = Date.now();
+        // console.log(newTime, currentTime)
+        // console.log("draw", newTime - currentTime);
     }
 }
 

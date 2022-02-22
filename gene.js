@@ -30,12 +30,21 @@
 //
 // There are also some useful functions in the `./util.js` file.
 
+const testPrinter = (newValue, _propertyName) => console.log(`Inserted ${newValue}`);
+const exampleCallback = (newValue, propertyName) => {
+    const container = document.getElementById(propertyName + "-container");
+    const p = container.children[0];
+    p.textContent = `:${propertyName}: ${newValue}`;
+};
+
 /* Default Global Parameters related to Genes */
-params.cellSize = 2;
-params.fillToLevel = 0;     //getRandomInteger(1,3);
-params.partitionSize = 1;   // it was set at 2 but Chris might want this at 1
-params.mutationChance = 0.3;
-params.initialPartitions = 10; // TODO: Find out why we can't level beyond 4
+attachPropertiesWithCallbacks(params, [ // Function in `util.js`
+    [ "cellSize", 2, testPrinter ],
+    [ "fillToLevel", 0, testPrinter ],  // getRandomInteger(1,3);
+    [ "partitionSize", 1, testPrinter ], // it was set at 2 but Chris might want this at 1
+    [ "mutationChance", 0.3, testPrinter ],
+    [ "initialPartitions", 6, testPrinter ],
+]);
 
 /** Library of Gene related values and functions */
 const libGene = (() => {

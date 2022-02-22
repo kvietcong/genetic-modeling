@@ -179,3 +179,32 @@ const createOrganismHistogram = (
         villageReference.organisms, updatesPerTick);
     return histogram;
 }
+
+const attachPropertyWithCallback = (object, property, initialValue, callback) => {
+    Object.defineProperty(object, property, {
+        get: () => object[`_${property}`],
+        set: newValue => {
+            object[`_${property}`] = newValue;
+            callback(newValue, property);
+        }
+    });
+    object[property] = initialValue;
+};
+
+const attachPropertiesWithCallbacks = (object, things) => {
+    const t = things.reduce((acc, thing) => {
+        const [ property, _initialValue, callback ] = thing;
+        acc[property] = {
+            get: () => object[`_${property}`],
+            set: newValue => {
+                object[`_${property}`] = newValue;
+                callback(newValue, property);
+            }
+        };
+        return acc;
+    }, {});
+    Object.defineProperties(object, t);
+    things.forEach(([ property, initialValue, _callback ]) => {
+        object[property] = initialValue;
+    });
+};
