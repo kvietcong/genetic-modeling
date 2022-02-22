@@ -3,10 +3,10 @@ const params = {
     // Maybe use for toggle-able logging?
     isDebugging: true,
     canvas: {
-        // width: 3840,
-        // height: 2160,
-        width: 1280,
-        height: 720,
+        width: 2500,
+        height: 2000,
+        // width: 1280,
+        // height: 720,
         backgroundColor: "white",
         border: "1px solid black",
         attachID: "simulations",

@@ -7,42 +7,18 @@ const restart = gameEngine => {
 }
 
 const gridExample = gameEngine => {
-    // gameEngine.addEntity(testHistogram);
-
-    const rows = 8;         // change the number of villages in the world
-    const columns = 8;      // change the number of villages in the world
+    const rows = 8;
+    const columns = 8;
     const world = new World(rows, columns);
-
-    class HistogramManager {
-        constructor(histograms) {
-            this.histograms = histograms;
-            this.selected = { i: 0, j: 0 };
-        }
-
-        update(gameEngine) {
-            const size = min(gameEngine.width, gameEngine.height);
-            const { x, y } = gameEngine.mouse ?? { x: 0, y: 0 };
-            const rows = this.histograms.length;
-            const cols = this.histograms[0].length;
-
-            const iHover = floor(y / size * rows);
-            const jHover = floor(x / size * cols);
-
-            const { i: iOld, j: jOld } = this.selected;
-            this.histograms[iOld][jOld].isDrawing = false;
-            this.selected = iHover >= 0 && iHover < rows
-                                && jHover >= 0 && jHover < cols
-                          ? { i: iHover, j: jHover }
-                          : { i: iOld, j: jOld };
-            const { i, j } = this.selected;
-            this.histograms[i][j].isDrawing = true;
-        }
-    }
+    const width = params.canvas.width / columns;
+    const height = params.canvas.height / rows;
 
     const histograms = [];
     for (let i = 0; i < rows; i++) {
         histograms[i] = [];
         for (let j = 0; j < columns; j++) {
+            const village = world.getVillage(i, j);
+
             // This histogram helper function can be found in `util.js`
             // More information about parameters is there too.
             const histogram = createOrganismHistogram(
@@ -67,17 +43,17 @@ const gridExample = gameEngine => {
                 organism => floor(average(organism.learnList.map(gene => gene.level))), // need to give it a function
 
                 // Where To Draw
-                min(gameEngine.width, gameEngine.height), 250,
-                550, 460,
-                // j * 300, i * 250,
-                // 300, 250,
+                j * width, i * height,
+                width, height,
 
                 `Village ${i}, ${j}`, // Title
 
                 // Updating variables
-                world.getVillage(i, j), 10
+                village, 10
             );
-            histogram.isDrawing = false;
+            // histogram.tint(params.environments[village.environment].color);
+            // histogram.backgroundColor = params.environments[village.environment].color;
+            histogram.backgroundColor = { color: params.environments[village.environment].color, opacity: 0.1 };
 
             histograms[i][j] = histogram;
             gameEngine.addEntity(histogram); // For Draw Calls
@@ -85,7 +61,6 @@ const gridExample = gameEngine => {
         }
     }
     gameEngine.addEntity(world);
-    gameEngine.addEntity(new HistogramManager(histograms));
 };
 
 const geneExample = gameEngine => {
@@ -130,7 +105,7 @@ const deleteSim = simID => {
 
 const scrollToSim = simID => {
     const simulations = document.getElementById("simulations");
-    simulations.children[simID].scrollIntoView({behavior: "smooth"});
+    simulations.children[simID].scrollIntoView({behavior: "smooth", block: "start"});
 };
 
 const pausePlayEngine = simID => gameEngines[simID].isPaused = !gameEngines[simID].isPaused;
@@ -143,25 +118,33 @@ const pausePlaySim = simID => gameEngines[simID]
 
 const regenerateButtons = () => {
     const buttonList = document.getElementById("buttons");
+
     while (buttonList.firstChild) {
         buttonList.removeChild(buttonList.firstChild);
     }
-    gameEngines.forEach((_, id) => {
+
+    gameEngines.forEach((gameEngine, id) => {
+        gameEngine.id = id; // Update Game Engine ID
+
         const deletionButton = document.createElement("button");
-        deletionButton.innerText = `Delete Sim ${id + 1}`;
+        deletionButton.innerText = `Delete Sim ${id}`;
         deletionButton.onclick = () => deleteSim(id);
+        deletionButton.id = `delete-sim-${id}`;
 
         const pausePlayEngineButton = document.createElement("button");
-        pausePlayEngineButton.innerText = `Pause/Play Engine ${id + 1}`;
+        pausePlayEngineButton.innerText = `Pause/Play Engine ${id}`;
         pausePlayEngineButton.onclick = () => pausePlayEngine(id);
+        pausePlayEngineButton.id = `pause-play-engine-${id}`;
 
         const pausePlaySimButton = document.createElement("button");
-        pausePlaySimButton.innerText = `Pause/Play Sim ${id + 1}`;
+        pausePlaySimButton.innerText = `Pause/Play Sim ${id}`;
         pausePlaySimButton.onclick = () => pausePlaySim(id);
+        pausePlaySimButton.id = `pause-play-sim-${id}`;
 
         const scrollToButton = document.createElement("button");
-        scrollToButton.innerText = `Scroll To Sim ${id + 1}`;
+        scrollToButton.innerText = `Scroll To Sim ${id}`;
         scrollToButton.onclick = () => scrollToSim(id);
+        scrollToButton.id = `scroll-to-sim-${id}`;
 
         const li = document.createElement("li");
         li.appendChild(deletionButton);
