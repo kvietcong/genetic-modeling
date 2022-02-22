@@ -53,8 +53,11 @@ const gridExample = gameEngine => {
             );
             // histogram.tint(params.environments[village.environment].color);
             // histogram.backgroundColor = params.environments[village.environment].color;
-            histogram.backgroundColor = { color: params.environments[village.environment].color, opacity: 0.1 };
-
+            // histogram.backgroundColor = { color: params.environments[village.environment].color, opacity: 0.1 };
+            histogram.isDrawing = false;
+            if(i===0 && j===0) {
+                histogram.isDrawing = true;
+            }
             histograms[i][j] = histogram;
             gameEngine.addEntity(histogram); // For Draw Calls
             world.syncedEntities.push(histogram); // For synced stepping
