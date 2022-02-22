@@ -188,7 +188,7 @@ const libGene = (() => {
     }
     /** Default Recomboer to combine two genes */
     // _.recomboer = _.recomboers.chooseFromPartitionLibrary;
-    _.recomboer = (gene, otherGene) => _.recomboers.perCell.template(gene, otherGene, _.recomboers.perCell.AND);
+    _.recomboer = (gene, otherGene) => _.recomboers.perCell.template(gene, otherGene, _.recomboers.perCell.OR);
 
     /** Different functions to mutate a Gene's cells */
     _.mutators = {
