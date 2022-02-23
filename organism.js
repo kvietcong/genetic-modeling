@@ -71,7 +71,7 @@ class Organism {
 
         this.learnList = [];
         for (let i = 0; i < ARR_LEN; i++) {
-            let meme = new Gene()
+            let meme = new Gene();
             this.learnList.push(meme);
         }
 
@@ -147,7 +147,13 @@ class Organism {
         // very low chance of indLearning every tick
 
         // mutate one Gene in learnList
-        chooseRandom(this.learnList).mutate();
+        let randomGene = chooseRandom(this.learnList);
+
+        if (randomGene.level > 0)
+            console.log("Initial ", randomGene.level);
+        randomGene.mutate();
+        if (randomGene.level > 0)
+            console.log("After ", randomGene.level);
     };
 
     // social learning - recombining one learn gene
@@ -169,7 +175,11 @@ class Organism {
         if (option === 1) {
             // 1) Random villager as teacher
             // Recombinging learn gene at index with learn gene at index of a random villager (teacher)
-            this.learnList[index].recombine(this.village.getRandomOrganism().learnList[index]);
+
+            let randomOrganism = this.village.getRandomOrganism();
+            if (randomOrganism != undefined) {
+                this.learnList[index].recombine(randomOrganism.learnList[index]);
+            }
         } else if (option === 2 && this.parent1 != undefined) {
             // 2) Parent
             if (this.parent1 === this.parent2) { // comes from asexual repr
