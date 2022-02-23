@@ -42,7 +42,7 @@ const gridExample = gameEngine => {
                 `Village ${i}, ${j}`, // Title
 
                 // Updating variables
-                village, 1
+                village, 2
             );
             // histogram.tint(params.environments[village.environment].color);
             // histogram.backgroundColor = params.environments[village.environment].color;
