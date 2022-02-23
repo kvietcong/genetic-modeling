@@ -44,7 +44,7 @@ class Histogram {
         data.forEach(dataPoint => {
             const category = this.getCategory(dataPoint);
             if (!(category in counts))
-                throw new Error(`Unknown category: ${category}`);
+               throw new Error(`Unknown category: ${category}`);
             counts[category] += 1
         });
         return counts;

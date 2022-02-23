@@ -40,10 +40,10 @@ const exampleCallback = (newValue, propertyName) => {
 /* Default Global Parameters related to Genes */
 attachPropertiesWithCallbacks(params, [ // Function in `util.js`
     [ "cellSize", 2, testPrinter ],
-    [ "fillToLevel", 0, testPrinter ],  // getRandomInteger(1,3);
-    [ "partitionSize", 1, testPrinter ], // it was set at 2 but Chris might want this at 1
+    [ "fillToLevel", 0, testPrinter ],  // getRandomInteger(1,3); // document.getElementById("fillToLevelIn").value;
+    [ "partitionSize", 1, testPrinter ], // document.getElementById("sizeOfLevelIn").value; // it was set at 2 but Chris might want this at 1
     [ "mutationChance", 0.3, testPrinter ],
-    [ "initialPartitions", 6, testPrinter ],
+    [ "initialPartitions", 5, testPrinter ],
 ]);
 
 /** Library of Gene related values and functions */
@@ -197,7 +197,7 @@ const libGene = (() => {
     }
     /** Default Recomboer to combine two genes */
     // _.recomboer = _.recomboers.chooseFromPartitionLibrary;
-    _.recomboer = (gene, otherGene) => _.recomboers.perCell.template(gene, otherGene, _.recomboers.perCell.AND);
+    _.recomboer = (gene, otherGene) => _.recomboers.perCell.template(gene, otherGene, _.recomboers.perCell.OR);
 
     /** Different functions to mutate a Gene's cells */
     _.mutators = {
@@ -230,8 +230,11 @@ const libGene = (() => {
         destroy: () => 0,
     }
     /** Default mutator for genes */
-    _.mutator = gene =>
+    _.mutator = gene => {
+
+
         _.mutators.currentLevel.template(gene, _.mutators.currentLevel.flip);
+    }
 
     /** Different functions to draw a Gene's cells */
     _.drawers = {

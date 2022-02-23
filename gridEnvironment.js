@@ -1,4 +1,4 @@
-params.stepsPerSecond = 60;
+params.stepsPerSecond = 20;
 params.population = 20;
 
 // play with environments.
@@ -31,7 +31,7 @@ params.environments = {
         name : "rainforest",
         color: "green",
         reward: 1,
-        threshold: [0, 0,0,0,0]
+        threshold: [0,0,0,0,0]
     },
 };
 
@@ -44,7 +44,32 @@ class Village {
         this.organisms = [];
         this.organismsToAdd = [];
 
-        this.environment = chooseRandom(Object.keys(params.environments));
+        if (document.getElementsByName("worldType")[0].checked) { // set the world village configuration
+            if((i === 3 || i === 4) && (j === 3 || j === 4)) { // middle rainforest
+
+                this.environment = "rainforest";
+
+            } else if ((i > 1 && i < 6) && (j > 1 && j < 6)) { // 1 out from center mediterranean
+
+                this.environment = "mediterranean";
+
+            } else if ((i > 0 && i < 7) && (j > 0 && j < 7)) { // 2 out from center mountains
+
+                this.environment = "mountains";
+
+            } else { // outer ring desert or polarice randomly
+
+                let randNum = getRandomInteger(0,1);
+
+                if(randNum === 0) {
+                    this.environment = "desert";
+                } else {
+                    this.environment = "polarice";
+                }
+            }
+        } else {  // randomly set the village configuration
+            this.environment = chooseRandom(Object.keys(params.environments));
+        }
 
         this.taskList = [];             // all the tasks associated with the village
         this.numTasks = 5;
@@ -368,7 +393,57 @@ class World {
         console.log("Time taken: " + this.days + " days")
     }
 
-    draw(ctx) { }
+    draw(ctx) {
+        return; // Disable old drawing for now
+        const { width: ctxWidth, height: ctxHeight } = ctx.canvas;
+        const size = min(ctxWidth, ctxHeight);
+        const drawWidth = size / this.columns;
+        const drawHeight = size / this.rows;
+
+        const { populationMax, populationMin } = this.stats;
+
+        ctx.fillStyle = "White";
+        ctx.font = "18px 'Arial'";
+
+        for (let i = 0; i < this.rows; i++) {
+            for (let j = 0; j < this.columns; j++) {
+                const village = this.villages[i][j];
+                const environment = village.environment;
+                const population = village.organisms.length;
+
+                ctx.fillStyle = params.environments[environment].color;
+                ctx.fillRect(
+                    drawWidth * j, drawHeight * i,
+                    drawWidth, drawHeight);
+
+                ctx.strokeStyle = "black";
+                ctx.strokeRect(
+                    drawWidth * j, drawHeight * i,
+                    drawWidth, drawHeight);
+
+                const ratio = (population - populationMin) / (populationMax || 1);
+                const maxRadius = (min(drawWidth, drawHeight) / 2) * 0.8;
+                const radius = round(ratio * maxRadius);
+
+                const x = drawWidth * j + drawWidth / 2;
+                const y = drawHeight * i + drawHeight / 2;
+
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, 2 * PI);
+                ctx.fillStyle = rgba(0, 0, 0, ratio + 0.2);
+                ctx.fill();
+                ctx.fillStyle = "black";
+                ctx.fillText(population, x - 45, y + 40);
+            }
+        }
+
+        ctx.fillStyle = "Green";
+        ctx.font = "25px 'Arial'";
+        ctx.fillText("Day " + this.days, 740, 50);
+        ctx.fillText("Sexual Reproduction Chance: " + document.getElementById("sexualRepChance").value, 740, 90);
+        ctx.fillText("Offspring Migration Chance   : " + document.getElementById("migrationChance").value, 740, 120);
+        // ctx.fillText("Initial Learning Ability             : " + document.getElementById("learningSlider").value, 740, 150);
+    }
 
     toString() {
         return this.villages.map(row =>

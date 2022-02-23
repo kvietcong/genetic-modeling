@@ -1,0 +1,66 @@
+#geneDiv {
+    font-size: 15px;
+    width: 240px;
+    border: 2px solid blue;
+    margin: auto;
+    font-family: Arial;
+    color: blue;
+    background-color: lightblue;
+    display:inline-block;
+    text-align:left;
+    margin: 10px;
+    margin-right: 100px;
+}
+
+#reproductionDiv {
+    font-size: 15px;
+    width: 320px;
+    border: 2px solid brown;
+    margin: auto;
+    font-family: Arial;
+    color: brown;
+    background-color: sandybrown;
+    display:inline-block;
+    text-align:left;
+    margin: 10px;
+}
+
+#learningDiv {
+    font-size: 15px;
+    width: 320px;
+    border: 2px solid purple;
+    margin: auto;
+    font-family: Arial;
+    color: purple;
+    background-color: mediumpurple;
+    display:inline-block;
+    text-align:left;
+    margin: 10px;
+}
+
+#worldConfig {
+    font-size: 15px;
+    width: 320px;
+    border: 2px solid darkgreen;
+    margin: auto;
+    font-family: Arial;
+    color: darkgreen;
+    background-color: lightgreen;
+    display:inline-block;
+    text-align:left;
+    margin: 10px;
+}
+
+
+div input {
+    width: 30px;
+}
+
+div div input {
+    width: 150px;
+}
+
+p {
+    margin: 4px;
+    font-size:20px;
+} 

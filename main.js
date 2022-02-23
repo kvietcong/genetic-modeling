@@ -9,6 +9,7 @@ const restart = gameEngine => {
 const gridExample = gameEngine => {
     const rows = 8;
     const columns = 8;
+
     const world = new World(rows, columns);
     const width = params.canvas.width / columns;
     const height = params.canvas.height / rows;
@@ -24,15 +25,15 @@ const gridExample = gameEngine => {
             const histogram = createOrganismHistogram(
 
                 // Average Gene Level Histogram
-                range(0, params.initialPartitions),
-                organism =>
-                    floor(average(organism.geneList.map(gene => gene.level))), // need to give it a function
+                // range(0, params.initialPartitions),
+                // organism =>
+                //     floor(average(organism.geneList.map(gene => gene.level))), // need to give it a function
 
 
                 // Average gene-based learn Level Histogram
-                // [0, 1, 2, 3, 4, 5],
-                // organism =>
-                //     floor(average(organism.learnList.map(gene => gene.level))), // need to give it a function
+                [0, 1, 2, 3, 4, 5],
+                organism =>
+                    floor(average(organism.learnList.map(gene => gene.level))), // need to give it a function
 
                 // Where To Draw
                 j * width, i * height,

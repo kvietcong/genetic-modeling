@@ -152,6 +152,9 @@ const initCanvas = options => {
     canvas.height = height;
     canvas.style.border = border;
     canvas.style.backgroundColor = backgroundColor;
+    canvas.style.float = "left";
+    // canvas.style.display = "inline-block";
+    // canvas.style.display = "flex";
 
 	const context = canvas.getContext("2d");
     const listItem = document.createElement("li");
