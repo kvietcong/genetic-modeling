@@ -24,15 +24,15 @@ const gridExample = gameEngine => {
             const histogram = createOrganismHistogram(
 
                 // Average Gene Level Histogram
-                // range(0, params.initialPartitions),
-                // organism =>
-                //     floor(average(organism.geneList.map(gene => gene.level))), // need to give it a function
+                range(0, params.initialPartitions),
+                organism =>
+                    floor(average(organism.geneList.map(gene => gene.level))), // need to give it a function
 
 
                 // Average gene-based learn Level Histogram
-                [0, 1, 2, 3, 4, 5],
-                organism =>
-                    floor(average(organism.learnList.map(gene => gene.level))), // need to give it a function
+                // [0, 1, 2, 3, 4, 5],
+                // organism =>
+                //     floor(average(organism.learnList.map(gene => gene.level))), // need to give it a function
 
                 // Where To Draw
                 j * width, i * height,
@@ -45,7 +45,7 @@ const gridExample = gameEngine => {
             );
             // histogram.tint(params.environments[village.environment].color);
             // histogram.backgroundColor = params.environments[village.environment].color;
-            histogram.backgroundColor = { color: params.environments[village.environment].color, opacity: 0.1 };
+            histogram.backgroundColor = { color: params.environments[village.environment].color, opacity: 0.75 };
 
             // Drawing speed testing
             // if (i < 2 && j < 2) histogram.isDrawing = true;

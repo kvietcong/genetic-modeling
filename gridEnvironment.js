@@ -44,28 +44,34 @@ class Village {
         this.organisms = [];
         this.organismsToAdd = [];
 
-        if (document.getElementsByName("worldType")[0].checked) { // set the world village configuration
+        if (document.getElementsByName("worldType")[2].checked) { // set the spiral village configuration
+
+
+        } else if (document.getElementsByName("worldType")[0].checked) { // set the world village configuration
             if((i === 3 || i === 4) && (j === 3 || j === 4)) { // middle rainforest
 
                 this.environment = "rainforest";
 
             } else if ((i > 1 && i < 6) && (j > 1 && j < 6)) { // 1 out from center mediterranean
 
-                this.environment = "mediterranean";
+                // this.environment = "mediterranean";
+                this.environment = "polarice";
 
             } else if ((i > 0 && i < 7) && (j > 0 && j < 7)) { // 2 out from center mountains
 
-                this.environment = "mountains";
+                // this.environment = "mountains";
+                this.environment = "polarice";
 
             } else { // outer ring desert or polarice randomly
 
                 let randNum = getRandomInteger(0,1);
+                this.environment = "polarice";
 
-                if(randNum === 0) {
-                    this.environment = "desert";
-                } else {
-                    this.environment = "polarice";
-                }
+                // if(randNum === 0) {
+                //     this.environment = "desert";
+                // } else {
+                //     this.environment = "polarice";
+                // }
             }
         } else {  // randomly set the village configuration
             this.environment = chooseRandom(Object.keys(params.environments));
@@ -111,6 +117,14 @@ class Village {
             this.taskList.push(task);   // adds the task to the task list.
         }
     };
+
+    spiralTasks() {
+        task.reward = 1;
+        task.threshold = params.environments.rainforest.threshold[0];
+
+
+
+    }
 
     doTasks(organism) {
         let reward = {successes: 0, failures: 0, energy: 0};
@@ -269,6 +283,8 @@ class World {
         }
         this.days++;
         this.TICK = gameEngine.clockTick;
+
+        document.getElementById("dayOutput").innerHTML = "Day # " + this.days;
 
     }
 
@@ -436,13 +452,12 @@ class World {
                 ctx.fillText(population, x - 45, y + 40);
             }
         }
-
-        ctx.fillStyle = "Green";
-        ctx.font = "25px 'Arial'";
-        ctx.fillText("Day " + this.days, 740, 50);
-        ctx.fillText("Sexual Reproduction Chance: " + document.getElementById("sexualRepChance").value, 740, 90);
-        ctx.fillText("Offspring Migration Chance   : " + document.getElementById("migrationChance").value, 740, 120);
-        // ctx.fillText("Initial Learning Ability             : " + document.getElementById("learningSlider").value, 740, 150);
+        // ctx.fillStyle = "Green";
+        // ctx.font = "25px 'Arial'";
+        // ctx.fillText("Day " + this.days, 740, 50);
+        // ctx.fillText("Sexual Reproduction Chance: " + document.getElementById("sexualRepChance").value, 740, 90);
+        // ctx.fillText("Offspring Migration Chance   : " + document.getElementById("migrationChance").value, 740, 120);
+        // // ctx.fillText("Initial Learning Ability             : " + document.getElementById("learningSlider").value, 740, 150);
     }
 
     toString() {

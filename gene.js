@@ -31,6 +31,7 @@
 // There are also some useful functions in the `./util.js` file.
 
 const testPrinter = (newValue, _propertyName) => console.log(`Inserted ${newValue}`);
+
 const exampleCallback = (newValue, propertyName) => {
     const container = document.getElementById(propertyName + "-container");
     const p = container.children[0];
@@ -231,8 +232,6 @@ const libGene = (() => {
     }
     /** Default mutator for genes */
     _.mutator = gene => {
-
-
         _.mutators.currentLevel.template(gene, _.mutators.currentLevel.flip);
     }
 
