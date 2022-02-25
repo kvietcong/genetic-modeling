@@ -12,11 +12,11 @@
     <script type="text/javascript" src="./gameengine.js"></script>
 
     <script type="text/javascript" src="./util.js"></script>
-    <script type="text/javascript" src="./gene.js"></script>
+    <script type="text/javascript" src="./gene.js" defer></script>
     <script type="text/javascript" src="./gridEnvironment.js"></script>
     <script type="text/javascript" src="./organism.js"></script>
     <script type="text/javascript" src="./dataVisualization.js"></script>
-    <script type="text/javascript" src="./main.js"></script>
+    <script type="text/javascript" src="./main.js" defer></script>
     <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
     <style>
         #simulations {
@@ -90,7 +90,7 @@
     <div id = "reproductionDiv">
         <p> Reproduction </p>
         <input type="text" id="sexualRepChance" value="0.5" /> Sexual Reproduction Chance (0 - 1)<br />
-        <input type="text" id="migrationChance" value="0.5" /> Migration Chance (0 - 1)<br />
+        <input type="text" id="migrationChance" value="0.001" /> Migration Chance (0 - 1)<br />
     </div>
 
     <div id = "learningDiv">

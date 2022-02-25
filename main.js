@@ -30,17 +30,9 @@ const gridExample = gameEngine => {
 
 
                 // Average gene-based learn Level Histogram
-
-                /*
-                [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],  // need to give categories
+                [0, 1, 2, 3, 4, 5],
                 organism =>
                     floor(average(organism.learnList.map(gene => gene.level))), // need to give it a function
-                */
-
-
-                // Average integer-based Learn Level Histogram
-                [0, 1, 2, 3, 4],
-                organism => floor(average(organism.learnList.map(gene => gene.level))), // need to give it a function
 
                 // Where To Draw
                 j * width, i * height,
@@ -49,15 +41,16 @@ const gridExample = gameEngine => {
                 `Village ${i}, ${j}`, // Title
 
                 // Updating variables
-                village, 10
+                village, 1
             );
             // histogram.tint(params.environments[village.environment].color);
             // histogram.backgroundColor = params.environments[village.environment].color;
-            // histogram.backgroundColor = { color: params.environments[village.environment].color, opacity: 0.1 };
-            histogram.isDrawing = false;
-            if(i===0 && j===0) {
-                histogram.isDrawing = true;
-            }
+            histogram.backgroundColor = { color: params.environments[village.environment].color, opacity: 0.1 };
+
+            // Drawing speed testing
+            // if (i < 2 && j < 2) histogram.isDrawing = true;
+            // else histogram.isDrawing = false;
+
             histograms[i][j] = histogram;
             gameEngine.addEntity(histogram); // For Draw Calls
             world.syncedEntities.push(histogram); // For synced stepping
