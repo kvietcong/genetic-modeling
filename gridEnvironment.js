@@ -7,16 +7,15 @@ class Village {
         this._grid = grid;
         this._pos = Object.freeze({ i, j });
 
+        this.spiral = false;
         this.organisms = [];
         this.organismsToAdd = [];
 
         if (document.getElementsByName("worldType")[2].checked) { // set the spiral village configuration
 
 
-            console.log("spiral" + i + "" + j);
+            this.spiral = true;
             this.environment = "spiral" + i + "" + j;
-
-
 
         } else if (document.getElementsByName("worldType")[0].checked) { // set the world village configuration
             if((i === 3 || i === 4) && (j === 3 || j === 4)) { // middle rainforest
@@ -83,6 +82,11 @@ class Village {
            else if (this.environment === "rainforest") {
                task.reward = params.environments.rainforest.reward;
                task.threshold = params.environments.rainforest.threshold[i];
+           } 
+           // spiral environment
+           else {
+               task.reward = eval("params.spiralEnvironments." + "spiral" + this.i + "" + this.j + ".reward");
+               task.threshold = eval("params.spiralEnvironments." + "spiral" + this.i + "" + this.j + ".threshold[i]");
            }
 
             this.taskList.push(task);   // adds the task to the task list.

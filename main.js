@@ -45,7 +45,8 @@ const gridExample = gameEngine => {
             );
             // histogram.tint(params.environments[village.environment].color);
             // histogram.backgroundColor = params.environments[village.environment].color;
-            histogram.backgroundColor = { color: params.environments[village.environment].color, opacity: 0.75 };
+            if (!village.spiral) histogram.backgroundColor = { color: params.environments[village.environment].color, opacity: 0.75 };
+            else histogram.backgroundColor = { color: params.spiralEnvironments[village.environment].color, opacity: 0.75 };
 
             // Drawing speed testing
             // if (i < 2 && j < 2) histogram.isDrawing = true;
