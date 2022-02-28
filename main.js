@@ -142,8 +142,12 @@ const regenerateButtons = () => {
         scrollToButton.onclick = () => scrollToSim(id);
         scrollToButton.id = `scroll-to-sim-${id}`;
 
+        const avgFPS = document.createElement("p");
+        avgFPS.innerHTML = `<strong>Avg FPS: <span id="avg-fps-${id}">?</span></strong>`;
+        avgFPS.style = "color: red; font-size: 1em;";
+
         const fps = document.createElement("p");
-        fps.innerHTML = `<strong>Avg FPS: <span id="fps-${id}">?</span></strong>`;
+        fps.innerHTML = `<strong>FPS: <span id="fps-${id}">?</span></strong>`;
         fps.style = "color: red; font-size: 1em;";
 
         const li = document.createElement("li");
@@ -151,6 +155,7 @@ const regenerateButtons = () => {
         li.appendChild(scrollToButton);
         li.appendChild(pausePlayEngineButton);
         li.appendChild(pausePlaySimButton);
+        li.appendChild(avgFPS);
         li.appendChild(fps);
         buttonList.appendChild(li);
     });
@@ -170,9 +175,10 @@ const addSim = () => {
 
         regenerateButtons();
 
-        const timer = new DebugTimer(null, false);
+        const timer = new DebugFrameTimer(null, false);
         timer.attachTo(gameEngine, "update");
-        timer.updateAverageFPSElement(`fps-${id}`);
+        timer.updateAverageFPSElement(`avg-fps-${id}`);
+        timer.updateFPSElement(`fps-${id}`);
     });
 }
 
