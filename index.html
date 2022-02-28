@@ -13,6 +13,7 @@
 
     <script type="text/javascript" src="./util.js"></script>
     <script type="text/javascript" src="./gene.js" defer></script>
+    <script type="text/javascript" src="./environments.js"></script>
     <script type="text/javascript" src="./gridEnvironment.js"></script>
     <script type="text/javascript" src="./organism.js"></script>
     <script type="text/javascript" src="./dataVisualization.js"></script>
@@ -74,18 +75,43 @@
         <input type="text" id="num_tasks_in" value="5" />Number of tasks<br />
     </div> -->
 
-    <div id = "geneDiv">
+    <h1 id="dayOutput"></h1>
+
+
+    <br>
+
+    <!-- <div id = "geneDiv">
         <p> Gene </p>
-        <!-- <input type="text" id="numGenes" value="5" /> Number of genes<br /> -->
+        comment <input type="text" id="numGenes" value="5" /> Number of genes<br />
         <input type="text" id="sizeOfLevelIn" value="1" /> Size of level<br />
-        <input type="text" id="fillToLevelIn" value="1" /> Fill to level<br />
+        <input type="text" id="fillToLevelIn" value="1" /> Fill to level<br /> <br>
 
-        <input type="radio" id = "flip" name = "recomboType" value = "flip" checked>
-        <label for = "flip"> Flip </label>
+        <p> Mutator type </p>
 
-        <input type="radio" id = "rejuvenate" name = "recomboType" value = "rejuvenate">
-        <label for = "rejuvenate"> Rejuvenate </label>
-    </div>
+        <input type="radio" id = "flip" name = "mutatorType" value = "flip" checked>
+        <label for = "flip"> Flip </label> <br>
+
+        <input type="radio" id = "rejuvenate" name = "mutatorType" value = "rejuvenate">
+        <label for = "rejuvenate"> Rejuvenate </label> <br><br>
+
+        <p> Recomboer type </p>
+
+        <input type="radio" id = "xor" name = "recomboType" value = "xor">
+        <label for = "xor"> XOR </label> <br>
+
+        <input type="radio" id = "or" name = "recomboType" value = "or" checked>
+        <label for = "or"> OR </label> <br>
+
+        <input type="radio" id = "and" name = "recomboType" value = "and">
+        <label for = "and"> AND </label> <br>
+
+        <input type="radio" id = "nand" name = "recomboType" value = "nand">
+        <label for = "nand"> NAND </label> <br>
+
+        <input type="radio" id = "nor" name = "recomboType" value = "nor">
+        <label for = "nor"> NOR </label>
+    </div> -->
+   
 
     <div id = "reproductionDiv">
         <p> Reproduction </p>
@@ -123,10 +149,13 @@
     <div id = "worldConfig">
         <p> World Configuration </p>
         <input type="radio" name = "worldType">
-        <label for = "layered"> Layered World Configuration </label> <br>
+        <label for = "layered"> Layered </label> <br>
 
-        <input type="radio" name = "worldType"checked>
-        <label for = "random"> Random World Configuration </label>  <br>
+        <input type="radio" name = "worldType" checked>
+        <label for = "random"> Random </label>  <br>
+
+        <input type="radio" name = "worldType">
+        <label for = "spiral"> Spiral (only 5x5) </label>  <br>
     </div>
 </body>
 </html>

@@ -28,24 +28,6 @@ class Organism {
         this.parent2 = parent2;
         this.geneList = [];
 
-        /* if (parent1 === undefined && parent2 === undefined) {
-            console.log("spawned");
-        } else if (parent1 != undefined && parent1 === parent2) {
-            console.log("asexual");
-        } else if (parent1 != parent2) {
-            console.log("sexual");
-        } */
-
-        /*
-        this.origin = "";
-        if (parent1 === undefined) {
-            this.origin = "spawned";
-        } else if (parent1 == parent2) {
-            this.origin = "asexual";
-        } else {
-            this.origin = "sexual";
-        } 
-        */
 
         // Instance variables
         // Creation of the genes associated with the current organism
@@ -148,12 +130,7 @@ class Organism {
 
         // mutate one Gene in learnList
         let randomGene = chooseRandom(this.learnList);
-
-        if (randomGene.level > 0)
-            console.log("Initial ", randomGene.level);
         randomGene.mutate();
-        if (randomGene.level > 0)
-            console.log("After ", randomGene.level);
     };
 
     // social learning - recombining one learn gene
