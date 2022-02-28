@@ -45,6 +45,9 @@ attachPropertiesWithCallbacks(params, [ // Function in `util.js`
     [ "partitionSize", 1, testPrinter ], // document.getElementById("sizeOfLevelIn").value; // it was set at 2 but Chris might want this at 1
     [ "mutationChance", 0.3, testPrinter ],
     [ "initialPartitions", 6, testPrinter ],
+
+    ["recomboOption",  "_.recomboers.perCell.OR", testPrinter ],
+    ["mutateOption",  "_.mutators.currentLevel.rejuvenate", testPrinter],
 ]);
 
 /** Library of Gene related values and functions */
@@ -198,8 +201,22 @@ const libGene = (() => {
     }
     /** Default Recomboer to combine two genes */
     // _.recomboer = _.recomboers.chooseFromPartitionLibrary;
+
+
+    // TESTING
+    /*let recomboOption = _.recomboers.perCell.OR;
+
+    let recomboerRadios = document.getElementsByName("recomboType");  // this will return an array of the radio buttons
     
-    _.recomboer = (gene, otherGene) => _.recomboers.perCell.template(gene, otherGene, _.recomboers.perCell.OR);
+    if (recomboerRadios[0].checked) recomboOption = _.recomboers.perCell.XOR;     
+    else if (recomboerRadios[1].checked) recomboOption = _.recomboers.perCell.OR; 
+    else if (recomboerRadios[2].checked) recomboOption = _.recomboers.perCell.AND;    
+    else if (recomboerRadios[3].checked)  recomboOption = _.recomboers.perCell.NAND;    
+    else if (recomboerRadios[4].checked)  recomboOption = _.recomboers.perCell.NOR; */
+
+    _.recomboer = (gene, otherGene) => _.recomboers.perCell.template(gene, otherGene, eval(params.recomboOption)); 
+
+    // TESTING
 
     /** Different functions to mutate a Gene's cells */
     _.mutators = {
@@ -214,7 +231,7 @@ const libGene = (() => {
             const indexStart = levelToIndex(level);
             const indexEnd = levelToIndex(level + 1);
 
-            if (indexStart >= gene.cells.length) return console.log("FULL!")
+            if (indexStart >= gene.cells.length) return // console.log("FULL!")
 
             for (let i = 0; i < indexEnd; i++)
                 for (let j = indexStart; j < indexEnd; j++)
@@ -233,7 +250,8 @@ const libGene = (() => {
     }
     /** Default mutator for genes */
     _.mutator = gene => {
-        _.mutators.currentLevel.template(gene, _.mutators.currentLevel.rejuvenate);
+        //_.mutators.currentLevel.template(gene, _.mutators.currentLevel.rejuvenate);
+        _.mutators.currentLevel.template(gene, eval(params.mutateOption));
     }
 
     /** Different functions to draw a Gene's cells */

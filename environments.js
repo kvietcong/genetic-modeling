@@ -29,6 +29,9 @@ params.environments = {
         reward: 1,
         threshold: [0,0,0,0,0]
     },
+};
+
+params.spiralEnvironments = {
 ///////////
     spiral00: {
         name : "spiral00",
@@ -186,3 +189,5 @@ spiral44: {
 },
 
 };
+
+

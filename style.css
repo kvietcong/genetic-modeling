@@ -1,6 +1,6 @@
 #geneDiv {
-    font-size: 15px;
-    width: 240px;
+    font-size: 30px;
+    width: 320px;
     border: 2px solid blue;
     margin: auto;
     font-family: Arial;
@@ -13,8 +13,8 @@
 }
 
 #reproductionDiv {
-    font-size: 15px;
-    width: 320px;
+    font-size: 30px;
+    width: 600px;
     border: 2px solid brown;
     margin: auto;
     font-family: Arial;
@@ -26,8 +26,8 @@
 }
 
 #learningDiv {
-    font-size: 15px;
-    width: 320px;
+    font-size: 30px;
+    width:600px;
     border: 2px solid purple;
     margin: auto;
     font-family: Arial;
@@ -39,8 +39,8 @@
 }
 
 #worldConfig {
-    font-size: 15px;
-    width: 320px;
+    font-size: 30px;
+    width: 350px;
     border: 2px solid darkgreen;
     margin: auto;
     font-family: Arial;
@@ -53,16 +53,18 @@
 
 
 div input {
-    width: 30px;
+    width: 80px;
+    font-size:30px;
 }
 
 div div input {
-    width: 150px;
+    width: 250px;
+    font-size:30px;
 }
 
 p {
     margin: 4px;
-    font-size:20px;
+    font-size:30px;
 } 
 
 h1 {
