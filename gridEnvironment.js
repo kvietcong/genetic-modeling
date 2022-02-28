@@ -1,40 +1,6 @@
 params.stepsPerSecond = 20;
 params.population = 20;
 
-// play with environments.
-params.environments = {
-    polarice: {
-        name: "polarice",
-        color: "white",
-        reward: 1,          // want an array of task in each environment with different values
-        threshold: [4,4,4,4,4]
-    },
-    desert: {
-        name: "desert",
-        color: "yellow",
-        reward: 1,
-        threshold: [3,3,3,3,3]
-    },
-    mountains: {
-        name : "mountains",
-        color: "brown",
-        reward: 1,
-        threshold: [2,2,2,2,2]
-    },
-    mediterranean: {
-        name: "mediterranean",
-        color: "blue",
-        reward: 1,          // want an array of task in each environment with different values
-        threshold: [1,1,1,1,1]
-    },
-    rainforest: {
-        name : "rainforest",
-        color: "green",
-        reward: 1,
-        threshold: [0,0,0,0,0]
-    },
-};
-
 // This represents a "village"
 class Village {
     constructor(i, j, grid) {
@@ -45,6 +11,11 @@ class Village {
         this.organismsToAdd = [];
 
         if (document.getElementsByName("worldType")[2].checked) { // set the spiral village configuration
+
+
+            console.log("spiral" + i + "" + j);
+            this.environment = "spiral" + i + "" + j;
+
 
 
         } else if (document.getElementsByName("worldType")[0].checked) { // set the world village configuration

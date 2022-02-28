@@ -44,7 +44,7 @@ attachPropertiesWithCallbacks(params, [ // Function in `util.js`
     [ "fillToLevel", 0, testPrinter ],  // getRandomInteger(1,3); // document.getElementById("fillToLevelIn").value;
     [ "partitionSize", 1, testPrinter ], // document.getElementById("sizeOfLevelIn").value; // it was set at 2 but Chris might want this at 1
     [ "mutationChance", 0.3, testPrinter ],
-    [ "initialPartitions", 5, testPrinter ],
+    [ "initialPartitions", 6, testPrinter ],
 ]);
 
 /** Library of Gene related values and functions */
@@ -232,7 +232,7 @@ const libGene = (() => {
     }
     /** Default mutator for genes */
     _.mutator = gene => {
-        _.mutators.currentLevel.template(gene, _.mutators.currentLevel.flip);
+        _.mutators.currentLevel.template(gene, _.mutators.currentLevel.rejuvenate);
     }
 
     /** Different functions to draw a Gene's cells */

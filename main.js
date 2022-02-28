@@ -7,8 +7,8 @@ const restart = gameEngine => {
 }
 
 const gridExample = gameEngine => {
-    const rows = 8;
-    const columns = 8;
+    const rows = 5;
+    const columns = 5;
     const world = new World(rows, columns);
     const width = params.canvas.width / columns;
     const height = params.canvas.height / rows;
