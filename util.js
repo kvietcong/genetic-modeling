@@ -2,6 +2,7 @@
 const params = {
     // Maybe use for toggle-able logging?
     isDebugging: true,
+    debugEntities: {},
     canvas: {
         width: 2500,
         height: 2000,

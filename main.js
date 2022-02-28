@@ -106,7 +106,6 @@ const scrollToSim = simID => {
 };
 
 const pausePlayEngine = simID => gameEngines[simID].isPaused = !gameEngines[simID].isPaused;
-;
 
 const pausePlaySim = simID => gameEngines[simID]
     .entities
@@ -143,11 +142,16 @@ const regenerateButtons = () => {
         scrollToButton.onclick = () => scrollToSim(id);
         scrollToButton.id = `scroll-to-sim-${id}`;
 
+        const fps = document.createElement("p");
+        fps.innerHTML = `<strong>Avg FPS: <span id="fps-${id}">?</span></strong>`;
+        fps.style = "color: red; font-size: 1em;";
+
         const li = document.createElement("li");
         li.appendChild(deletionButton);
         li.appendChild(scrollToButton);
         li.appendChild(pausePlayEngineButton);
         li.appendChild(pausePlaySimButton);
+        li.appendChild(fps);
         buttonList.appendChild(li);
     });
 };
@@ -161,9 +165,14 @@ const addSim = () => {
         restart(gameEngine);
         gameEngine.start();
 
+        const id = gameEngines.length;
         gameEngines.push(gameEngine);
 
         regenerateButtons();
+
+        const timer = new DebugTimer(null, false);
+        timer.attachTo(gameEngine, "update");
+        timer.updateAverageFPSElement(`fps-${id}`);
     });
 }
 

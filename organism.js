@@ -44,7 +44,7 @@ class Organism {
             this.origin = "asexual";
         } else {
             this.origin = "sexual";
-        } 
+        }
         */
 
         // Instance variables
@@ -149,11 +149,11 @@ class Organism {
         // mutate one Gene in learnList
         let randomGene = chooseRandom(this.learnList);
 
-        if (randomGene.level > 0)
-            console.log("Initial ", randomGene.level);
+        // if (randomGene.level > 0)
+        //     console.log("Initial ", randomGene.level);
         randomGene.mutate();
-        if (randomGene.level > 0)
-            console.log("After ", randomGene.level);
+        // if (randomGene.level > 0)
+        //     console.log("After ", randomGene.level);
     };
 
     // social learning - recombining one learn gene
