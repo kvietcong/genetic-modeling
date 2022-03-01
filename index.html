@@ -111,7 +111,6 @@
         <input type="radio" id = "nor" name = "recomboType" value = "nor">
         <label for = "nor"> NOR </label>
     </div> -->
-   
 
     <div id = "reproductionDiv">
         <p> Reproduction </p>
@@ -128,7 +127,7 @@
         <input type="checkbox" id="noSocial"> No social learning or<br>
         <input type="text" id="socialPercent" value="0.05" /> Social Learning Chance (0 - 1) or<br />
         <input type="text" id="socialDays" value="0" /> # days between soc. learning<br><br>
-        
+
         Social learning from: <br>
         <input type="radio" name = "socialType"checked>
         <label for = "random"> Random of all the above </label>  <br>
@@ -156,6 +155,12 @@
 
         <input type="radio" name = "worldType">
         <label for = "spiral"> Spiral (only 5x5) </label>  <br>
+
+        <label for="histogramType">Histogram Type:</label>
+        <select name="histogramType" id="histogramType">
+            <option value="gene">Gene</option>
+            <option value="learn">Learning</option>
+        </select>
     </div>
 </body>
 </html>

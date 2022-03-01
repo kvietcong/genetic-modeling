@@ -82,7 +82,7 @@ class Village {
            else if (this.environment === "rainforest") {
                task.reward = params.environments.rainforest.reward;
                task.threshold = params.environments.rainforest.threshold[i];
-           } 
+           }
            // spiral environment
            else {
                task.reward = eval("params.spiralEnvironments." + "spiral" + this.i + "" + this.j + ".reward");

@@ -2,16 +2,50 @@ const assetManager = new AssetManager();
 let gameEngines = [];
 
 const restart = gameEngine => {
-    gridExample(gameEngine);
+    gridExample(gameEngine, params.gridSize[0], params.gridSize[1]);
     // geneExample(gameEngine);
 }
 
-const gridExample = gameEngine => {
-    const rows = 5;
-    const columns = 5;
+const gridExample = (gameEngine, rows = 5, columns = 5) => {
     const world = new World(rows, columns);
     const width = params.canvas.width / columns;
     const height = params.canvas.height / rows;
+
+    class HistogramManager {
+        constructor(histograms, type = "learn") {
+            this.histograms = histograms;
+            this.histogramType = type;
+
+            this.histogramSelectorElement =
+                document.getElementById("histogramType");
+            if (this.histogramSelectorElement)
+                this.histogramSelectorElement.addEventListener("change",
+                    event => this.histogramType = event.target.value);
+        }
+
+        get histogramType() { return this._histogramType; }
+        set histogramType(type) {
+            if (!this._histogramType) this._histogramType = type;
+
+            for (const row of this.histograms) {
+                for (const histogramInfo of row) {
+                    histogramInfo[this.histogramType].isDrawing = false;
+                }
+            }
+            for (const row of this.histograms) {
+                for (const histogramInfo of row) {
+                    if (!(type in histogramInfo))
+                        throw new Error(`Invalid histogram index: ${type}`);
+                    histogramInfo[type].isDrawing = true;
+                }
+            }
+
+            this._histogramType = type;
+
+            if (this.histogramSelectorElement)
+                this.histogramSelectorElement.value = this.histogramType;
+        }
+    }
 
     const histograms = [];
     for (let i = 0; i < rows; i++) {
@@ -21,18 +55,11 @@ const gridExample = gameEngine => {
 
             // This histogram helper function can be found in `util.js`
             // More information about parameters is there too.
-            const histogram = createOrganismHistogram(
-
-                // Average Gene Level Histogram
-                range(0, params.initialPartitions),
-                organism =>
-                    floor(average(organism.geneList.map(gene => gene.level))), // need to give it a function
-
-
+            const learnHistogram = createOrganismHistogram(
                 // Average gene-based learn Level Histogram
-                // [0, 1, 2, 3, 4, 5],
-                // organism =>
-                //     floor(average(organism.learnList.map(gene => gene.level))), // need to give it a function
+                [0, 1, 2, 3, 4, 5],
+                organism =>
+                    floor(average(organism.learnList.map(gene => gene.level))),
 
                 // Where To Draw
                 j * width, i * height,
@@ -43,20 +70,42 @@ const gridExample = gameEngine => {
                 // Updating variables
                 village, 2
             );
-            // histogram.tint(params.environments[village.environment].color);
-            // histogram.backgroundColor = params.environments[village.environment].color;
-            if (!village.spiral) histogram.backgroundColor = { color: params.environments[village.environment].color, opacity: 0.75 };
-            else histogram.backgroundColor = { color: params.spiralEnvironments[village.environment].color, opacity: 0.75 };
+            const geneHistogram = createOrganismHistogram(
+                // Average Gene Level Histogram
+                range(0, params.initialPartitions),
+                organism =>
+                    floor(average(organism.geneList.map(gene => gene.level))),
 
-            // Drawing speed testing
-            // if (i < 2 && j < 2) histogram.isDrawing = true;
-            // else histogram.isDrawing = false;
+                // Where To Draw
+                j * width, i * height,
+                width, height,
 
-            histograms[i][j] = histogram;
-            gameEngine.addEntity(histogram); // For Draw Calls
-            world.syncedEntities.push(histogram); // For synced stepping
+                `Village ${i}, ${j}`, // Title
+
+                // Updating variables
+                village, 1
+            );
+            if (!village.spiral) {
+                learnHistogram.backgroundColor = { color: params.environments[village.environment].color, opacity: 0.7 };
+                geneHistogram.backgroundColor = { color: params.environments[village.environment].color, opacity: 0.7 };
+            } else {
+                learnHistogram.backgroundColor = { color: params.spiralEnvironments[village.environment].color, opacity: 0.7 };
+                geneHistogram.backgroundColor = { color: params.spiralEnvironments[village.environment].color, opacity: 0.7 };
+            }
+            learnHistogram.isDrawing = false;
+            geneHistogram.isDrawing = false;
+
+            histograms[i][j] = { learn: learnHistogram, gene: geneHistogram };
+            gameEngine.addEntity(learnHistogram); // For Draw Calls
+            gameEngine.addEntity(geneHistogram); // For Draw Calls
+            world.syncedEntities.push(learnHistogram); // For synced stepping
+            world.syncedEntities.push(geneHistogram); // For synced stepping
         }
     }
+    const histogramManager = new HistogramManager(histograms, "gene");
+    params.debugEntities.histogramManager = histogramManager;
+    params.debugEntities.world = world;
+    gameEngine.addEntity(histogramManager);
     gameEngine.addEntity(world);
 };
 
@@ -106,7 +155,6 @@ const scrollToSim = simID => {
 };
 
 const pausePlayEngine = simID => gameEngines[simID].isPaused = !gameEngines[simID].isPaused;
-;
 
 const pausePlaySim = simID => gameEngines[simID]
     .entities
@@ -143,11 +191,21 @@ const regenerateButtons = () => {
         scrollToButton.onclick = () => scrollToSim(id);
         scrollToButton.id = `scroll-to-sim-${id}`;
 
+        const avgFPS = document.createElement("p");
+        avgFPS.innerHTML = `<strong>Avg FPS: <span id="avg-fps-${id}">?</span></strong>`;
+        avgFPS.style = "color: red; font-size: 1em;";
+
+        const fps = document.createElement("p");
+        fps.innerHTML = `<strong>FPS: <span id="fps-${id}">?</span></strong>`;
+        fps.style = "color: red; font-size: 1em;";
+
         const li = document.createElement("li");
         li.appendChild(deletionButton);
         li.appendChild(scrollToButton);
         li.appendChild(pausePlayEngineButton);
         li.appendChild(pausePlaySimButton);
+        li.appendChild(avgFPS);
+        li.appendChild(fps);
         buttonList.appendChild(li);
     });
 };
@@ -161,9 +219,15 @@ const addSim = () => {
         restart(gameEngine);
         gameEngine.start();
 
+        const id = gameEngines.length;
         gameEngines.push(gameEngine);
 
         regenerateButtons();
+
+        const timer = new DebugFrameTimer(null, false);
+        timer.attachTo(gameEngine, "draw");
+        timer.updateAverageFPSElement(`avg-fps-${id}`);
+        timer.updateFPSElement(`fps-${id}`);
     });
 }
 

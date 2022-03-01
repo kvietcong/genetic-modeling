@@ -2,9 +2,11 @@
 const params = {
     // Maybe use for toggle-able logging?
     isDebugging: true,
+    debugEntities: {},
+    gridSize: [5, 5],
     canvas: {
-        width: 2500,
-        height: 2000,
+        width: 2000,
+        height: 1600,
         // width: 1280,
         // height: 720,
         backgroundColor: "white",
@@ -19,6 +21,8 @@ const params = {
         debugging: false,
     }
 };
+
+const logReturn = thing => console.log(thing) || thing;
 
 /** Easy access to math functions */
 const {
@@ -201,7 +205,7 @@ const attachPropertiesWithCallbacks = (object, things) => {
             get: () => object[`_${property}`],
             set: newValue => {
                 object[`_${property}`] = newValue;
-                callback(newValue, property);
+                if (callback) callback(newValue, property);
             }
         };
         return acc;

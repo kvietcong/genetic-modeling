@@ -28,7 +28,6 @@ class Organism {
         this.parent2 = parent2;
         this.geneList = [];
 
-
         // Instance variables
         // Creation of the genes associated with the current organism
 
