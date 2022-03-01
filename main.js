@@ -14,6 +14,42 @@ const gridExample = gameEngine => {
     const width = params.canvas.width / columns;
     const height = params.canvas.height / rows;
 
+    class HistogramManager {
+        constructor(histograms, type = "learn") {
+            this.histograms = histograms;
+            this.histogramType = type;
+
+            this.histogramSelectorElement =
+                document.getElementById("histogramType");
+            if (this.histogramSelectorElement)
+                this.histogramSelectorElement.addEventListener("change",
+                    event => this.histogramType = event.target.value);
+        }
+
+        get histogramType() { return this._histogramType; }
+        set histogramType(type) {
+            if (!this._histogramType) this._histogramType = type;
+
+            for (const row of this.histograms) {
+                for (const histogramInfo of row) {
+                    histogramInfo[this.histogramType].isDrawing = false;
+                }
+            }
+            for (const row of this.histograms) {
+                for (const histogramInfo of row) {
+                    if (!(type in histogramInfo))
+                        throw new Error(`Invalid histogram index: ${type}`);
+                    histogramInfo[type].isDrawing = true;
+                }
+            }
+
+            this._histogramType = type;
+
+            if (this.histogramSelectorElement)
+                this.histogramSelectorElement.value = this.histogramType;
+        }
+    }
+
     const histograms = [];
     for (let i = 0; i < rows; i++) {
         histograms[i] = [];
@@ -22,18 +58,11 @@ const gridExample = gameEngine => {
 
             // This histogram helper function can be found in `util.js`
             // More information about parameters is there too.
-            const histogram = createOrganismHistogram(
-
-                // Average Gene Level Histogram
-                // range(0, params.initialPartitions),
-                // organism =>
-                //     floor(average(organism.geneList.map(gene => gene.level))), // need to give it a function
-
-
+            const learnHistogram = createOrganismHistogram(
                 // Average gene-based learn Level Histogram
                 [0, 1, 2, 3, 4, 5],
                 organism =>
-                    floor(average(organism.learnList.map(gene => gene.level))), // need to give it a function
+                    floor(average(organism.learnList.map(gene => gene.level))),
 
                 // Where To Draw
                 j * width, i * height,
@@ -44,19 +73,36 @@ const gridExample = gameEngine => {
                 // Updating variables
                 village, 1
             );
-            // histogram.tint(params.environments[village.environment].color);
-            // histogram.backgroundColor = params.environments[village.environment].color;
-            histogram.backgroundColor = { color: params.environments[village.environment].color, opacity: 0.1 };
+            const geneHistogram = createOrganismHistogram(
+                // Average Gene Level Histogram
+                range(0, params.initialPartitions),
+                organism =>
+                    floor(average(organism.geneList.map(gene => gene.level))),
 
-            // Drawing speed testing
-            // if (i < 2 && j < 2) histogram.isDrawing = true;
-            // else histogram.isDrawing = false;
+                // Where To Draw
+                j * width, i * height,
+                width, height,
 
-            histograms[i][j] = histogram;
-            gameEngine.addEntity(histogram); // For Draw Calls
-            world.syncedEntities.push(histogram); // For synced stepping
+                `Village ${i}, ${j}`, // Title
+
+                // Updating variables
+                village, 1
+            );
+            learnHistogram.backgroundColor = { color: params.environments[village.environment].color, opacity: 0.1 };
+            geneHistogram.backgroundColor = { color: params.environments[village.environment].color, opacity: 0.1 };
+            learnHistogram.isDrawing = false;
+            geneHistogram.isDrawing = false;
+
+            histograms[i][j] = { learn: learnHistogram, gene: geneHistogram };
+            gameEngine.addEntity(learnHistogram); // For Draw Calls
+            gameEngine.addEntity(geneHistogram); // For Draw Calls
+            world.syncedEntities.push(learnHistogram); // For synced stepping
+            world.syncedEntities.push(geneHistogram); // For synced stepping
         }
     }
+    const histogramManager = new HistogramManager(histograms, "gene");
+    params.debugEntities.histogramManager = histogramManager;
+    gameEngine.addEntity(histogramManager);
     gameEngine.addEntity(world);
 };
 

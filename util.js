@@ -21,6 +21,8 @@ const params = {
     }
 };
 
+const logReturn = thing => console.log(thing) || thing;
+
 /** Easy access to math functions */
 const {
     pow, ceil, floor, round, log, log2: lg, max, min, random, sqrt, abs,
