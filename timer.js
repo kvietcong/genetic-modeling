@@ -81,7 +81,8 @@ class DebugFrameTimer {
         if (elementID) this.fpsElementID = elementID;
         if (!this.fpsElementID) return;
         const element = document.getElementById(this.fpsElementID);
-        element.innerText = `${this.framesPerSecond.toFixed(2)}`;
+        if (element) element.innerText = `${this.framesPerSecond.toFixed(2)}`;
+        else this.reset();
     }
 }
 

@@ -6,10 +6,7 @@ const restart = gameEngine => {
     // geneExample(gameEngine);
 }
 
-const gridExample = gameEngine => {
-    const rows = 8;
-    const columns = 8;
-
+const gridExample = (gameEngine, rows = 8, columns = 8) => {
     const world = new World(rows, columns);
     const width = params.canvas.width / columns;
     const height = params.canvas.height / rows;
@@ -102,6 +99,7 @@ const gridExample = gameEngine => {
     }
     const histogramManager = new HistogramManager(histograms, "gene");
     params.debugEntities.histogramManager = histogramManager;
+    params.debugEntities.world = world;
     gameEngine.addEntity(histogramManager);
     gameEngine.addEntity(world);
 };
@@ -222,7 +220,7 @@ const addSim = () => {
         regenerateButtons();
 
         const timer = new DebugFrameTimer(null, false);
-        timer.attachTo(gameEngine, "update");
+        timer.attachTo(gameEngine, "draw");
         timer.updateAverageFPSElement(`avg-fps-${id}`);
         timer.updateFPSElement(`fps-${id}`);
     });
