@@ -99,13 +99,12 @@ class Organism {
         // let sexualReproductionStatus = document.getElementById("sexualReproductionBox").checked;
 
         let migrationChance = random(); // random value between 0 and 1
-        let migrationThreshold = document.getElementById("migrationChance").value;
 
         if(this.energy >= REPRODUCTION_THRESH && otherOrganism.energy >= REPRODUCTION_THRESH) {
             this.energy -= REPRODUCTION_THRESH / 2; // this.parent1 25
             otherOrganism.energy -= REPRODUCTION_THRESH / 2; // this.parent1 25
 
-            if (migrationChance >= migrationThreshold) { // no migration OR migration but the chance is
+            if (migrationChance >= params.migrationThreshold ) { // no migration OR migration but the chance is
                     this.village.addOrganism(new Organism(this.village, this, otherOrganism));
             } else { // migration checked on and migration condition met
                     let ranVillage = this.village.getRandomNeighbor();
@@ -134,15 +133,14 @@ class Organism {
 
     // social learning - recombining one learn gene
     socLearning() {
-        let radios = document.getElementsByName("socialType");  // this will return an array of the radio buttons
         let index = getRandomInteger(0, 4);
         let option;
 
-        if (radios[0].checked) option = 0;          // this is for random of all the below options
-        else if (radios[1].checked) option = 1;     // random villager
-        else if (radios[2].checked) option = 2;     // parent
-        else if (radios[3].checked) option = 3;     // elder
-        else if (radios[4].checked) option = 4;     // wise
+        if (params.SLradios[0].checked) option = 0;          // this is for random of all the below options
+        else if (params.SLradios[1].checked) option = 1;     // random villager
+        else if (params.SLradios[2].checked) option = 2;     // parent
+        else if (params.SLradios[3].checked) option = 3;     // elder
+        else if (params.SLradios[4].checked) option = 4;     // wise
 
         if (option === 0) {
             // Random 1-4
@@ -201,7 +199,7 @@ class Organism {
         }
 
         let sexualReproChance = random();   // random value between 0 and 1
-        let sexualReproThreshold = document.getElementById("sexualRepChance").value;
+
 
         // soft age cap using the "percentage" above
         if (this.alive) { // this would be 20 (7300) - 60 "years" (365 days * 60 years)
@@ -212,7 +210,7 @@ class Organism {
                 this.energy -= Math.floor(this.village.organisms.length/100);
             }
 
-            if (sexualReproChance < sexualReproThreshold) {     //sexual
+            if (sexualReproChance < params.sexualReproThreshold) {     //sexual
                 let otherParent = this.village.getFitOrganism();
                 let countVillagers = 0;
                 while (otherParent === this && countVillagers < this.village.organisms.length) {
@@ -229,53 +227,28 @@ class Organism {
 
             // social learning
             // requires at least 2 organisms in the village
-            if (!document.getElementById("noSocial").checked) {
+            if (!params.SLcheck) {
 
-                let socialChance = document.getElementById("socialPercent").value;
-                let socialDays = document.getElementById("socialDays").value;
-
-                if (socialChance != 0 && random() < socialChance && this.village.organisms.length > 1) {
+                if (params.socialChance != 0 && random() < params.socialChance && this.village.organisms.length > 1) {
                     this.socLearning();
                 }
 
-                if (socialDays != 0 && this.days % socialDays === 0) {
+                if (params.socialDays != 0 && this.days % params.socialDays === 0) {
                     this.socLearning();
                 }
             }
 
             // individual learning
-            if (!document.getElementById("noIndividual").checked) {
+            if (!params.ILcheck) {
 
-                let indChance = document.getElementById("indPercent").value;
-                let indDays = document.getElementById("indDays").value;
-
-                if (indChance != 0 && random() < indChance && this.village.organisms.length > 1) {
+                if (params.indChance != 0 && random() < params.indChance && this.village.organisms.length > 1) {
                     this.indLearning();
                 }
 
-                if (indDays != 0 && this.days % indDays === 0) {
+                if (params.indDays != 0 && this.days % params.indDays === 0) {
                     this.indLearning();
                 }
             }
-
-            // 5% chance of individual learning every tick (mutating one learnList gene)
-            // if (random() < 1) {
-            //     this.indLearning();
-            // }
         }
-
-        // Hard age cap
-        // if(this.days < 36500) { // this would be 20 (7300) - 60 "years" (365 days * 60 years)
-        //     this.successes += this.reward.successes;           // keep track of successes on the tasks
-        //     this.failures += this.reward.failures;             // will allow percentage calculation
-        //     this.energy += this.reward.energy;                 // energy of the Organism
-        //     this.reproduce();
-        // } else {                        // if they are 100 or more they "die"
-        //     this.alive = false;
-        //     this.village.removeOrganism(this);
-        // }
-
-        // this.days++; // increment the day/age
-
     };
 };

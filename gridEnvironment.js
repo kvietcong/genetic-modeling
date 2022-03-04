@@ -11,41 +11,52 @@ class Village {
         this.organisms = [];
         this.organismsToAdd = [];
 
-        if (document.getElementsByName("worldType")[2].checked) { // set the spiral village configuration
-
-
+        if (params.worldType === 'spiral') { // set the spiral village configuration
             this.spiral = true;
             this.environment = "spiral" + i + "" + j;
 
-        } else if (document.getElementsByName("worldType")[0].checked) { // set the world village configuration
+        } else if (params.worldType === 'layered') { // set the world village configuration
+
+            let mid = floor(params.worldSize / 2);
+
+            if( i === mid & j === mid) {
+                this.environment = "rainforest";
+            } else {
+                this.environment = "polarice";
+            }
+        } else if (params.worldType === 'layered8by8'){
+            
             if((i === 3 || i === 4) && (j === 3 || j === 4)) { // middle rainforest
 
                 this.environment = "rainforest";
 
             } else if ((i > 1 && i < 6) && (j > 1 && j < 6)) { // 1 out from center mediterranean
 
-                // this.environment = "mediterranean";
-                this.environment = "polarice";
+                this.environment = "mediterranean";
 
             } else if ((i > 0 && i < 7) && (j > 0 && j < 7)) { // 2 out from center mountains
 
-                // this.environment = "mountains";
-                this.environment = "polarice";
+                this.environment = "mountains";
 
             } else { // outer ring desert or polarice randomly
 
                 let randNum = getRandomInteger(0,1);
                 this.environment = "polarice";
 
-                // if(randNum === 0) {
-                //     this.environment = "desert";
-                // } else {
-                //     this.environment = "polarice";
-                // }
+                if(randNum === 0) {
+                    this.environment = "desert";
+                } else {
+                    this.environment = "polarice";
+                }
             }
-        } else {  // randomly set the village configuration
+
+
+        } else {                    // randomly set the village configuration
             this.environment = chooseRandom(Object.keys(params.environments));
         }
+
+
+            
 
         this.taskList = [];             // all the tasks associated with the village
         this.numTasks = 5;
@@ -61,7 +72,7 @@ class Village {
      * createTaskList:
      * will create a list of the tasks that the organism will attempt in a tick if they live in this village.
      */
-    createTaskList() {
+    createTaskList() {        
         for(let i = 0; i < this.numTasks; i++) {
             let task = {reward: 0, threshold: 0};
             if (this.environment === "polarice") {
@@ -88,7 +99,6 @@ class Village {
                task.reward = eval("params.spiralEnvironments." + "spiral" + this.i + "" + this.j + ".reward");
                task.threshold = eval("params.spiralEnvironments." + "spiral" + this.i + "" + this.j + ".threshold[i]");
            }
-
             this.taskList.push(task);   // adds the task to the task list.
         }
     };
