@@ -7,6 +7,12 @@ const restart = gameEngine => {
 }
 
 const gridExample = (gameEngine, rows = 5, columns = 5) => {
+    
+    getParams();
+
+    rows = params.worldSize;
+    columns = params.worldSize;
+
     const world = new World(rows, columns);
     const width = params.canvas.width / columns;
     const height = params.canvas.height / rows;
@@ -96,6 +102,7 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
                 // Updating variables
                 village, 2
             );
+            
             const geneHistogram = createOrganismHistogram(
                 // Average Gene Level Histogram
                 range(0, params.initialPartitions),
@@ -111,13 +118,15 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
                 // Updating variables
                 village, 1
             );
+
             if (!village.spiral) {
-                learnHistogram.backgroundColor = { color: params.environments[village.environment].color, opacity: 0.7 };
-                geneHistogram.backgroundColor = { color: params.environments[village.environment].color, opacity: 0.7 };
+                learnHistogram.backgroundColor = { color: params.environments[village.environment].color, opacity: 0.75 };
+                geneHistogram.backgroundColor = { color: params.environments[village.environment].color, opacity: 0.75 };
             } else {
-                learnHistogram.backgroundColor = { color: params.spiralEnvironments[village.environment].color, opacity: 0.7 };
-                geneHistogram.backgroundColor = { color: params.spiralEnvironments[village.environment].color, opacity: 0.7 };
+                learnHistogram.backgroundColor = { color: params.spiralEnvironments[village.environment].color, opacity: 0.75 };
+                geneHistogram.backgroundColor = { color: params.spiralEnvironments[village.environment].color, opacity: 0.75 };
             }
+
             learnHistogram.isDrawing = false;
             geneHistogram.isDrawing = false;
 
@@ -254,7 +263,67 @@ const addSim = () => {
         timer.attachTo(gameEngine, "draw");
         timer.updateAverageFPSElement(`avg-fps-${id}`);
         timer.updateFPSElement(`fps-${id}`);
+
     });
+}
+
+const getParams = () => {
+    // reproduction related
+    params.migrationThreshold = document.getElementById("migrationChance").value;
+    params.sexualReproThreshold = document.getElementById("sexualRepChance").value;
+
+    // learning related
+    params.SLradios = document.getElementsByName("socialType");  // this will return an array of the radio buttons
+    params.SLcheck = document.getElementById("noSocial").checked;
+    params.socialChance = document.getElementById("socialPercent").value;
+    params.socialDays = document.getElementById("socialDays").value;
+    params.ILcheck = document.getElementById("noIndividual").checked;
+    params.indChance = document.getElementById("indPercent").value;
+    params.indDays = document.getElementById("indDays").value;
+
+
+    // GENE related
+
+    // recombo
+    if (document.getElementById("and").checked) {
+        params.gene.recomboer = (gene, otherGene) => libGene.recomboers.perCell.template(gene, otherGene, libGene.recomboers.perCell.AND);
+    } else if (document.getElementById("or").checked) {
+        params.gene.recomboer = (gene, otherGene) => libGene.recomboers.perCell.template(gene, otherGene, libGene.recomboers.perCell.OR);
+    } else if (document.getElementById("xor").checked) {
+        params.gene.recomboer = (gene, otherGene) => libGene.recomboers.perCell.template(gene, otherGene, libGene.recomboers.perCell.XOR);
+    } else if (document.getElementById("nand").checked) {
+        params.gene.recomboer = (gene, otherGene) => libGene.recomboers.perCell.template(gene, otherGene, libGene.recomboers.perCell.NAND);
+    } else if (document.getElementById("nor").checked) {
+        params.gene.recomboer = (gene, otherGene) => libGene.recomboers.perCell.template(gene, otherGene, libGene.recomboers.perCell.NOR);
+    }
+
+    // mutate
+    if (document.getElementById("flip").checked) {
+        params.gene.mutators = (gene, otherGene) => libGene.mutators.currentLevel.template(gene, libGene.mutators.currentLevel.flip);
+    } else if (document.getElementById("rejuvenate").checked) {
+        params.gene.mutators = (gene, otherGene) => libGene.mutators.currentLevel.template(gene, libGene.mutators.currentLevel.rejuvenate);
+    }
+
+    // Misc Parameters
+    params.fillToLevel = document.getElementById("fillToLevelIn").value;
+    params.partitionSize = document.getElementById("partitionSize").value;
+    params.mutationChance = document.getElementById("mutationChance").value;
+
+    params.worldSize = document.getElementById("worldSi").value;
+
+    // World Parameters
+    if (document.getElementsByName("worldType")[0].checked) {
+        params.worldType = 'layered8by8';
+        params.worldSize = 8;
+    } else if (document.getElementsByName("worldType")[1].checked) {
+        params.worldType = 'spiral';
+        params.worldSize = 5;
+    } else     if (document.getElementsByName("worldType")[2].checked) {
+        params.worldType = 'layered';
+    } else if (document.getElementsByName("worldType")[3].checked) {
+        params.worldType = 'random';
+    }
+
 }
 
 const nuke = () => {

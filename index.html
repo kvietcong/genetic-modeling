@@ -80,11 +80,8 @@
 
     <br>
 
-    <!-- <div id = "geneDiv">
+    <div id = "geneDiv">
         <p> Gene </p>
-        comment <input type="text" id="numGenes" value="5" /> Number of genes<br />
-        <input type="text" id="sizeOfLevelIn" value="1" /> Size of level<br />
-        <input type="text" id="fillToLevelIn" value="1" /> Fill to level<br /> <br>
 
         <p> Mutator type </p>
 
@@ -95,7 +92,6 @@
         <label for = "rejuvenate"> Rejuvenate </label> <br><br>
 
         <p> Recomboer type </p>
-
         <input type="radio" id = "xor" name = "recomboType" value = "xor">
         <label for = "xor"> XOR </label> <br>
 
@@ -110,7 +106,14 @@
 
         <input type="radio" id = "nor" name = "recomboType" value = "nor">
         <label for = "nor"> NOR </label>
-    </div> -->
+
+        <br><br>
+
+        <input type="text" id="mutationChance" value="0.3" /> Chance of Mutation <br >
+        <input type="text" id="partitionSize" value="1" /> Partition Size <br >
+        <input type="text" id="fillToLevelIn" value="0" /> Fill to level<br > <br>
+
+    </div>
 
     <div id = "reproductionDiv">
         <p> Reproduction </p>
@@ -130,7 +133,7 @@
 
         Social learning from: <br>
         <input type="radio" name = "socialType"checked>
-        <label for = "random"> Random of all the above </label>  <br>
+        <label for = "random"> Random of all options below. </label>  <br>
 
         <input type="radio" name = "socialType">
         <label for = "villager"> Random Villager </label> <br>
@@ -147,19 +150,39 @@
 
     <div id = "worldConfig">
         <p> World Configuration </p>
+
+        <label for="worldS">Select World Dimensions for Random & Layered:</label>
+        <select name="worldS" id="worldSi">
+            <options style="font-size: 100px;">
+            <option value=5>5 by 5</option>
+            <option value=7>7 by 7 </option>
+            <option value=8>8 by 8 </option>
+            <option value=9>9 by 9 </option>
+            </options>
+        </select> <br>
+
+        <input type="radio" name = "worldType">
+        <label for = "layer8by8"> Layered (only 8x8) </label>  <br>
+
+        <input type="radio" name = "worldType">
+        <label for = "spiral"> Spiral (only 5x5) </label>  <br>
+
         <input type="radio" name = "worldType">
         <label for = "layered"> Layered </label> <br>
 
         <input type="radio" name = "worldType" checked>
         <label for = "random"> Random </label>  <br>
 
-        <input type="radio" name = "worldType">
-        <label for = "spiral"> Spiral (only 5x5) </label>  <br>
+
+        <!-- <input type="radio" name = "worldType"checked>
+        <label for = "random"> Random World Configuration </label>  <br> -->
 
         <label for="histogramType">Histogram Type:</label>
         <select name="histogramType" id="histogramType">
-            <option value="gene">Gene</option>
-            <option value="learn">Learning</option>
+            <optgroup>
+                <option value="gene">Gene</option>
+                <option value="learn">Learning</option>
+            </optgroup>
         </select>
     </div>
 </body>
