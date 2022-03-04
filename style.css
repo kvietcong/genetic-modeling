@@ -73,3 +73,7 @@ p {
 h1 {
     color: red;
 }
+
+input[type='radio'] { 
+    transform: scale(2.5); 
+}
