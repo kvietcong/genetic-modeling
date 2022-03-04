@@ -3,6 +3,7 @@ const params = {
     // Maybe use for toggle-able logging?
     isDebugging: true,
     debugEntities: {},
+    gridSize: [5, 5],
     migrationThreshold: 0,
     SLradios: 0,
     sexualReproThreshold: 0,
