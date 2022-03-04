@@ -3,6 +3,17 @@ const params = {
     // Maybe use for toggle-able logging?
     isDebugging: true,
     debugEntities: {},
+    migrationThreshold: 0,
+    SLradios: 0,
+    sexualReproThreshold: 0,
+    SLcheck: false,
+    socialChance: 0,
+    socialDays: 0, 
+    ILcheck: false,
+    indChance: 0,
+    indDays: 0, 
+    worldSize: 5,
+    worldType: 'random',
     canvas: {
         width: 2500,
         height: 2000,
