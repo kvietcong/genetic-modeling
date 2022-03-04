@@ -9,10 +9,10 @@ const params = {
     sexualReproThreshold: 0,
     SLcheck: false,
     socialChance: 0,
-    socialDays: 0, 
+    socialDays: 0,
     ILcheck: false,
     indChance: 0,
-    indDays: 0, 
+    indDays: 0,
     worldSize: 5,
     worldType: 'random',
     canvas: {
@@ -233,6 +233,8 @@ class BitArray {
         this._array = new Uint8Array(bytes);
         this._length = bytes * 8;
     }
+
+    get length() { return this._length; }
 
     get(index) {
         const byteIndex = floor(index / 8);
