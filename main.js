@@ -12,6 +12,7 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
     const height = params.canvas.height / rows;
 
     class HistogramManager {
+        types = ["learn", "gene"];
         constructor(histograms, type = "learn") {
             this.histograms = histograms;
             this.histogramType = type;
@@ -21,6 +22,31 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
             if (this.histogramSelectorElement)
                 this.histogramSelectorElement.addEventListener("change",
                     event => this.histogramType = event.target.value);
+
+            this.drawLast = histograms[0][0][type].drawLast;
+            this.collectionRate = histograms[0][0][type].unitTimePerUpdate;
+        }
+
+        get collectionRate() { return this._collectionRate; }
+        set collectionRate(collectionRate) {
+            this._collectionRate = collectionRate;
+            for (const row of this.histograms) {
+                for (const histogramInfo of row) {
+                    this.types.forEach(type =>
+                        histogramInfo[type].unitTimePerUpdate = collectionRate);
+                }
+            }
+        }
+
+        get drawLast() { return this._drawLast; }
+        set drawLast(drawLast) {
+            this._drawLast = drawLast;
+            for (const row of this.histograms) {
+                for (const histogramInfo of row) {
+                    this.types.forEach(type =>
+                        histogramInfo[type].drawLast = drawLast);
+                }
+            }
         }
 
         get histogramType() { return this._histogramType; }
