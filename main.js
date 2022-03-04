@@ -7,7 +7,6 @@ const restart = gameEngine => {
 }
 
 const gridExample = (gameEngine, rows = 5, columns = 5) => {
-    
     getParams();
 
     rows = params.worldSize;
@@ -29,6 +28,18 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
                 this.histogramSelectorElement.addEventListener("change",
                     event => this.histogramType = event.target.value);
 
+            this.histogramCollectionRateElement =
+                document.getElementById("histogramCollectionRate");
+            if (this.histogramCollectionRateElement)
+                this.histogramCollectionRateElement.addEventListener("change",
+                    event => this.collectionRate = event.target.value);
+
+            this.histogramDrawLastElement =
+                document.getElementById("histogramDrawLast");
+            if (this.histogramDrawLastElement)
+                this.histogramDrawLastElement.addEventListener("change",
+                    event => this.drawLast = Number(event.target.value));
+
             this.drawLast = histograms[0][0][type].drawLast;
             this.collectionRate = histograms[0][0][type].unitTimePerUpdate;
         }
@@ -42,6 +53,7 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
                         histogramInfo[type].unitTimePerUpdate = collectionRate);
                 }
             }
+            this.histogramCollectionRateElement.value = this.collectionRate;
         }
 
         get drawLast() { return this._drawLast; }
@@ -53,6 +65,7 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
                         histogramInfo[type].drawLast = drawLast);
                 }
             }
+            this.histogramDrawLastElement.value = this.drawLast;
         }
 
         get histogramType() { return this._histogramType; }
@@ -102,7 +115,7 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
                 // Updating variables
                 village, 2
             );
-            
+
             const geneHistogram = createOrganismHistogram(
                 // Average Gene Level Histogram
                 range(0, params.initialPartitions),
@@ -138,6 +151,7 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
         }
     }
     const histogramManager = new HistogramManager(histograms, "gene");
+    gameEngine.histogramManager = histogramManager; // Not the best way to do this. TODO: Make this better.
     params.debugEntities.histogramManager = histogramManager;
     params.debugEntities.world = world;
     gameEngine.addEntity(histogramManager);
