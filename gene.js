@@ -30,8 +30,7 @@
 //
 // There are also some useful functions in the `./util.js` file.
 
-const testPrinter = (newValue, _propertyName) => console.log(`Inserted ${newValue}`);
-
+const testPrinter = (newValue, propertyName) => console.log(`${propertyName} is now ${newValue}`);
 const exampleCallback = (newValue, propertyName) => {
     const container = document.getElementById(propertyName + "-container");
     const p = container.children[0];
@@ -40,14 +39,12 @@ const exampleCallback = (newValue, propertyName) => {
 
 /* Default Global Parameters related to Genes */
 attachPropertiesWithCallbacks(params, [ // Function in `util.js`
-    [ "cellSize", 2, testPrinter ],
-    [ "fillToLevel", 0, testPrinter ],  // getRandomInteger(1,3); // document.getElementById("fillToLevelIn").value;
-    [ "partitionSize", 1, testPrinter ], // document.getElementById("sizeOfLevelIn").value; // it was set at 2 but Chris might want this at 1
-    [ "mutationChance", 0.3, testPrinter ],
-    [ "initialPartitions", 6, testPrinter ],
-
-    ["recomboOption",  "_.recomboers.perCell.OR", testPrinter ],
-    ["mutateOption",  "_.mutators.currentLevel.rejuvenate", testPrinter],
+    [ "cellSize", 2 ], // For Drawing (Currently Unused)
+    [ "fillToLevel", 0 ],  // getRandomInteger(1,3); // document.getElementById("fillToLevelIn").value;
+    [ "partitionSize", 1 ], // document.getElementById("sizeOfLevelIn").value; // it was set at 2 but Chris might want this at 1
+    [ "mutationChance", 0.3 ],
+    [ "initialPartitions", 5 ],
+    [ "gene", {} ]
 ]);
 
 /** Library of Gene related values and functions */
@@ -59,19 +56,19 @@ const libGene = (() => {
 
     /** Different sets of functions to change partition sizes */
     _.partitionTools = {
-        constant: {  // linear growth
+        constant: {
             indexToLevel: index => floor(index / params.partitionSize),
             levelToIndex: level => params.partitionSize * level,
             partitionSize: () => params.partitionSize,
         },
-        quadratic: {   // exponential growth
+        exponential: {
             indexToLevel: index => index === 0 ? 0 : floor(lg(index)) + 1,
             levelToIndex: level => level === 0 ? 0 : pow(2, level - 1),
             partitionSize: level => level < 2 ? 1 : pow(2, level - 1),
         },
     };
     /** Default Partitioning Tools */
-    _.partitionTooling = _.partitionTools.constant; // change to quadratic if want to have a harder gene growth
+    params.gene.partitionTooling = _.partitionTools.constant;
 
     /** Different functions to initialize a Gene's cells */
     _.initializers = {
@@ -82,7 +79,7 @@ const libGene = (() => {
     };
     _.initializers.perCell = {
         template: (gene, initializer, ...options) => {
-            const dimensions =  _.partitionTooling.levelToIndex(
+            const dimensions =  params.gene.partitionTooling.levelToIndex(
                 params.initialPartitions);
             gene.cells = [];
 
@@ -97,14 +94,14 @@ const libGene = (() => {
         fill: () => 1,
         random: () => getRandomInteger(0, 1),
         fillToLevel: (l, i, j) => [i, j].every(index =>
-                index < _.partitionTooling.levelToIndex(l))
+                index < params.gene.partitionTooling.levelToIndex(l))
                 ? 1 : 0,
         randomToLevel: (l, i, j) => [i, j].every(index =>
-                index < _.partitionTooling.levelToIndex(l))
+                index < params.gene.partitionTooling.levelToIndex(l))
                 ? getRandomInteger(0,1) : 0,
     };
     /** Default Initializer to create new genes */
-    _.initializer = gene =>
+    params.gene.initializer = gene =>
         _.initializers.perCell.template(gene,
                                         _.initializers.perCell.fillToLevel,
                                         params.fillToLevel);
@@ -165,8 +162,8 @@ const libGene = (() => {
                 chooseRandom([gene, otherGene]).getPartition(i, level);
             const newPartition2 =
                 chooseRandom([gene, otherGene]).getPartition(level, i);
-            const x = _.partitionTooling.levelToIndex(i);
-            const y = _.partitionTooling.levelToIndex(level);
+            const x = params.gene.partitionTooling.levelToIndex(i);
+            const y = params.gene.partitionTooling.levelToIndex(level);
             newCells = replacePartition(newCells, newPartition1, x, y);
             newCells = replacePartition(newCells, newPartition2, y, x);
         }
@@ -180,7 +177,7 @@ const libGene = (() => {
         }
 
         const level = gene.level;
-        if (_.partitionTooling.levelToIndex(level) >= gene.cells.length) {
+        if (params.gene.partitionTooling.levelToIndex(level) >= gene.cells.length) {
             // console.log("You have hit a level limit")
             return (gene.level > otherGene.level ? gene : otherGene).clone();
         }
@@ -192,42 +189,28 @@ const libGene = (() => {
             library.push(gene.getPartition(level, i));
         }
         for (i = 0; i < level; i++) {
-            const x = _.partitionTooling.levelToIndex(i);
-            const y = _.partitionTooling.levelToIndex(level);
+            const x = params.gene.partitionTooling.levelToIndex(i);
+            const y = params.gene.partitionTooling.levelToIndex(level);
             newCells = replacePartition(newCells, chooseRandom(library), x, y);
             newCells = replacePartition(newCells, chooseRandom(library), y, x);
         }
         return new Gene({cells: newCells});
     }
     /** Default Recomboer to combine two genes */
-    // _.recomboer = _.recomboers.chooseFromPartitionLibrary;
-
-
-    // TESTING
-    /*let recomboOption = _.recomboers.perCell.OR;
-
-    let recomboerRadios = document.getElementsByName("recomboType");  // this will return an array of the radio buttons
-    
-    if (recomboerRadios[0].checked) recomboOption = _.recomboers.perCell.XOR;     
-    else if (recomboerRadios[1].checked) recomboOption = _.recomboers.perCell.OR; 
-    else if (recomboerRadios[2].checked) recomboOption = _.recomboers.perCell.AND;    
-    else if (recomboerRadios[3].checked)  recomboOption = _.recomboers.perCell.NAND;    
-    else if (recomboerRadios[4].checked)  recomboOption = _.recomboers.perCell.NOR; */
-
-    _.recomboer = (gene, otherGene) => _.recomboers.perCell.template(gene, otherGene, eval(params.recomboOption)); 
-
-    // TESTING
+    // params.gene.recomboer = _.recomboers.chooseFromPartitionLibrary;
+    params.gene.recomboer = (gene, otherGene) => _.recomboers.perCell.template(gene, otherGene, _.recomboers.perCell.OR);
 
     /** Different functions to mutate a Gene's cells */
     _.mutators = {
         /** @param {Gene} gene The gene's state */
         _: gene => undefined,
+        void: _ => undefined
     };
     /** Mutate Cells on the current level */
     _.mutators.currentLevel = {
         template: (gene, mutator) => {
             const level = gene.level;
-            const levelToIndex = _.partitionTooling.levelToIndex;
+            const levelToIndex = params.gene.partitionTooling.levelToIndex;
             const indexStart = levelToIndex(level);
             const indexEnd = levelToIndex(level + 1);
 
@@ -249,10 +232,8 @@ const libGene = (() => {
         destroy: () => 0,
     }
     /** Default mutator for genes */
-    _.mutator = gene => {
-        //_.mutators.currentLevel.template(gene, _.mutators.currentLevel.rejuvenate);
-        _.mutators.currentLevel.template(gene, eval(params.mutateOption));
-    }
+    params.gene.mutator = gene =>
+        _.mutators.currentLevel.template(gene, _.mutators.currentLevel.flip);
 
     /** Different functions to draw a Gene's cells */
     _.drawers = {
@@ -266,7 +247,7 @@ const libGene = (() => {
             const cells = gene.cells;
             const cellSize = params.cellSize;
             const colors = ["red", "green", "blue"];
-            const indexToLevel = _.partitionTooling.indexToLevel;
+            const indexToLevel = params.gene.partitionTooling.indexToLevel;
 
             // Fill the grid up specially with levels in mind
             const x = gene.x + cellSize;
@@ -290,7 +271,7 @@ const libGene = (() => {
         },
     };
     /** Default drawing function to display a gene */
-    _.drawer = _.drawers.simpleDraw;
+    params.gene.drawer = _.drawers.simpleDraw;
 
     /** Representation of an organism's specific gene */
     _.Gene = class Gene {
@@ -324,14 +305,14 @@ const libGene = (() => {
             this.generateLevels();
         }
 
-        initializeCells(initializer = _.initializer) {
+        initializeCells(initializer = params.gene.initializer) {
             initializer(this);
         }
 
         getPartition(i, j) {
             const partition = [];
-            const partitionSize = _.partitionTooling.partitionSize(max(i, j));
-            const levelToIndex = _.partitionTooling.levelToIndex;
+            const partitionSize = params.gene.partitionTooling.partitionSize(max(i, j));
+            const levelToIndex = params.gene.partitionTooling.levelToIndex;
 
             let kStart, lStart;
             if (i > j) {
@@ -358,7 +339,7 @@ const libGene = (() => {
         }
 
         generateLevels() {
-            const indexToLevel = _.partitionTooling.indexToLevel;
+            const indexToLevel = params.gene.partitionTooling.indexToLevel;
             const levelAmount = indexToLevel(this.cells.length);
             const getLevel = (i, j) => indexToLevel(max(i, j));
             this.levels = []
@@ -375,7 +356,7 @@ const libGene = (() => {
             }
         }
 
-        recombine(otherGene, recomboer = _.recomboer) {
+        recombine(otherGene, recomboer = params.gene.recomboer) {
             return recomboer(this, otherGene);
         }
 
@@ -386,13 +367,13 @@ const libGene = (() => {
             return level;
         }
 
-        mutate(mutator = _.mutator) {
+        mutate(mutator = params.gene.mutator) {
             mutator(this);
             this.updateInfo();
         }
 
         draw(ctx, gameEngine) {
-            const drawer = _.drawer;
+            const drawer = params.gene.drawer;
             return drawer(this, ctx, gameEngine);
         }
 
@@ -408,3 +389,6 @@ const libGene = (() => {
 
 // General export to have things easily accessible to all other files.
 const { Gene } = libGene;
+
+// Changing the recomboer outside of the library example.
+// params.gene.recomboer = (gene, otherGene) => libGene.recomboers.perCell.template(gene, otherGene, libGene.recomboers.perCell.AND);
