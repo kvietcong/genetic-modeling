@@ -2,8 +2,8 @@ const assetManager = new AssetManager();
 let gameEngines = [];
 
 const restart = gameEngine => {
-    gridExample(gameEngine, params.gridSize[0], params.gridSize[1]);
-    // geneExample(gameEngine);
+    // gridExample(gameEngine, params.gridSize[0], params.gridSize[1]);
+    geneExample(gameEngine);
 }
 
 const gridExample = (gameEngine, rows = 5, columns = 5) => {
@@ -171,10 +171,10 @@ const geneExample = gameEngine => {
         }
     }
 
-    const levelToIndex = libGene.partitionTooling.levelToIndex;
-    const organismSize = params.cellDrawSize
+    const levelToIndex = params.gene.partitionTooling.levelToIndex;
+    const organismSize = params.cellSize
         * (levelToIndex(params.initialPartitions) + 2);
-    const padding = params.cellDrawSize * 4;
+    const padding = params.cellSize * 4;
 
     for (const [i, row] of genes.entries()) {
         for (const [j, gene] of row.entries()) {

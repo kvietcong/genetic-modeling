@@ -39,12 +39,13 @@ const exampleCallback = (newValue, propertyName) => {
 
 /* Default Global Parameters related to Genes */
 attachPropertiesWithCallbacks(params, [ // Function in `util.js`
-    [ "cellSize", 2 ], // For Drawing (Currently Unused)
+    [ "cellSize", 5 ], // For Drawing (Currently Unused)
     [ "fillToLevel", 0 ],  // getRandomInteger(1,3); // document.getElementById("fillToLevelIn").value;
     [ "partitionSize", 1 ], // document.getElementById("sizeOfLevelIn").value; // it was set at 2 but Chris might want this at 1
     [ "mutationChance", 0.3 ],
     [ "initialPartitions", 5 ],
-    [ "gene", {} ]
+    [ "gene", {} ],
+    [ "meme", {} ]
 ]);
 
 /** Library of Gene related values and functions */
@@ -102,6 +103,8 @@ const libGene = (() => {
         _.initializers.perCell.template(gene,
                                         _.initializers.perCell.fillToLevel,
                                         params.fillToLevel);
+    params.meme.initializer = params.gene.initializer;
+
     /**
      * @param {Array2D} cells Array of cells
      * @param {Array2D} newPartition Array of replacements
@@ -194,7 +197,8 @@ const libGene = (() => {
     }
     /** Default Recomboer to combine two genes */
     // params.gene.recomboer = _.recomboers.chooseFromPartitionLibrary;
-    params.gene.recomboer = (gene, otherGene) => _.recomboers.perCell.template(gene, otherGene, _.recomboers.perCell.OR);
+    params.gene.recomboer = (gene, otherGene) => _.recomboers.perCell.template(gene, otherGene, _.recomboers.perCell.NOR);
+    params.meme.recomboer = params.gene.recomboer;
 
     /** Different functions to mutate a Gene's cells */
     _.mutators = {
@@ -231,6 +235,7 @@ const libGene = (() => {
     /** Default mutator for genes */
     params.gene.mutator = gene =>
         _.mutators.currentLevel.template(gene, _.mutators.currentLevel.flip);
+    params.meme.mutator = params.gene.mutator;
 
     /** Different functions to draw a Gene's cells */
     _.drawers = {
@@ -381,11 +386,29 @@ const libGene = (() => {
         }
     }
 
+    _.Meme = class Meme extends _.Gene {
+        constructor(options = null) { super(options); }
+
+        clone() { return new Meme({cells: this.cells}); }
+
+        initializeCells(initializer = params.meme.initializer) {
+            return super.initializer(this, initializer);
+        }
+
+        recombine(otherGene, recomboer = params.meme.recomboer) {
+            return super.recombine(otherGene, recomboer);
+        }
+
+        mutate(mutator = params.meme.mutator) {
+            return super.mutator(mutator)
+        }
+    }
+
     return _;
 })();
 
 // General export to have things easily accessible to all other files.
-const { Gene } = libGene;
+const { Gene, Meme } = libGene;
 
 // Changing the recomboer outside of the library example.
 // params.gene.recomboer = (gene, otherGene) => libGene.recomboers.perCell.template(gene, otherGene, libGene.recomboers.perCell.AND);
