@@ -42,9 +42,7 @@ class GameEngine {
         gameLoop();
     };
 
-    stop() {
-        this.isRunning = false;
-    }
+    stop() { this.isRunning = false; }
 
     startInput() {
         const getXandY = e => ({

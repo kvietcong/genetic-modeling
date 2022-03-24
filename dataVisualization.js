@@ -29,6 +29,25 @@ class Histogram {
         this.backgroundColor = "white";
     }
 
+    toCSVText() {
+        return this.categories.join(",") + "\n"
+            + this.allCounts.map(counts =>
+                this.categories.map(category => counts[category]).join(","))
+                .join("\n");
+    }
+
+    downloadCSV() {
+        const currentDate = new Date();
+        const dateString = `${currentDate.getFullYear()}-${currentDate.getMonth()}-${currentDate.getDate()}-${currentDate.getHours()}-${currentDate.getMinutes()}-${currentDate.getSeconds()}`;
+        const csvData = new Blob([this.toCSVText()], { type: "text/csv" });
+        const csvUrl = URL.createObjectURL(csvData);
+        const link = document.createElement("a");
+        link.href = csvUrl;
+        link.target = "_blank";
+        link.download = `${dateString}.csv`;
+        link.click();
+    }
+
     untint() { this.tintInfo = null; }
 
     tint(color, strength = 0.3) {

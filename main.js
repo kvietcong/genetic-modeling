@@ -7,7 +7,6 @@ const restart = gameEngine => {
 }
 
 const gridExample = (gameEngine, rows = 5, columns = 5) => {
-    
     getParams();
 
     rows = params.worldSize;
@@ -18,6 +17,7 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
     const height = params.canvas.height / rows;
 
     class HistogramManager {
+        types = ["learn", "gene"];
         constructor(histograms, type = "learn") {
             this.histograms = histograms;
             this.histogramType = type;
@@ -27,6 +27,45 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
             if (this.histogramSelectorElement)
                 this.histogramSelectorElement.addEventListener("change",
                     event => this.histogramType = event.target.value);
+
+            this.histogramCollectionRateElement =
+                document.getElementById("histogramCollectionRate");
+            if (this.histogramCollectionRateElement)
+                this.histogramCollectionRateElement.addEventListener("change",
+                    event => this.collectionRate = event.target.value);
+
+            this.histogramDrawLastElement =
+                document.getElementById("histogramDrawLast");
+            if (this.histogramDrawLastElement)
+                this.histogramDrawLastElement.addEventListener("change",
+                    event => this.drawLast = Number(event.target.value));
+
+            this.drawLast = histograms[0][0][type].drawLast;
+            this.collectionRate = histograms[0][0][type].unitTimePerUpdate;
+        }
+
+        get collectionRate() { return this._collectionRate; }
+        set collectionRate(collectionRate) {
+            this._collectionRate = collectionRate;
+            for (const row of this.histograms) {
+                for (const histogramInfo of row) {
+                    this.types.forEach(type =>
+                        histogramInfo[type].unitTimePerUpdate = collectionRate);
+                }
+            }
+            this.histogramCollectionRateElement.value = this.collectionRate;
+        }
+
+        get drawLast() { return this._drawLast; }
+        set drawLast(drawLast) {
+            this._drawLast = drawLast;
+            for (const row of this.histograms) {
+                for (const histogramInfo of row) {
+                    this.types.forEach(type =>
+                        histogramInfo[type].drawLast = drawLast);
+                }
+            }
+            this.histogramDrawLastElement.value = this.drawLast;
         }
 
         get histogramType() { return this._histogramType; }
@@ -76,7 +115,7 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
                 // Updating variables
                 village, 2
             );
-            
+
             const geneHistogram = createOrganismHistogram(
                 // Average Gene Level Histogram
                 range(0, params.initialPartitions),
@@ -112,6 +151,7 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
         }
     }
     const histogramManager = new HistogramManager(histograms, "gene");
+    gameEngine.histogramManager = histogramManager; // Not the best way to do this. TODO: Make this better.
     params.debugEntities.histogramManager = histogramManager;
     params.debugEntities.world = world;
     gameEngine.addEntity(histogramManager);
@@ -131,10 +171,10 @@ const geneExample = gameEngine => {
         }
     }
 
-    const levelToIndex = libGene.partitionTooling.levelToIndex;
-    const organismSize = params.cellDrawSize
+    const levelToIndex = params.gene.partitionTooling.levelToIndex;
+    const organismSize = params.cellSize
         * (levelToIndex(params.initialPartitions) + 2);
-    const padding = params.cellDrawSize * 4;
+    const padding = params.cellSize * 4;
 
     for (const [i, row] of genes.entries()) {
         for (const [j, gene] of row.entries()) {

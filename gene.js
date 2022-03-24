@@ -39,12 +39,13 @@ const exampleCallback = (newValue, propertyName) => {
 
 /* Default Global Parameters related to Genes */
 attachPropertiesWithCallbacks(params, [ // Function in `util.js`
-    [ "cellSize", 2 ], // For Drawing (Currently Unused)
+    [ "cellSize", 5 ], // For Drawing (Currently Unused)
     [ "fillToLevel", 0 ],  // getRandomInteger(1,3); // document.getElementById("fillToLevelIn").value;
     [ "partitionSize", 1 ], // document.getElementById("sizeOfLevelIn").value; // it was set at 2 but Chris might want this at 1
     [ "mutationChance", 0.3 ],
     [ "initialPartitions", 5 ],
-    [ "gene", {} ]
+    [ "gene", {} ],
+    [ "meme", {} ]
 ]);
 
 /** Library of Gene related values and functions */
@@ -81,14 +82,11 @@ const libGene = (() => {
         template: (gene, initializer, ...options) => {
             const dimensions =  params.gene.partitionTooling.levelToIndex(
                 params.initialPartitions);
-            gene.cells = [];
+            gene.cells = new BitArray2D(dimensions, dimensions);
 
-            for (let i = 0; i < dimensions; i++) {
-                gene.cells[i] = [];
-                for (let j = 0; j < dimensions; j++) {
-                    gene.cells[i][j] = initializer(...options, i, j);
-                }
-            }
+            for (let i = 0; i < dimensions; i++)
+                for (let j = 0; j < dimensions; j++)
+                    gene.cells.set(i, j, initializer(...options, i, j));
         },
         blank: () => 0,
         fill: () => 1,
@@ -105,6 +103,8 @@ const libGene = (() => {
         _.initializers.perCell.template(gene,
                                         _.initializers.perCell.fillToLevel,
                                         params.fillToLevel);
+    params.meme.initializer = params.gene.initializer;
+
     /**
      * @param {Array2D} cells Array of cells
      * @param {Array2D} newPartition Array of replacements
@@ -113,10 +113,10 @@ const libGene = (() => {
      * @returns New cells with a replacement
      */
     const replacePartition = (cells, newPartition, x, y) => {
-        let newCells = deepObjectCopy(cells);
+        let newCells = cells.clone();
         for (let i = x; i < x + newPartition.length; i++) {
             for (let j = y; j < y + newPartition[0].length; j++) {
-                newCells[i][j] = newPartition[i-x][j-y];
+                newCells.set(i, j, newPartition[i-x][j-y]);
             }
         }
         return newCells;
@@ -134,16 +134,16 @@ const libGene = (() => {
     /** Combine on a per cell basis */
     _.recomboers.perCell = {
         template: (gene, otherGene, recomboer) => {
-            const newCells = [];
-            for (let i = 0; i < gene.cells.length; i++) {
-                newCells[i] = [];
-                for (let j = 0; j < gene.cells.length; j++) {
-                    newCells[i][j] = recomboer(gene.cells[i][j],
-                                               otherGene.cells[i][j],
-                                               i, j);
+            const newCells = new BitArray2D(gene.cells.width, gene.cells.height);
+            for (let i = 0; i < gene.cells.height; i++) {
+                for (let j = 0; j < gene.cells.width; j++) {
+                    newCells.set(i, j, recomboer(gene.cells.get(i, j),
+                                                 otherGene.cells.get(i, j),
+                                                 i, j));
                 }
             }
-            return new Gene({cells: newCells});
+            const Type = (gene instanceof Meme) ? Meme : Gene;
+            return new Type({cells: newCells});
         },
         XOR: (a, b) => (a + b) % 2,
         OR: (a, b) => ceil((a + b) / 2),
@@ -151,8 +151,47 @@ const libGene = (() => {
         NAND: (a, b) => !_.recomboers.perCell.AND(a, b),
         NOR: (a, b) => !_.recomboers.perCell.OR(a, b),
     };
+    _.recomboers.perLevel = {
+        template: (gene, otherGene, recomboer) => {
+            const levelA = gene.level;
+            const levelB = otherGene.level;
+            const level = max(levelA, levelB);
+
+            const { levelToIndex } = params.gene.partitionTooling;
+            const newCells = new BitArray2D(gene.cells.width, gene.cells.height);
+
+            let isEmpty = false;
+            let currentLevel = 0;
+            while (!isEmpty && currentLevel < level) {
+                isEmpty = true;
+                const indexStart = levelToIndex(currentLevel);
+                const indexEnd = levelToIndex(currentLevel + 1);
+
+                if (indexStart >= gene.cells.width) break;
+
+                for (let i = 0; i < indexEnd; i++)
+                    for (let j = indexStart; j < indexEnd; j++) {
+                        const newValue = recomboer(gene.cells.get(i, j), otherGene.cells.get(i, j), i, j, gene, otherGene);
+                        newCells.set(i, j, newValue);
+                        isEmpty = !newValue && isEmpty;
+                    }
+
+                for (let i = indexStart; i < indexEnd; i++)
+                    for (let j = 0; j < indexEnd; j++) {
+                        const newValue = recomboer(gene.cells.get(i, j), otherGene.cells.get(i, j), i, j, gene, otherGene);
+                        newCells.set(i, j, newValue);
+                        isEmpty = !newValue && isEmpty;
+                    }
+
+                currentLevel++;
+            }
+
+            const Type = (gene instanceof Meme) ? Meme : Gene;
+            return new Type({cells: newCells});
+        },
+    };
     _.recomboers.chooseOnePartition = (gene, otherGene) => {
-        let newCells = deepObjectCopy(gene.cells);
+        let newCells = gene.cells.clone();
         if (gene.level !== otherGene.level)
             return (gene.level > otherGene.level ? gene : otherGene).clone();
         let level = gene.level;
@@ -167,17 +206,18 @@ const libGene = (() => {
             newCells = replacePartition(newCells, newPartition1, x, y);
             newCells = replacePartition(newCells, newPartition2, y, x);
         }
-        return new Gene({cells: newCells});
+        const Type = (gene instanceof Meme) ? Meme : Gene;
+        return new Type({cells: newCells});
     };
     _.recomboers.chooseFromPartitionLibrary = (gene, otherGene) => {
-        let newCells = deepObjectCopy(gene.cells);
+        let newCells = gene.cells.clone();
         if (gene.level !== otherGene.level) {
             // console.log("You don't have the same level")
             return (gene.level > otherGene.level ? gene : otherGene).clone();
         }
 
         const level = gene.level;
-        if (params.gene.partitionTooling.levelToIndex(level) >= gene.cells.length) {
+        if (params.gene.partitionTooling.levelToIndex(level) >= gene.cells.width) {
             // console.log("You have hit a level limit")
             return (gene.level > otherGene.level ? gene : otherGene).clone();
         }
@@ -194,11 +234,13 @@ const libGene = (() => {
             newCells = replacePartition(newCells, chooseRandom(library), x, y);
             newCells = replacePartition(newCells, chooseRandom(library), y, x);
         }
-        return new Gene({cells: newCells});
+        const Type = (gene instanceof Meme) ? Meme : Gene;
+        return new Type({cells: newCells});
     }
     /** Default Recomboer to combine two genes */
     // params.gene.recomboer = _.recomboers.chooseFromPartitionLibrary;
     params.gene.recomboer = (gene, otherGene) => _.recomboers.perCell.template(gene, otherGene, _.recomboers.perCell.OR);
+    params.meme.recomboer = params.gene.recomboer;
 
     /** Different functions to mutate a Gene's cells */
     _.mutators = {
@@ -214,15 +256,16 @@ const libGene = (() => {
             const indexStart = levelToIndex(level);
             const indexEnd = levelToIndex(level + 1);
 
-            if (indexStart >= gene.cells.length) return // console.log("FULL!")
+            if (indexStart >= gene.cells.width) return // console.log("FULL!")
 
             for (let i = 0; i < indexEnd; i++)
-                for (let j = indexStart; j < indexEnd; j++)
-                    gene.cells[i][j] = mutator(gene.cells[i][j], i, j, gene);
+                for (let j = indexStart; j < indexEnd; j++) {
+                    gene.cells.set(i, j, mutator(gene.cells.get(i, j), i, j, gene));
+                }
 
             for (let i = indexStart; i < indexEnd; i++)
                 for (let j = 0; j < indexEnd; j++)
-                    gene.cells[i][j] = mutator(gene.cells[i][j], i, j, gene);
+                    gene.cells.set(i, j, mutator(gene.cells.get(i, j), i, j, gene));
         },
         flip: currentState =>
             Math.random() <= params.mutationChance
@@ -234,6 +277,7 @@ const libGene = (() => {
     /** Default mutator for genes */
     params.gene.mutator = gene =>
         _.mutators.currentLevel.template(gene, _.mutators.currentLevel.flip);
+    params.meme.mutator = params.gene.mutator;
 
     /** Different functions to draw a Gene's cells */
     _.drawers = {
@@ -252,9 +296,9 @@ const libGene = (() => {
             // Fill the grid up specially with levels in mind
             const x = gene.x + cellSize;
             const y = gene.y + cellSize;
-            for (let i = 0; i < cells.length; i++) {
-                for (let j = 0; j < cells.length; j++) {
-                    ctx.fillStyle = cells[i][j] == 1
+            for (let i = 0; i < cells.height; i++) {
+                for (let j = 0; j < cells.width; j++) {
+                    ctx.fillStyle = cells.get(i, j) == 1
                         ? colors[indexToLevel(max(i, j)) % colors.length]
                         : "white";
                     ctx.fillRect(cellSize * j + x, cellSize * i + y,
@@ -285,7 +329,7 @@ const libGene = (() => {
         constructor(options = null) {
             if (options) {
                 if (options.cells) {
-                    this.cells = deepObjectCopy(options.cells);
+                    this.cells = options.cells.clone();
                 } else if (options.init_function) {
                     this.initializeCells(options.init_function);
                 } else {
@@ -330,7 +374,7 @@ const libGene = (() => {
                 partition[x] = [];
                 let y = 0;
                 for (let l = lStart; l < lEnd; l++) {
-                    partition[x][y] = this.cells[k][l];
+                    partition[x][y] = this.cells.get(k, l);
                     y++;
                 }
                 x++;
@@ -340,17 +384,17 @@ const libGene = (() => {
 
         generateLevels() {
             const indexToLevel = params.gene.partitionTooling.indexToLevel;
-            const levelAmount = indexToLevel(this.cells.length);
+            const levelAmount = indexToLevel(this.cells.height);
             const getLevel = (i, j) => indexToLevel(max(i, j));
             this.levels = []
 
             for (let level = 0; level < levelAmount; level++)
                 this.levels[level] = 1;
 
-            for (let i = 0; i < this.cells.length; i++) {
-                for (let j = 0; j < this.cells.length; j++) {
+            for (let i = 0; i < this.cells.height; i++) {
+                for (let j = 0; j < this.cells.width; j++) {
                     const level = getLevel(i, j);
-                    this.levels[level] = this.cells[i][j] === 1
+                    this.levels[level] = this.cells.get(i, j) === 1
                         ? this.levels[level] : 0;
                 }
             }
@@ -361,10 +405,8 @@ const libGene = (() => {
         }
 
         /** Retrieve the current level of the gene. Accessed like a property */
-        get ["level"]() {
-            let level = -1;
-            while (this.levels[++level] === 1);
-            return level;
+        get level() {
+            let level = -1; while (this.levels[++level] === 1); return level;
         }
 
         mutate(mutator = params.gene.mutator) {
@@ -380,7 +422,27 @@ const libGene = (() => {
         update() { }
 
         toString() {
-            return this.cells.map(row => row.join(" ")).join("\n");
+            // TODO
+            // return this.cells.map(row => row.join(" ")).join("\n");
+            return "TODO"
+        }
+    }
+
+    _.Meme = class Meme extends _.Gene {
+        constructor(options = null) { super(options); }
+
+        clone() { return new Meme({cells: this.cells}); }
+
+        initializeCells(initializer = params.meme.initializer) {
+            return super.initializeCells(initializer);
+        }
+
+        recombine(otherGene, recomboer = params.meme.recomboer) {
+            return super.recombine(otherGene, recomboer);
+        }
+
+        mutate(mutator = params.meme.mutator) {
+            return super.mutator(mutator)
         }
     }
 
@@ -388,7 +450,7 @@ const libGene = (() => {
 })();
 
 // General export to have things easily accessible to all other files.
-const { Gene } = libGene;
+const { Gene, Meme } = libGene;
 
 // Changing the recomboer outside of the library example.
 // params.gene.recomboer = (gene, otherGene) => libGene.recomboers.perCell.template(gene, otherGene, libGene.recomboers.perCell.AND);
