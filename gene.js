@@ -142,13 +142,53 @@ const libGene = (() => {
                                                  i, j));
                 }
             }
-            return new Gene({cells: newCells});
+            const Type = (gene instanceof Meme) ? Meme : Gene;
+            return new Type({cells: newCells});
         },
         XOR: (a, b) => (a + b) % 2,
         OR: (a, b) => ceil((a + b) / 2),
         AND: (a, b) => (a + b) == 2 ? 1 : 0,
         NAND: (a, b) => !_.recomboers.perCell.AND(a, b),
         NOR: (a, b) => !_.recomboers.perCell.OR(a, b),
+    };
+    _.recomboers.perLevel = {
+        template: (gene, otherGene, recomboer) => {
+            const levelA = gene.level;
+            const levelB = otherGene.level;
+            const level = max(levelA, levelB);
+
+            const { levelToIndex } = params.gene.partitionTooling;
+            const newCells = new BitArray2D(gene.cells.width, gene.cells.height);
+
+            let isEmpty = false;
+            let currentLevel = 0;
+            while (!isEmpty && currentLevel < level) {
+                isEmpty = true;
+                const indexStart = levelToIndex(currentLevel);
+                const indexEnd = levelToIndex(currentLevel + 1);
+
+                if (indexStart >= gene.cells.width) break;
+
+                for (let i = 0; i < indexEnd; i++)
+                    for (let j = indexStart; j < indexEnd; j++) {
+                        const newValue = recomboer(gene.cells.get(i, j), otherGene.cells.get(i, j), i, j, gene, otherGene);
+                        newCells.set(i, j, newValue);
+                        isEmpty = !newValue && isEmpty;
+                    }
+
+                for (let i = indexStart; i < indexEnd; i++)
+                    for (let j = 0; j < indexEnd; j++) {
+                        const newValue = recomboer(gene.cells.get(i, j), otherGene.cells.get(i, j), i, j, gene, otherGene);
+                        newCells.set(i, j, newValue);
+                        isEmpty = !newValue && isEmpty;
+                    }
+
+                currentLevel++;
+            }
+
+            const Type = (gene instanceof Meme) ? Meme : Gene;
+            return new Type({cells: newCells});
+        },
     };
     _.recomboers.chooseOnePartition = (gene, otherGene) => {
         let newCells = gene.cells.clone();
@@ -166,7 +206,8 @@ const libGene = (() => {
             newCells = replacePartition(newCells, newPartition1, x, y);
             newCells = replacePartition(newCells, newPartition2, y, x);
         }
-        return new Gene({cells: newCells});
+        const Type = (gene instanceof Meme) ? Meme : Gene;
+        return new Type({cells: newCells});
     };
     _.recomboers.chooseFromPartitionLibrary = (gene, otherGene) => {
         let newCells = gene.cells.clone();
@@ -193,11 +234,12 @@ const libGene = (() => {
             newCells = replacePartition(newCells, chooseRandom(library), x, y);
             newCells = replacePartition(newCells, chooseRandom(library), y, x);
         }
-        return new Gene({cells: newCells});
+        const Type = (gene instanceof Meme) ? Meme : Gene;
+        return new Type({cells: newCells});
     }
     /** Default Recomboer to combine two genes */
     // params.gene.recomboer = _.recomboers.chooseFromPartitionLibrary;
-    params.gene.recomboer = (gene, otherGene) => _.recomboers.perCell.template(gene, otherGene, _.recomboers.perCell.NOR);
+    params.gene.recomboer = (gene, otherGene) => _.recomboers.perCell.template(gene, otherGene, _.recomboers.perCell.OR);
     params.meme.recomboer = params.gene.recomboer;
 
     /** Different functions to mutate a Gene's cells */
@@ -392,7 +434,7 @@ const libGene = (() => {
         clone() { return new Meme({cells: this.cells}); }
 
         initializeCells(initializer = params.meme.initializer) {
-            return super.initializer(this, initializer);
+            return super.initializeCells(initializer);
         }
 
         recombine(otherGene, recomboer = params.meme.recomboer) {
