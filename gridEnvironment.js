@@ -106,9 +106,6 @@ class Village {
     spiralTasks() {
         task.reward = 1;
         task.threshold = params.environments.rainforest.threshold[0];
-
-
-
     }
 
     doTasks(organism) {
