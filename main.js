@@ -2,8 +2,8 @@ const assetManager = new AssetManager();
 let gameEngines = [];
 
 const restart = gameEngine => {
-    // gridExample(gameEngine, params.gridSize[0], params.gridSize[1]);
-    geneExample(gameEngine);
+    gridExample(gameEngine, params.gridSize[0], params.gridSize[1]);
+    // geneExample(gameEngine);
 }
 
 const gridExample = (gameEngine, rows = 5, columns = 5) => {
