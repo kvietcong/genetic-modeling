@@ -134,19 +134,12 @@ class Organism {
     // social learning - recombining one learn gene
     socLearning() {
         let index = getRandomInteger(0, 4);
-        let option;
 
-        if (params.SLradios[0].checked) option = 0;          // this is for random of all the below options
-        else if (params.SLradios[1].checked) option = 1;     // random villager
-        else if (params.SLradios[2].checked) option = 2;     // parent
-        else if (params.SLradios[3].checked) option = 3;     // elder
-        else if (params.SLradios[4].checked) option = 4;     // wise
-
-        if (option === 0) {
+        if (params.SLoption === 0) {
             // Random 1-4
-            option = getRandomInteger(1, 4);
+            params.SLoption = getRandomInteger(1, 4);
         }
-        if (option === 1) {
+        if (params.SLoption === 1) {
             // 1) Random villager as teacher
             // Recombinging learn gene at index with learn gene at index of a random villager (teacher)
 
@@ -154,7 +147,7 @@ class Organism {
             if (randomOrganism != undefined) {
                 this.learnList[index].recombine(randomOrganism.learnList[index]);
             }
-        } else if (option === 2 && this.parent1 != undefined) {
+        } else if (params.SLoption === 2 && this.parent1 != undefined) {
             // 2) Parent
             if (this.parent1 === this.parent2) { // comes from asexual repr
                 this.learnList[index].recombine(this.parent1.learnList[index]);
@@ -167,19 +160,21 @@ class Organism {
                 }
             }
         }
-        else if (option === 3 && this.days < ELDER_THRESH) {
+        else if (params.SLoption === 3 && this.days < ELDER_THRESH) {
             // 3) Elder (age is  over 50 ticks)
             let elder = this.village.getElderOrganism();
             if (elder != undefined) {
                 this.learnList[index].recombine(elder.learnList[index]);
             }
-        } else if (option === 4) {
+        } else if (params.SLoption === 4) {
             // 4) Smart people
             let smart = this.village.getSmartOrganism();
             if (smart != undefined) {
                 this.learnList[index].recombine(smart.learnList[index]);
             }
         }
+
+        console.log(params.SLoption);
     }
 
     /**

@@ -287,7 +287,6 @@ const getParams = () => {
     params.sexualReproThreshold = document.getElementById("sexualRepChance").value;
 
     // learning related
-    params.SLradios = document.getElementsByName("socialType");  // this will return an array of the radio buttons
     params.SLcheck = document.getElementById("noSocial").checked;
     params.socialChance = document.getElementById("socialPercent").value;
     params.socialDays = document.getElementById("socialDays").value;
@@ -295,6 +294,14 @@ const getParams = () => {
     params.indChance = document.getElementById("indPercent").value;
     params.indDays = document.getElementById("indDays").value;
 
+    // Social Learning Option 
+    params.SLradios = document.getElementsByName("socialType"); // this will return an array of the radio buttons
+
+    if (params.SLradios[0].checked) params.SLoption = 0;      // this is for random of all the below options
+    else if (params.SLradios[1].checked) params.SLoption = 1; // random villager
+    else if (params.SLradios[2].checked) params.SLoption = 2; // parent
+    else if (params.SLradios[3].checked) params.SLoption = 3; // elder
+    else if (params.SLradios[4].checked) params.SLoption = 4; // wise
 
     // GENE related
 
@@ -337,6 +344,8 @@ const getParams = () => {
     } else if (document.getElementsByName("worldType")[3].checked) {
         params.worldType = 'random';
     }
+
+    
 
 }
 

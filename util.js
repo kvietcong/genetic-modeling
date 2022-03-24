@@ -8,6 +8,7 @@ const params = {
     SLradios: 0,
     sexualReproThreshold: 0,
     SLcheck: false,
+    SLoption: 0,
     socialChance: 0,
     socialDays: 0,
     ILcheck: false,
