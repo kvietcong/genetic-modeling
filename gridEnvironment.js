@@ -137,12 +137,27 @@ class Village {
 
     removeOrganism(organism) { organism.removeFromWorld = true; }
 
-    get fitOrganisms() { return this.organisms.filter(organism => organism.energy > REPRODUCTION_THRESH); }
-    get elderOrganisms() { return this.organisms.filter(organism => organism.days > ELDER_THRESH); }
-    get smartOrganisms() { return this.organisms.filter(organism => organism.learnCapability > LEARN_THRESH); }
+    get fitOrganisms() { 
+        return this.organisms.filter(organism => organism.energy > REPRODUCTION_THRESH);
+    }
+
+    get elderOrganisms() { 
+        if (!this.caches.elderOrganisms) {
+            this.caches.elderOrganisms = this.organisms.filter(organism => organism.days > ELDER_THRESH); 
+        }
+        return this.caches.elderOrganisms;
+    }
+
+    get smartOrganisms() { 
+        if (!this.caches.smartOrganisms) {
+            this.caches.smartOrganisms = this.organisms.filter(organism => organism.learnCapability > LEARN_THRESH); 
+        }
+        return this.caches.smartOrganisms;
+    }
 
     // Organisms should only interact with those in their "village"
     step(world) {
+        this.caches = {};
 
         if (this.organisms.length < this.populationCap) {
             this.organisms.forEach(organism => organism.step(this, this.grid));

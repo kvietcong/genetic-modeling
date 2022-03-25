@@ -173,8 +173,6 @@ class Organism {
                 this.learnList[index].recombine(smart.learnList[index]);
             }
         }
-
-        console.log(params.SLoption);
     }
 
     /**
