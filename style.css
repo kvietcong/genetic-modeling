@@ -51,6 +51,19 @@
     margin: 10px;
 }
 
+#histogramConfig {
+    font-family: Arial;
+    padding: 6px;
+    border-radius: 10px;
+    border: 2px solid blue;
+    margin: auto;
+    color: blue;
+    background-color: lightskyblue;
+    display: inline-block;
+    text-align: left;
+    margin: 10px;
+}
+
 select {
     font-size:30px;
 }
@@ -68,12 +81,12 @@ div div input {
 p {
     margin: 4px;
     font-size:30px;
-} 
+}
 
 h1 {
     color: red;
 }
 
-input[type='radio'] { 
-    transform: scale(2.5); 
+input[type='radio'] {
+    transform: scale(2.5);
 }

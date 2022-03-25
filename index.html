@@ -7,6 +7,8 @@
 
     <link rel="stylesheet" type="text/css" href="./style.css"></link>
 
+    <script type="text/javascript" src="./jszip.min.js"></script>
+
     <script type="text/javascript" src="./assetmanager.js"></script>
     <script type="text/javascript" src="./timer.js"></script>
     <script type="text/javascript" src="./gameengine.js"></script>
@@ -176,7 +178,9 @@
 
         <!-- <input type="radio" name = "worldType"checked>
         <label for = "random"> Random World Configuration </label>  <br> -->
+    </div>
 
+    <div id="histogramConfig">
         <label for="histogramType">Histogram Type:</label>
         <select name="histogramType" id="histogramType">
             <optgroup>
@@ -194,6 +198,13 @@
 
         <label for="histogramDrawLast">Plot Last N Ticks:</label>
         <input type="number" name="histogramDrawLast" min="0" id="histogramDrawLast">
+
+
+        <div>
+            <h3 style="margin: 5px;">Download CSV</h3>
+            <button id="histogramDownloadCurrent">Current Type</button>
+            <button id="histogramDownloadAll">All Types</button>
+        </div>
     </div>
 </body>
 </html>

@@ -18,6 +18,7 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
 
     class HistogramManager {
         types = ["learn", "gene"];
+
         constructor(histograms, type = "learn") {
             this.histograms = histograms;
             this.histogramType = type;
@@ -39,6 +40,14 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
             if (this.histogramDrawLastElement)
                 this.histogramDrawLastElement.addEventListener("change",
                     event => this.drawLast = Number(event.target.value));
+
+            this.histogramDownloadCurrentElement = document.getElementById("histogramDownloadCurrent");
+            if (this.histogramDownloadCurrentElement)
+                this.histogramDownloadCurrentElement.addEventListener("click", _ => this.downloadCSVForCurrentType());
+
+            this.histogramDownloadAllElement = document.getElementById("histogramDownloadAll");
+            if (this.histogramDownloadAllElement)
+                this.histogramDownloadAllElement.addEventListener("click", _ => this.downloadCSVForAllTypes());
 
             this.drawLast = histograms[0][0][type].drawLast;
             this.collectionRate = histograms[0][0][type].unitTimePerUpdate;
@@ -89,6 +98,54 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
 
             if (this.histogramSelectorElement)
                 this.histogramSelectorElement.value = this.histogramType;
+        }
+
+        toCSVTextArray(type) {
+            type = type ?? this.histogramType;
+            const csvTextArray = [];
+            for (const [i, row] of this.histograms.entries()) {
+                csvTextArray[i] = [];
+                for (const [j, histogramInfo] of row.entries()) {
+                    csvTextArray[i][j] = histogramInfo[type].toCSVText();
+                }
+            }
+            return csvTextArray;
+        }
+
+        downloadZip(zip) {
+            zip.generateAsync({ type: "blob" }).then(content => {
+                const currentDate = new Date();
+                const dateString = `${currentDate.getFullYear()}-${currentDate.getMonth()}-${currentDate.getDate()}-${currentDate.getHours()}-${currentDate.getMinutes()}-${currentDate.getSeconds()}`;
+                const allCSVData = new Blob([content]);
+                const url = URL.createObjectURL(allCSVData);
+                const link = document.createElement("a");
+                link.href = url;
+                link.target = "_blank";
+                link.download = `${dateString}.zip`;
+                link.click();
+            });
+        }
+
+        downloadCSVForCurrentType(type) {
+            const zip = new JSZip();
+            for (const [i, row] of this.toCSVTextArray(type).entries()) {
+                for (const [j, csvData] of row.entries()) {
+                    zip.file(`${i}.${j}.csv`, csvData);
+                }
+            }
+            this.downloadZip(zip);
+        }
+
+        downloadCSVForAllTypes() {
+            const zip = new JSZip();
+            for (const type of this.types) {
+                for (const [i, row] of this.toCSVTextArray(type).entries()) {
+                    for (const [j, csvData] of row.entries()) {
+                        zip.folder(type).file(`${i}.${j}.csv`, csvData);
+                    }
+                }
+            }
+            this.downloadZip(zip);
         }
     }
 
@@ -294,7 +351,7 @@ const getParams = () => {
     params.indChance = document.getElementById("indPercent").value;
     params.indDays = document.getElementById("indDays").value;
 
-    // Social Learning Option 
+    // Social Learning Option
     params.SLradios = document.getElementsByName("socialType"); // this will return an array of the radio buttons
 
     if (params.SLradios[0].checked) params.SLoption = 0;      // this is for random of all the below options
@@ -345,7 +402,7 @@ const getParams = () => {
         params.worldType = 'random';
     }
 
-    
+
 
 }
 
