@@ -52,7 +52,7 @@ class Organism {
 
         this.learnList = [];
         for (let i = 0; i < ARR_LEN; i++) {
-            let meme = new Gene();
+            let meme = new Meme();
             this.learnList.push(meme);
         }
 

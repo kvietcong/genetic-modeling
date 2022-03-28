@@ -442,7 +442,7 @@ const libGene = (() => {
         }
 
         mutate(mutator = params.meme.mutator) {
-            return super.mutator(mutator)
+            return super.mutate(mutator)
         }
     }
 
