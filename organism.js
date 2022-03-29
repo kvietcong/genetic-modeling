@@ -50,6 +50,13 @@ class Organism {
             }
         }
 
+        // The learning genes: index 0 = individual and index 1 = social
+        this.learnGeneList = [];
+        for(let i = 0; i < 2; i++) {
+            let learnGene = new Gene();
+            this.learnGeneList.push(learnGene);
+        }
+
         this.learnList = [];
         for (let i = 0; i < ARR_LEN; i++) {
             let meme = new Meme();
@@ -175,15 +182,26 @@ class Organism {
         }
     }
 
+    // Evolve the gene for learning
+    learnGeneEvolve () {
+        for(let i = 0; i < 2; i++) {
+            this.learnGeneList[i].mutate();
+        }
+    }
+
     /**
      * step function will advance the organism by a day every tick
      */
     step(tile, grid) {
 
-
         // Figure out how to use this.time instead of the count or if it is necessary.
         this.days++;
-        // this.time = this.village.grid.getTick;
+
+        // Learning genetic evolution every 10 ticks.
+        if (this.days % 10 === 0) {
+            this.learnGeneEvolve();
+        }
+        
 
         // 1% chance of dying
         if (this.alive && random() < 0.01) {
@@ -192,7 +210,6 @@ class Organism {
         }
 
         let sexualReproChance = random();   // random value between 0 and 1
-
 
         // soft age cap using the "percentage" above
         if (this.alive) { // this would be 20 (7300) - 60 "years" (365 days * 60 years)
@@ -222,25 +239,37 @@ class Organism {
             // requires at least 2 organisms in the village
             if (!params.SLcheck) {
 
-                if (params.socialChance != 0 && random() < params.socialChance && this.village.organisms.length > 1) {
+                for(let i = 0; i < this.learnGeneList[1].level; i++) {
+                // for(let i = 0; i < 1; i++) {
                     this.socLearning();
                 }
 
-                if (params.socialDays != 0 && this.days % params.socialDays === 0) {
-                    this.socLearning();
-                }
+                // Previous Method
+                // if (params.socialChance != 0 && random() < params.socialChance && this.village.organisms.length > 1) {
+                //     this.socLearning();
+                // }
+
+                // if (params.socialDays != 0 && this.days % params.socialDays === 0) {
+                //     this.socLearning();
+                // }
             }
 
             // individual learning
             if (!params.ILcheck) {
 
-                if (params.indChance != 0 && random() < params.indChance && this.village.organisms.length > 1) {
+                for(let i = 0; i < this.learnGeneList[0].level; i++) {
+                // for(let i = 0; i < 1; i++) {
                     this.indLearning();
                 }
 
-                if (params.indDays != 0 && this.days % params.indDays === 0) {
-                    this.indLearning();
-                }
+                // Previous Method
+                // if (params.indChance != 0 && random() < params.indChance && this.village.organisms.length > 1) {
+                //     this.indLearning();
+                // }
+
+                // if (params.indDays != 0 && this.days % params.indDays === 0) {
+                //     this.indLearning();
+                // }
             }
         }
     };
