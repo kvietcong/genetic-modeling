@@ -27,6 +27,7 @@ class Organism {
         this.parent1 = parent1;           // the parent1 of the Organism
         this.parent2 = parent2;
         this.geneList = [];
+        this.learnGeneList = [];  // The learning genes: index 0 = individual and index 1 = social
 
         // Instance variables
         // Creation of the genes associated with the current organism
@@ -37,24 +38,35 @@ class Organism {
                 newGene.mutate();
                 this.geneList.push(newGene);
             }
+
+            for (let i = 0; i < 2; i++) {
+                const newLearnGene = this.parent1.learnGeneList[i].recombine(this.parent2.learnGeneList[i]);
+                newLearnGene.mutate();
+                this.learnGeneList.push(newLearnGene);
+            }
         }
         else if (this.parent1) { // if there's a parent1 organism
             for (let i = 0; i < ARR_LEN; i++) {
                 const newGene = this.parent1.geneList[i].recombine(this.parent1.geneList[i]);
                 newGene.mutate();
                 this.geneList.push(newGene);
-            }                                                     // geneome to the recomboer.
+            }
+            for (let i = 0; i < 2; i++) {
+                const newLearnGene = this.parent1.learnGeneList[i].recombine(this.parent1.learnGeneList[i]);
+                newLearnGene.mutate();
+                this.learnGeneList.push(newLearnGene);
+            }
         } else { // if this is the first set of organisms created
+            // Create the gene list
             for (let i = 0; i < ARR_LEN; i++) {
                 this.geneList.push(new Gene());
             }
-        }
 
-        // The learning genes: index 0 = individual and index 1 = social
-        this.learnGeneList = [];
-        for(let i = 0; i < 2; i++) {
-            let learnGene = new Gene();
-            this.learnGeneList.push(learnGene);
+            // create the learn gene list
+            for(let i = 0; i < 2; i++) {
+                let learnGene = new Gene();
+                this.learnGeneList.push(learnGene);
+            }
         }
 
         this.learnList = [];
@@ -139,22 +151,21 @@ class Organism {
     };
 
     // social learning - recombining one learn gene
-    socLearning() {
-        let index = getRandomInteger(0, 4);
+    socLearning(index, SLoption) {
 
-        if (params.SLoption === 0) {
+        if (SLoption === 0) {
             // Random 1-4
-            params.SLoption = getRandomInteger(1, 4);
+            SLoption = getRandomInteger(1, 4);
         }
-        if (params.SLoption === 1) {
+        if (this.parent1 === undefined || SLoption === 1) { // If there are no parents a random villager will be selected
             // 1) Random villager as teacher
-            // Recombinging learn gene at index with learn gene at index of a random villager (teacher)
+            // Recombining learn gene at index with learn gene at index of a random villager (teacher)
 
             let randomOrganism = this.village.getRandomOrganism();
             if (randomOrganism != undefined) {
                 this.learnList[index].recombine(randomOrganism.learnList[index]);
             }
-        } else if (params.SLoption === 2 && this.parent1 != undefined) {
+        } else if (SLoption === 2 && this.parent1 != undefined) {
             // 2) Parent
             if (this.parent1 === this.parent2) { // comes from asexual repr
                 this.learnList[index].recombine(this.parent1.learnList[index]);
@@ -167,25 +178,22 @@ class Organism {
                 }
             }
         }
-        else if (params.SLoption === 3 && this.days < ELDER_THRESH) {
+        else if (SLoption === 3 && this.days < ELDER_THRESH) {
             // 3) Elder (age is  over 50 ticks)
             let elder = this.village.getElderOrganism();
             if (elder != undefined) {
-                this.learnList[index].recombine(elder.learnList[index]);
+                this.learnList[index].recombine(elder.learnList[index]).mutate();
+            } else {
+                this.socLearning(index, 1); // if there are no wise select random villager
             }
-        } else if (params.SLoption === 4) {
+        } else if (SLoption === 4) {
             // 4) Smart people
             let smart = this.village.getSmartOrganism();
             if (smart != undefined) {
-                this.learnList[index].recombine(smart.learnList[index]);
+                this.learnList[index].recombine(smart.learnList[index]).mutate();
+            } else {
+                this.socLearning(index, 1); // if there are no wise select random villager
             }
-        }
-    }
-
-    // Evolve the gene for learning
-    learnGeneEvolve () {
-        for(let i = 0; i < 2; i++) {
-            this.learnGeneList[i].mutate();
         }
     }
 
@@ -196,12 +204,6 @@ class Organism {
 
         // Figure out how to use this.time instead of the count or if it is necessary.
         this.days++;
-
-        // Learning genetic evolution every 10 ticks.
-        if (this.days % 10 === 0) {
-            this.learnGeneEvolve();
-        }
-        
 
         // 1% chance of dying
         if (this.alive && random() < 0.01) {
@@ -238,10 +240,10 @@ class Organism {
             // social learning
             // requires at least 2 organisms in the village
             if (!params.SLcheck) {
-
                 for(let i = 0; i < this.learnGeneList[1].level; i++) {
                 // for(let i = 0; i < 1; i++) {
-                    this.socLearning();
+                    let index = getRandomInteger(0, 4);
+                    this.socLearning(index, params.SLoption);
                 }
 
                 // Previous Method
