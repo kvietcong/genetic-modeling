@@ -1,3 +1,4 @@
+// const socket = typeof io !== "undefined" ? io.connect("http://76.28.146.35:8888") : null;
 const assetManager = new AssetManager();
 let gameEngines = [];
 
@@ -113,7 +114,23 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
         }
 
         downloadZip(zip) {
-            zip.generateAsync({ type: "blob" }).then(content => {
+            console.log("Beginning to Zip");
+            let lastProgress = -1;
+            zip.generateAsync(
+                {
+                    type: "blob",
+                    compression: "DEFLATE",
+                    compressionOptions: {
+                        level: 9,
+                    },
+                },
+                metadata => {
+                    let newProgress = floor(metadata.percent.toFixed(0) / 5) * 5;
+                    if (lastProgress === newProgress) return;
+                    lastProgress = newProgress;
+                    console.log(`Zipping Progress: ${metadata.percent.toFixed(0)}%`)
+                },
+            ).then(content => {
                 const currentDate = new Date();
                 const dateString = `${currentDate.getFullYear()}-${currentDate.getMonth()}-${currentDate.getDate()}-${currentDate.getHours()}-${currentDate.getMinutes()}-${currentDate.getSeconds()}`;
                 const allCSVData = new Blob([content]);
