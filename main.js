@@ -17,7 +17,7 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
     const height = params.canvas.height / rows;
 
     class HistogramManager {
-        types = ["learn", "gene"];
+        types = ["learn", "gene", "individual", "social"];
 
         constructor(histograms, type = "learn") {
             this.histograms = histograms;
@@ -186,25 +186,69 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
                 `Village ${i}, ${j}`, // Title
 
                 // Updating variables
-                village, 1
+                village, 2
+            );
+
+            const individualHistogram = createOrganismHistogram(
+                // Average gene-based learn Level Histogram
+                [0, 1, 2, 3, 4, 5],
+                organism => organism.learnGeneList[0].level,
+
+                // Where To Draw
+                j * width, i * height,
+                width, height,
+
+                `Village ${i}, ${j}`, // Title
+
+                // Updating variables
+                village, 2
+            );
+
+            const socialHistogram = createOrganismHistogram(
+                // Average gene-based learn Level Histogram
+                [0, 1, 2, 3, 4, 5],
+                organism => organism.learnGeneList[1].level,
+
+                // Where To Draw
+                j * width, i * height,
+                width, height,
+
+                `Village ${i}, ${j}`, // Title
+
+                // Updating variables
+                village, 2
             );
 
             if (!village.spiral) {
-                learnHistogram.backgroundColor = { color: params.environments[village.environment].color, opacity: 0.75 };
-                geneHistogram.backgroundColor = { color: params.environments[village.environment].color, opacity: 0.75 };
+                const spiralColor = { color: params.environments[village.environment].color, opacity: 0.75 };
+                learnHistogram.backgroundColor = spiralColor;
+                geneHistogram.backgroundColor = spiralColor;
+                individualHistogram.backgroundColor = spiralColor;
+                socialHistogram.backgroundColor = spiralColor;
             } else {
-                learnHistogram.backgroundColor = { color: params.spiralEnvironments[village.environment].color, opacity: 0.75 };
-                geneHistogram.backgroundColor = { color: params.spiralEnvironments[village.environment].color, opacity: 0.75 };
+                const color = { color: params.spiralEnvironments[village.environment].color, opacity: 0.75 };
+                learnHistogram.backgroundColor = color;
+                geneHistogram.backgroundColor = color;
+                individualHistogram.backgroundColor = color;
+                socialHistogram.backgroundColor = color;
             }
 
             learnHistogram.isDrawing = false;
             geneHistogram.isDrawing = false;
 
-            histograms[i][j] = { learn: learnHistogram, gene: geneHistogram };
-            gameEngine.addEntity(learnHistogram); // For Draw Calls
-            gameEngine.addEntity(geneHistogram); // For Draw Calls
-            world.syncedEntities.push(learnHistogram); // For synced stepping
-            world.syncedEntities.push(geneHistogram); // For synced stepping
+            histograms[i][j] = { learn: learnHistogram, gene: geneHistogram, individual: individualHistogram, social: socialHistogram };
+
+            // For Draw Calls
+            gameEngine.addEntity(learnHistogram);
+            gameEngine.addEntity(geneHistogram);
+            gameEngine.addEntity(individualHistogram);
+            gameEngine.addEntity(socialHistogram);
+
+            // For synced stepping
+            world.syncedEntities.push(learnHistogram);
+            world.syncedEntities.push(geneHistogram);
+            world.syncedEntities.push(individualHistogram);
+            world.syncedEntities.push(socialHistogram);
         }
     }
     const histogramManager = new HistogramManager(histograms, "gene");
