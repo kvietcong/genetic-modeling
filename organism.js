@@ -92,6 +92,7 @@ class Organism {
         this.days = 0;                  // the age of the organism in days.
     };
 
+    // Function to calculate the reproduction threshold of the agent.
     get reproductionThresh() {
         let penalty = 0;
 
