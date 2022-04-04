@@ -355,6 +355,12 @@ class BitArray2D {
         return accumulated;
     }
 
+    reduceBits(callback, initialValue) {
+        let accumulated = initialValue;
+        this.forEachBit((bit, i, j) => accumulated = callback(accumulated, bit, i, j));
+        return accumulated;
+    }
+
     toString() {
         return this.reduce((string, row) =>
             string + row.reduce((acc, bit) => acc + " " + bit,"") + "\n", "");
