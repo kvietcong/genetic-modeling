@@ -8,12 +8,13 @@
 
 // Constants associated with every Organism
 const ARR_LEN = 5;              // the number of tasks/genes/learning that the Organism has to do
-const REPRODUCTION_BASE = 50;
+const REPRODUCTION_BASE = 1;    // this number sets the value that learning will happen
 const ELDER_THRESH = 50;        // Organism is considered Elder after 50 days old
-const LEARN_THRESH = 15;
+const LEARN_THRESH = 12;        // We reduced the learn threshold from 15 to 12.
 const GENE_WEIGHT = 1;
 const IND_WEIGHT = 1;
 const SOC_WEIGHT = 1;
+const LEARN_TICKET_MULTIPLIER = 5;  // Increase this value to increase the number of times an agent learns per tick
 
 /**
  * Organism class:
@@ -133,6 +134,7 @@ class Organism {
      * @returns the capability of the organism to complete a task
      */
     getTaskCapabilities() {
+
         for (let i = 0; i < ARR_LEN; i++) {
             this.taskCapabilities.push(this.learnList[i].level + this.geneList[i].level);
         }
@@ -279,7 +281,8 @@ class Organism {
             // social learning
             // requires at least 2 organisms in the village
             if (!params.SLcheck) {
-                for(let i = 0; i < this.learnGeneList[1].level; i++) {
+                let tickets = this.learnGeneList[1].level * LEARN_TICKET_MULTIPLIER;
+                for(let i = 0; i < tickets; i++) {
                 // for(let i = 0; i < 1; i++) {
                     let index = getRandomInteger(0, 4);
                     this.socLearning(index, params.SLoption);
@@ -298,7 +301,8 @@ class Organism {
             // individual learning
             if (!params.ILcheck) {
 
-                for(let i = 0; i < this.learnGeneList[0].level; i++) {
+                let tickets = this.learnGeneList[0].level * LEARN_TICKET_MULTIPLIER;
+                for(let i = 0; i < tickets; i++) {
                 // for(let i = 0; i < 1; i++) {
                     this.indLearning();
                 }
