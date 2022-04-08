@@ -103,7 +103,7 @@ class Organism {
                 penalty += this.parent2.geneList[i].cellCount * GENE_WEIGHT;
                 // penalty += Math.floor((this.parent1.geneList[i].cellCount + this.parent2.geneList[i].cellCount) / 2) * GENE_WEIGHT;
             }
-    
+
             penalty += this.parent1.learnGeneList[0].cellCount * IND_WEIGHT;
             penalty += this.parent2.learnGeneList[0].cellCount * IND_WEIGHT;
             // penalty += Math.floor((this.parent1.learnGeneList[0].cellCount + this.parent2.learnGeneList[0].cellCount) / 2) * IND_WEIGHT;
@@ -111,19 +111,19 @@ class Organism {
             penalty += this.parent1.learnGeneList[1].cellCount * SOC_WEIGHT;
             penalty += this.parent2.learnGeneList[1].cellCount * SOC_WEIGHT;
             // penalty += Math.floor((this.parent1.learnGeneList[1].cellCount + this.parent2.learnGeneList[1].cellCount) / 2) * SOC_WEIGHT;
-        } else if (this.parent1) { 
+        } else if (this.parent1) {
             for (let i = 0; i < ARR_LEN; i++) {
                 penalty += this.parent1.geneList[i].cellCount * GENE_WEIGHT;
             }
-    
+
             penalty += this.parent1.learnGeneList[0].cellCount * IND_WEIGHT;
 
             penalty += this.parent1.learnGeneList[1].cellCount * SOC_WEIGHT;
 
             penalty *= 2;
-        } 
+        }
 
-        // if no parents (i.e. first geneneration of organisms), penalty is 0
+        // if no parents (i.e. first generation of organisms), penalty is 0
 
         return REPRODUCTION_BASE + penalty;
     }
