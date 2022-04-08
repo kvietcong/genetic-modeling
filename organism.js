@@ -8,9 +8,12 @@
 
 // Constants associated with every Organism
 const ARR_LEN = 5;              // the number of tasks/genes/learning that the Organism has to do
-const REPRODUCTION_THRESH = 50; // assume this will be the same for every Organism
+const REPRODUCTION_BASE = 50;
 const ELDER_THRESH = 50;        // Organism is considered Elder after 50 days old
 const LEARN_THRESH = 15;
+const GENE_WEIGHT = 1;
+const IND_WEIGHT = 1;
+const SOC_WEIGHT = 1;
 
 /**
  * Organism class:
@@ -28,6 +31,7 @@ class Organism {
         this.parent2 = parent2;
         this.geneList = [];
         this.learnGeneList = [];  // The learning genes: index 0 = individual and index 1 = social
+        this.reproduction_thresh = this.reproductionThresh;
 
         // Instance variables
         // Creation of the genes associated with the current organism
@@ -86,8 +90,43 @@ class Organism {
 
         this.alive = true;              // sets the organism to be alive
         this.days = 0;                  // the age of the organism in days.
-
     };
+
+    // Function to calculate the reproduction threshold of the agent.
+    get reproductionThresh() {
+        let penalty = 0;
+
+        // possibly add averaging between the parents
+        if (this.parent1 && this.parent2) {
+            for (let i = 0; i < ARR_LEN; i++) {
+                penalty += this.parent1.geneList[i].cellCount * GENE_WEIGHT;
+                penalty += this.parent2.geneList[i].cellCount * GENE_WEIGHT;
+                // penalty += Math.floor((this.parent1.geneList[i].cellCount + this.parent2.geneList[i].cellCount) / 2) * GENE_WEIGHT;
+            }
+    
+            penalty += this.parent1.learnGeneList[0].cellCount * IND_WEIGHT;
+            penalty += this.parent2.learnGeneList[0].cellCount * IND_WEIGHT;
+            // penalty += Math.floor((this.parent1.learnGeneList[0].cellCount + this.parent2.learnGeneList[0].cellCount) / 2) * IND_WEIGHT;
+
+            penalty += this.parent1.learnGeneList[1].cellCount * SOC_WEIGHT;
+            penalty += this.parent2.learnGeneList[1].cellCount * SOC_WEIGHT;
+            // penalty += Math.floor((this.parent1.learnGeneList[1].cellCount + this.parent2.learnGeneList[1].cellCount) / 2) * SOC_WEIGHT;
+        } else if (this.parent1) { 
+            for (let i = 0; i < ARR_LEN; i++) {
+                penalty += this.parent1.geneList[i].cellCount * GENE_WEIGHT;
+            }
+    
+            penalty += this.parent1.learnGeneList[0].cellCount * IND_WEIGHT;
+
+            penalty += this.parent1.learnGeneList[1].cellCount * SOC_WEIGHT;
+
+            penalty *= 2;
+        } 
+
+        // if no parents (i.e. first geneneration of organisms), penalty is 0
+
+        return REPRODUCTION_BASE + penalty;
+    }
 
     /**
      * getTaskCapability function
@@ -119,9 +158,9 @@ class Organism {
 
         let migrationChance = random(); // random value between 0 and 1
 
-        if(this.energy >= REPRODUCTION_THRESH && otherOrganism.energy >= REPRODUCTION_THRESH) {
-            this.energy -= REPRODUCTION_THRESH / 2; // this.parent1 25
-            otherOrganism.energy -= REPRODUCTION_THRESH / 2; // this.parent1 25
+        if(this.energy >= this.reproduction_thresh && otherOrganism.energy >= otherOrganism.reproduction_thresh) {
+            this.energy -= this.reproduction_thresh / 2; // this.parent1 25
+            otherOrganism.energy -= otherOrganism.reproduction_thresh / 2; // this.parent1 25
 
             if (migrationChance >= params.migrationThreshold ) { // no migration OR migration but the chance is
                     this.village.addOrganism(new Organism(this.village, this, otherOrganism));

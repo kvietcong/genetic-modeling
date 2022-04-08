@@ -138,7 +138,7 @@ class Village {
     removeOrganism(organism) { organism.removeFromWorld = true; }
 
     get fitOrganisms() { 
-        return this.organisms.filter(organism => organism.energy > REPRODUCTION_THRESH);
+        return this.organisms.filter(organism => organism.energy > organism.reproduction_thresh);
     }
 
     get elderOrganisms() { 
