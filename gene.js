@@ -253,15 +253,34 @@ const libGene = (() => {
         template: (gene, mutator) => {
             const level = gene.level;
             const levelToIndex = params.gene.partitionTooling.levelToIndex;
-            const indexStart = levelToIndex(level);
+            const currentLevelIndexStart = levelToIndex(level);
             const indexEnd = levelToIndex(level + 1);
 
-            if (indexStart >= gene.cells.width) return // console.log("FULL!")
+            if (currentLevelIndexStart >= gene.cells.width) return;
+
+            let isEmpty = true;
+
+            for (let i = 0; i < indexEnd; i++) {
+                if (!isEmpty) break;
+                for (let j = currentLevelIndexStart; j < indexEnd; j++) {
+                    isEmpty = !gene.cells.get(i, j);
+                    if (!isEmpty) break;
+                }
+            }
+
+            for (let i = currentLevelIndexStart; i < indexEnd; i++) {
+                if (!isEmpty) break;
+                for (let j = 0; j < indexEnd; j++) {
+                    isEmpty = !gene.cells.get(i, j);
+                    if (!isEmpty) break;
+                }
+            }
+
+            const indexStart = isEmpty ? levelToIndex(max(level - 1, 0)) : currentLevelIndexStart;
 
             for (let i = 0; i < indexEnd; i++)
-                for (let j = indexStart; j < indexEnd; j++) {
+                for (let j = indexStart; j < indexEnd; j++)
                     gene.cells.set(i, j, mutator(gene.cells.get(i, j), i, j, gene));
-                }
 
             for (let i = indexStart; i < indexEnd; i++)
                 for (let j = 0; j < indexEnd; j++)
