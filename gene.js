@@ -242,6 +242,62 @@ const libGene = (() => {
     params.gene.recomboer = (gene, otherGene) => _.recomboers.perCell.template(gene, otherGene, _.recomboers.perCell.OR);
     params.meme.recomboer = params.gene.recomboer;
 
+    const checkIfLevelIsEmpty = (gene, level) => {
+        if (level === 0) return false;
+
+        const levelToIndex = params.gene.partitionTooling.levelToIndex;
+        const indexStart = levelToIndex(level - 1);
+        const indexEnd = levelToIndex(level);
+
+        let isEmpty = true;
+
+        if (indexStart >= gene.cells.width) return isEmpty;
+
+        for (let i = 0; i < indexEnd; i++) {
+            for (let j = indexStart; j < indexEnd; j++) {
+                isEmpty = !gene.cells.get(i, j);
+                if (!isEmpty) return false;
+            }
+        }
+
+        for (let i = indexStart; i < indexEnd; i++) {
+            for (let j = 0; j < indexEnd; j++) {
+                isEmpty = !gene.cells.get(i, j);
+                if (!isEmpty) return false;
+            }
+        }
+
+        return true;
+    };
+
+    const checkIfLevelIsFilled = (gene, level) => {
+        if (level === 0) return true;
+
+        const levelToIndex = params.gene.partitionTooling.levelToIndex;
+        const indexStart = levelToIndex(level - 1);
+        const indexEnd = levelToIndex(level);
+
+        let isFilled = true;
+
+        if (indexStart >= gene.cells.width) return false;
+
+        for (let i = 0; i < indexEnd; i++) {
+            for (let j = indexStart; j < indexEnd; j++) {
+                isFilled = !!gene.cells.get(i, j);
+                if (!isFilled) return false;
+            }
+        }
+
+        for (let i = indexStart; i < indexEnd; i++) {
+            for (let j = 0; j < indexEnd; j++) {
+                isFilled = !!gene.cells.get(i, j);
+                if (!isFilled) return false;
+            }
+        }
+
+        return true;
+    };
+
     /** Different functions to mutate a Gene's cells */
     _.mutators = {
         /** @param {Gene} gene The gene's state */
@@ -253,19 +309,32 @@ const libGene = (() => {
         template: (gene, mutator) => {
             const level = gene.level;
             const levelToIndex = params.gene.partitionTooling.levelToIndex;
-            const indexStart = levelToIndex(level);
-            const indexEnd = levelToIndex(level + 1);
+            const isLevelEmpty = checkIfLevelIsEmpty(gene, level);
+            const indexStart = levelToIndex(level - isLevelEmpty);
+            const indexEnd = levelToIndex(level + !isLevelEmpty);
 
-            if (indexStart >= gene.cells.width) return // console.log("FULL!")
+            if (indexStart >= gene.cells.width) return;
 
-            for (let i = 0; i < indexEnd; i++)
-                for (let j = indexStart; j < indexEnd; j++) {
-                    gene.cells.set(i, j, mutator(gene.cells.get(i, j), i, j, gene));
-                }
+            const mutateStrip = (indexStart, indexEnd) => {
+                let deactivatedAnything = false;
+                for (let i = 0; i < indexEnd; i++)
+                    for (let j = indexStart; j < indexEnd; j++) {
+                        const newValue = gene.cells.set(i, j, mutator(gene.cells.get(i, j), i, j, gene));
+                        deactivatedAnything = deactivatedAnything || !newValue;
+                    }
 
-            for (let i = indexStart; i < indexEnd; i++)
-                for (let j = 0; j < indexEnd; j++)
-                    gene.cells.set(i, j, mutator(gene.cells.get(i, j), i, j, gene));
+                for (let i = indexStart; i < indexEnd; i++)
+                    for (let j = 0; j < indexEnd; j++) {
+                        const newValue = gene.cells.set(i, j, mutator(gene.cells.get(i, j), i, j, gene));
+                        deactivatedAnything = deactivatedAnything || !newValue;
+                    }
+
+                return deactivatedAnything;
+            };
+
+            const deactivatedAnything = mutateStrip(indexStart, indexEnd);
+            if (isLevelEmpty && !deactivatedAnything) mutateStrip(indexEnd, levelToIndex(level + 1));
+
         },
         flip: currentState =>
             Math.random() <= params.mutationChance
