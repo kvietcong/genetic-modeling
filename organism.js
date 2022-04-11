@@ -2,25 +2,28 @@
  *
  * Organism & Task classes
  * @author Raz and Kumiko
- * @version Rev 6 - 2/8/2022
+ * @version 4/11/2022
  *
  */
 
 // Constants associated with every Organism
 const ARR_LEN = 5;              // the number of tasks/genes/learning that the Organism has to do
+
 const ELDER_THRESH = 50;        // Organism is considered Elder after 50 days old
+
 const GENE_WEIGHT = 1;
 const IND_WEIGHT = 1;
 const SOC_WEIGHT = 1;
 
 // Values that Raz and Kumiko have been changing to see more social evolution
-const LEARN_THRESH = 12;            // We reduced the learn threshold from 15 to 12.
+// const LEARN_THRESH = 12;            // We reduced the learn threshold from 15 to 12.
                                     // make this relative by looking at the population average
                                     // first pass take average
                                     // may be a second pass is average of the top half of the average
                                     // second or third pass filter based average
 const REPRODUCTION_BASE = 1;        // this number sets the value that learning will happen
-const LEARN_TICKET_MULTIPLIER = 5;  // Increase this value to increase the number of times an agent learns per tick
+const IND_LEARN_TICKET_MULTIPLIER = 5;  // Increase this value to increase the number of times an agent learns per tick
+const SOC_LEARN_TICKET_MULTIPLIER = 5;
 
 /**
  * Organism class:
@@ -248,11 +251,10 @@ class Organism {
      * step function will advance the organism by a day every tick
      */
     step(tile, grid) {
-
         // Figure out how to use this.time instead of the count or if it is necessary.
         this.days++;
 
-        // 1% chance of dying
+        // 1% chance of dying - soft age cap
         if (this.alive && random() < 0.01) {
             this.alive = false;
             this.village.removeOrganism(this);
@@ -260,7 +262,6 @@ class Organism {
 
         let sexualReproChance = random();   // random value between 0 and 1
 
-        // soft age cap using the "percentage" above
         if (this.alive) { // this would be 20 (7300) - 60 "years" (365 days * 60 years)
             this.successes += this.reward.successes;            // keep track of successes on the tasks
             this.failures += this.reward.failures;              // will allow percentage calculation
@@ -287,7 +288,7 @@ class Organism {
             // social learning
             // requires at least 2 organisms in the village
             if (!params.SLcheck) {
-                let tickets = this.learnGeneList[1].level * LEARN_TICKET_MULTIPLIER;
+                let tickets = this.learnGeneList[1].level * SOC_LEARN_TICKET_MULTIPLIER;
                 for(let i = 0; i < tickets; i++) {
                 // for(let i = 0; i < 1; i++) {
                     let index = getRandomInteger(0, 4);
@@ -307,7 +308,7 @@ class Organism {
             // individual learning
             if (!params.ILcheck) {
 
-                let tickets = this.learnGeneList[0].level * LEARN_TICKET_MULTIPLIER;
+                let tickets = this.learnGeneList[0].level * IND_LEARN_TICKET_MULTIPLIER;
                 for(let i = 0; i < tickets; i++) {
                 // for(let i = 0; i < 1; i++) {
                     this.indLearning();

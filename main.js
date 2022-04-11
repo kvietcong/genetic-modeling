@@ -450,6 +450,12 @@ const getParams = () => {
 
     params.worldSize = document.getElementById("worldSi").value;
 
+    // Village Type Option
+    params.isolatedVillageOption = document.getElementsByName("villageType"); // this will return an array of the radio buttons
+
+    if (params.isolatedVillageOption[0].checked) params.isolated = true;      // this is for random of all the below options
+    else if (params.isolatedVillageOption[1].checked) params.isolated = false; // random villager
+
     // World Parameters
     if (document.getElementsByName("worldType")[0].checked) {
         params.worldType = 'layered8by8';

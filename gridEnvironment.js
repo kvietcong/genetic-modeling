@@ -2,14 +2,17 @@ params.stepsPerSecond = 20;
 params.population = 20;
 
 // This represents a "village"
-class Village {
+class Village {             
     constructor(i, j, grid) {
         this._grid = grid;
         this._pos = Object.freeze({ i, j });
 
+        this.isolated = params.isolated;
         this.spiral = false;
         this.organisms = [];
         this.organismsToAdd = [];
+
+        this.neighborList = [];
 
         if (params.worldType === 'spiral') { // set the spiral village configuration
             this.spiral = true;
@@ -65,7 +68,6 @@ class Village {
 
         this.createTaskList();
         this.populateVillage();
-
     }
 
     /**
@@ -150,7 +152,27 @@ class Village {
 
     get smartOrganisms() { 
         if (!this.caches.smartOrganisms) {
-            this.caches.smartOrganisms = this.organisms.filter(organism => organism.learnCapability > LEARN_THRESH); 
+            // this.caches.smartOrganisms = this.organisms.filter(organism => organism.learnCapability > LEARN_THRESH); 
+
+            // one pass to find the average
+            let sum = 0; 
+            for (let i = 0; i < this.organisms.length; i++) {
+                sum += this.organisms[i].learnCapability;
+            }
+            let average = sum / this.organisms.length; // average
+            // second pass to find the top 25%
+            sum = 0; 
+            let selected = 0;
+            for (let i = 0; i < this.organisms.length; i++) {
+                if (this.organisms[i].learnCapability >= average) {
+                    sum += this.organisms[i].learnCapability;
+                    selected++;
+                }
+            }
+            average = sum / selected; // average
+            // third pass to filter those above the average
+
+            this.caches.smartOrganisms = this.organisms.filter(organism => organism.learnCapability > average); 
         }
         return this.caches.smartOrganisms;
     }
@@ -182,21 +204,59 @@ class Village {
         return this.getVillagesInRange(this, 1, 1);
     }
 
-    getRandomOrganism() { return chooseRandom(this.organisms); }
+    getRandomOrganism() { 
+        if (this.isolated) {
+            return chooseRandom(this.organisms); 
+        }
+        
+        // else if !this.isolated
+        let neighborAgents = [];
+        for (let i = 0; i < this.neighborList.length; i++) {
+            neighborAgents.push(chooseRandom(this.neighborList[i].organisms));
+        }
+        return chooseRandom(neighborAgents);
+    }
 
     getRandomNeighbor() { return chooseRandom(this.neighbors); }
 
     // get organisms that meet the reproduction thresholds
     getFitOrganism(){
-        return this.fitOrganisms[getRandomInteger(0, this.fitOrganisms.length - 1)];
+        if (this.isolated) {
+            return this.fitOrganisms[getRandomInteger(0, this.fitOrganisms.length - 1)];
+        }
+        
+        // else if !this.isolated
+        let neighborAgents = [];
+        for (let i = 0; i < this.neighborList.length; i++) {
+            neighborAgents.push(this.neighborList[i].fitOrganisms[getRandomInteger(0, this.fitOrganisms.length - 1)]);
+        }
+        return chooseRandom(neighborAgents);
     }
 
     getElderOrganism() {
-        return this.elderOrganisms[getRandomInteger(0, this.elderOrganisms.length - 1)];
+        if (this.isolated) {
+            return this.elderOrganisms[getRandomInteger(0, this.elderOrganisms.length - 1)];
+        }
+
+        // else if !this.isolated
+        let neighborAgents = [];
+        for (let i = 0; i < this.neighborList.length; i++) {
+            neighborAgents.push(this.neighborList[i].elderOrganisms[getRandomInteger(0, this.elderOrganisms.length - 1)]);
+        }
+        return chooseRandom(neighborAgents);
     }
 
     getSmartOrganism() {
-        return this.smartOrganisms[getRandomInteger(0, this.smartOrganisms.length - 1)];
+        if (this.isolated) {
+            return this.smartOrganisms[getRandomInteger(0, this.smartOrganisms.length - 1)];
+        }
+       
+        // else if !this.isolated
+        let neighborAgents = [];
+        for (let i = 0; i < this.neighborList.length; i++) {
+            neighborAgents.push(this.neighborList[i].smartOrganisms[getRandomInteger(0, this.smartOrganisms.length - 1)]);
+        }
+        return chooseRandom(neighborAgents);
     }
 
     get i() { return this._pos.i; }
@@ -225,6 +285,13 @@ class World {
                 const village = new Village(i, j, this);
                 village.populateVillage();
                 this._villages[i][j] = village;
+            }
+        }
+
+        // Caching neighbors in a field of village.
+        for (let i = 0; i < rows; i++) {
+            for (let j = 0; j < columns; j++) {
+                this.villages[i][j].neighborList = this.villages[i][j].neighbors;
             }
         }
     }

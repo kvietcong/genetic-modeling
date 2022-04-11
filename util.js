@@ -16,6 +16,7 @@ const params = {
     indDays: 0,
     worldSize: 5,
     worldType: 'random',
+    isolated: true,
     canvas: {
         width: 2000,
         height: 1600,
