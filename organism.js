@@ -8,12 +8,18 @@
 
 // Constants associated with every Organism
 const ARR_LEN = 5;              // the number of tasks/genes/learning that the Organism has to do
-const REPRODUCTION_BASE = 1;    // this number sets the value that learning will happen
 const ELDER_THRESH = 50;        // Organism is considered Elder after 50 days old
-const LEARN_THRESH = 12;        // We reduced the learn threshold from 15 to 12.
 const GENE_WEIGHT = 1;
 const IND_WEIGHT = 1;
 const SOC_WEIGHT = 1;
+
+// Values that Raz and Kumiko have been changing to see more social evolution
+const LEARN_THRESH = 12;            // We reduced the learn threshold from 15 to 12.
+                                    // make this relative by looking at the population average
+                                    // first pass take average
+                                    // may be a second pass is average of the top half of the average
+                                    // second or third pass filter based average
+const REPRODUCTION_BASE = 1;        // this number sets the value that learning will happen
 const LEARN_TICKET_MULTIPLIER = 5;  // Increase this value to increase the number of times an agent learns per tick
 
 /**
