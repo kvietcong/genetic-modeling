@@ -265,6 +265,7 @@ class BitArray {
             ? this._array[byteIndex] | mask
             : this._array[byteIndex] & ~mask;
         this._array[byteIndex] = newByte;
+        return value;
     }
 
     clear(index) {
@@ -323,7 +324,7 @@ class BitArray2D {
 
     set(i, j, value = 1) {
         this.checkBounds(i, j);
-        this._bitArray.set(i * this._width + j, value);
+        return this._bitArray.set(i * this._width + j, value);
     }
 
     flip(i, j) { this.set(i, j, !this.get(i, j)) }
