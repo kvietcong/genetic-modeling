@@ -174,7 +174,7 @@ class Village {
 
     }
 
-    getVillagesInRange(start, end) {                                    // zero includes the current village
+    getVillagesInRange(start, end) {                                    // inclusive; zero includes the current village
         return this._grid.getVillagesInRangeFrom(this, start, end);
     }
 

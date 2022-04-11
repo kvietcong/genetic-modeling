@@ -150,6 +150,7 @@ const libGene = (() => {
         AND: (a, b) => (a + b) == 2 ? 1 : 0,
         NAND: (a, b) => !_.recomboers.perCell.AND(a, b),
         NOR: (a, b) => !_.recomboers.perCell.OR(a, b),
+        ORAND: (a, b) => Math.random() < 0.5 ? _.recomboers.perCell.OR(a, b) : _.recomboers.perCell.AND(a, b), // randomly selects between OR and AND
     };
     _.recomboers.perLevel = {
         template: (gene, otherGene, recomboer) => {
