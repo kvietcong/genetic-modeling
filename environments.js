@@ -19,7 +19,7 @@ params.environments = {
     },
     mediterranean: {
         name: "mediterranean",
-        color: "blue",
+        color: "lightblue",
         reward: 1,          // want an array of task in each environment with different values
         threshold: [1,1,1,1,1]
     },
@@ -41,7 +41,7 @@ params.spiralEnvironments = {
     },
     spiral01: {
         name : "spiral01",
-        color: "blue",
+        color: "lightblue",
         reward: 1,
         threshold: [0,0,0,5,5]
     },
@@ -72,7 +72,7 @@ params.spiralEnvironments = {
     },
     spiral11: {
         name : "spiral11",
-        color: "blue",
+        color: "lightblue",
         reward: 1,
         threshold: [0,0,0,4,5]
     },
@@ -103,7 +103,7 @@ spiral20: {
 },
 spiral21: {
     name : "spiral21",
-    color: "blue",
+    color: "lightblue",
     reward: 1,
     threshold: [0,0,0,3,5]
 },
@@ -134,13 +134,13 @@ spiral30: {
 },
 spiral31: {
     name : "spiral31",
-    color: "blue",
+    color: "lightblue",
     reward: 1,
     threshold: [0,0,0,2,5]
 },
 spiral32: {
     name : "spiral32",
-    color: "blue",
+    color: "lightblue",
     reward: 1,
     threshold: [0,0,0,1,5]
 },

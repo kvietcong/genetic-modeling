@@ -423,9 +423,20 @@ const getParams = () => {
 
     // GENE related
 
+    // mutate
+    if (document.getElementById("destroy").checked) {
+        params.gene.mutators = (gene) => libGene.mutators.currentLevel.template(gene, libGene.mutators.currentLevel.destroy);
+    } else if (document.getElementById("flip").checked) {
+        params.gene.mutators = (gene) => libGene.mutators.currentLevel.template(gene, libGene.mutators.currentLevel.flip);
+    } else if (document.getElementById("rejuvenate").checked) {
+        params.gene.mutators = (gene) => libGene.mutators.currentLevel.template(gene, libGene.mutators.currentLevel.rejuvenate);
+    }
+
     // recombo
     if (document.getElementById("and").checked) {
         params.gene.recomboer = (gene, otherGene) => libGene.recomboers.perCell.template(gene, otherGene, libGene.recomboers.perCell.AND);
+    } else if (document.getElementById("orand").checked) {
+        params.gene.recomboer = (gene, otherGene) => libGene.recomboers.perCell.template(gene, otherGene, libGene.recomboers.perCell.ORAND);
     } else if (document.getElementById("or").checked) {
         params.gene.recomboer = (gene, otherGene) => libGene.recomboers.perCell.template(gene, otherGene, libGene.recomboers.perCell.OR);
     } else if (document.getElementById("xor").checked) {
@@ -434,13 +445,6 @@ const getParams = () => {
         params.gene.recomboer = (gene, otherGene) => libGene.recomboers.perCell.template(gene, otherGene, libGene.recomboers.perCell.NAND);
     } else if (document.getElementById("nor").checked) {
         params.gene.recomboer = (gene, otherGene) => libGene.recomboers.perCell.template(gene, otherGene, libGene.recomboers.perCell.NOR);
-    }
-
-    // mutate
-    if (document.getElementById("flip").checked) {
-        params.gene.mutators = (gene, otherGene) => libGene.mutators.currentLevel.template(gene, libGene.mutators.currentLevel.flip);
-    } else if (document.getElementById("rejuvenate").checked) {
-        params.gene.mutators = (gene, otherGene) => libGene.mutators.currentLevel.template(gene, libGene.mutators.currentLevel.rejuvenate);
     }
 
     // Misc Parameters

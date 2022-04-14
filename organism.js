@@ -21,7 +21,7 @@ const SOC_WEIGHT = 1;
                                     // first pass take average
                                     // may be a second pass is average of the top half of the average
                                     // second or third pass filter based average
-const REPRODUCTION_BASE = 1;        // this number sets the value that learning will happen
+const REPRODUCTION_BASE = 25;        // this number sets the value that learning will happen
 const IND_LEARN_TICKET_MULTIPLIER = 5;  // Increase this value to increase the number of times an agent learns per tick
 const SOC_LEARN_TICKET_MULTIPLIER = 5;
 
@@ -313,7 +313,7 @@ class Organism {
                 // for(let i = 0; i < 1; i++) {
                     this.indLearning();
                 }
-
+ 
                 // Previous Method
                 // if (params.indChance != 0 && random() < params.indChance && this.village.organisms.length > 1) {
                 //     this.indLearning();

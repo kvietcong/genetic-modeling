@@ -88,21 +88,31 @@
 
         <p> Mutator type </p>
 
+        <input type="radio" id = "destroy" name = "mutatorType" value = "destroy">
+        <label for = "destroy"> Rejuvenate </label> <br>
+
         <input type="radio" id = "flip" name = "mutatorType" value = "flip" checked>
         <label for = "flip"> Flip </label> <br>
 
         <input type="radio" id = "rejuvenate" name = "mutatorType" value = "rejuvenate">
-        <label for = "rejuvenate"> Rejuvenate </label> <br><br>
+        <label for = "rejuvenate"> Rejuvenate </label> <br>
+        
+        
+        
+        <br>
 
         <p> Recomboer type </p>
-        <input type="radio" id = "xor" name = "recomboType" value = "xor">
-        <label for = "xor"> XOR </label> <br>
-
-        <input type="radio" id = "or" name = "recomboType" value = "or" checked>
-        <label for = "or"> OR </label> <br>
-
         <input type="radio" id = "and" name = "recomboType" value = "and">
         <label for = "and"> AND </label> <br>
+
+        <input type="radio" id = "orand" name = "recomboType" value = "orand" checked>
+        <label for = "orand"> ORAND </label> <br>
+
+        <input type="radio" id = "or" name = "recomboType" value = "or">
+        <label for = "or"> OR </label> <br>
+
+        <input type="radio" id = "xor" name = "recomboType" value = "xor">
+        <label for = "xor"> XOR </label> <br>
 
         <input type="radio" id = "nand" name = "recomboType" value = "nand">
         <label for = "nand"> NAND </label> <br>
@@ -156,10 +166,10 @@
 
         <label>Select Village Type:</label> <br>
 
-        <input type="radio" name = "villageType" checked>
+        <input type="radio" name = "villageType">
         <label for = "isolated"> Isolated </label>  <br>
 
-        <input type="radio" name = "villageType">
+        <input type="radio" name = "villageType" checked>
         <label for = "neighborly"> Neighborly </label>  <br>
 
         <label for="worldS">Select World Dimensions for Random & Layered:</label>
@@ -175,13 +185,13 @@
         <input type="radio" name = "worldType">
         <label for = "layer8by8"> Layered (only 8x8) </label>  <br>
 
-        <input type="radio" name = "worldType">
+        <input type="radio" name = "worldType" checked>
         <label for = "spiral"> Spiral (only 5x5) </label>  <br>
 
         <input type="radio" name = "worldType">
         <label for = "layered"> Layered </label> <br>
 
-        <input type="radio" name = "worldType" checked>
+        <input type="radio" name = "worldType">
         <label for = "random"> Random </label>  <br>
 
 
