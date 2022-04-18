@@ -401,18 +401,26 @@ const addSim = () => {
 
 const getParams = () => {
     // reproduction related
+    params.REPRODUCTION_BASE = document.getElementById("repBase").value;
+    params.GENE_WEIGHT = document.getElementById("geneWeight").value;
+    params.IND_WEIGHT = document.getElementById("indWeight").value;
+    params.SOC_WEIGHT = document.getElementById("socWeight").value;
+
     params.migrationThreshold = document.getElementById("migrationChance").value;
     params.sexualReproThreshold = document.getElementById("sexualRepChance").value;
 
-    // learning related
-    params.SLcheck = document.getElementById("noSocial").checked;
-    params.socialChance = document.getElementById("socialPercent").value;
-    params.socialDays = document.getElementById("socialDays").value;
-    params.ILcheck = document.getElementById("noIndividual").checked;
-    params.indChance = document.getElementById("indPercent").value;
-    params.indDays = document.getElementById("indDays").value;
+    // learning related // deprecated
+    // params.SLcheck = document.getElementById("noSocial").checked;
+    // params.socialChance = document.getElementById("socialPercent").value;
+    // params.socialDays = document.getElementById("socialDays").value;
+    // params.ILcheck = document.getElementById("noIndividual").checked;
+    // params.indChance = document.getElementById("indPercent").value;
+    // params.indDays = document.getElementById("indDays").value;
 
     // Social Learning Option
+    params.IND_LEARN_TICKET_MULTIPLIER = document.getElementById("indMultiplier").value;
+    params.SOC_LEARN_TICKET_MULTIPLIER = document.getElementById("socMultiplier").value;
+
     params.SLradios = document.getElementsByName("socialType"); // this will return an array of the radio buttons
 
     if (params.SLradios[0].checked) params.SLoption = 0;      // this is for random of all the below options

@@ -2,7 +2,7 @@
  *
  * Organism & Task classes
  * @author Raz and Kumiko
- * @version 4/11/2022
+ * @version 4/18/2022 Week 4 Monday
  *
  */
 
@@ -10,20 +10,6 @@
 const ARR_LEN = 5;              // the number of tasks/genes/learning that the Organism has to do
 
 const ELDER_THRESH = 50;        // Organism is considered Elder after 50 days old
-
-const GENE_WEIGHT = 1;
-const IND_WEIGHT = 1;
-const SOC_WEIGHT = 1;
-
-// Values that Raz and Kumiko have been changing to see more social evolution
-// const LEARN_THRESH = 12;            // We reduced the learn threshold from 15 to 12.
-                                    // make this relative by looking at the population average
-                                    // first pass take average
-                                    // may be a second pass is average of the top half of the average
-                                    // second or third pass filter based average
-const REPRODUCTION_BASE = 25;        // this number sets the value that learning will happen
-const IND_LEARN_TICKET_MULTIPLIER = 5;  // Increase this value to increase the number of times an agent learns per tick
-const SOC_LEARN_TICKET_MULTIPLIER = 5;
 
 /**
  * Organism class:
@@ -109,33 +95,33 @@ class Organism {
         // possibly add averaging between the parents
         if (this.parent1 && this.parent2) {
             for (let i = 0; i < ARR_LEN; i++) {
-                penalty += this.parent1.geneList[i].cellCount * GENE_WEIGHT;
-                penalty += this.parent2.geneList[i].cellCount * GENE_WEIGHT;
+                penalty += this.parent1.geneList[i].cellCount * params.GENE_WEIGHT;
+                penalty += this.parent2.geneList[i].cellCount * params.GENE_WEIGHT;
                 // penalty += Math.floor((this.parent1.geneList[i].cellCount + this.parent2.geneList[i].cellCount) / 2) * GENE_WEIGHT;
             }
 
-            penalty += this.parent1.learnGeneList[0].cellCount * IND_WEIGHT;
-            penalty += this.parent2.learnGeneList[0].cellCount * IND_WEIGHT;
+            penalty += this.parent1.learnGeneList[0].cellCount * params.IND_WEIGHT;
+            penalty += this.parent2.learnGeneList[0].cellCount * params.IND_WEIGHT;
             // penalty += Math.floor((this.parent1.learnGeneList[0].cellCount + this.parent2.learnGeneList[0].cellCount) / 2) * IND_WEIGHT;
 
-            penalty += this.parent1.learnGeneList[1].cellCount * SOC_WEIGHT;
-            penalty += this.parent2.learnGeneList[1].cellCount * SOC_WEIGHT;
+            penalty += this.parent1.learnGeneList[1].cellCount * params.SOC_WEIGHT;
+            penalty += this.parent2.learnGeneList[1].cellCount * params.SOC_WEIGHT;
             // penalty += Math.floor((this.parent1.learnGeneList[1].cellCount + this.parent2.learnGeneList[1].cellCount) / 2) * SOC_WEIGHT;
         } else if (this.parent1) {
             for (let i = 0; i < ARR_LEN; i++) {
-                penalty += this.parent1.geneList[i].cellCount * GENE_WEIGHT;
+                penalty += this.parent1.geneList[i].cellCount * params.GENE_WEIGHT;
             }
 
-            penalty += this.parent1.learnGeneList[0].cellCount * IND_WEIGHT;
+            penalty += this.parent1.learnGeneList[0].cellCount * params.IND_WEIGHT;
 
-            penalty += this.parent1.learnGeneList[1].cellCount * SOC_WEIGHT;
+            penalty += this.parent1.learnGeneList[1].cellCount * params.SOC_WEIGHT;
 
             penalty *= 2;
         }
 
         // if no parents (i.e. first generation of organisms), penalty is 0
 
-        return REPRODUCTION_BASE + penalty;
+        return params.REPRODUCTION_BASE + penalty;
     }
 
     /**
@@ -251,6 +237,7 @@ class Organism {
      * step function will advance the organism by a day every tick
      */
     step(tile, grid) {
+
         // Figure out how to use this.time instead of the count or if it is necessary.
         this.days++;
 
@@ -287,41 +274,16 @@ class Organism {
 
             // social learning
             // requires at least 2 organisms in the village
-            if (!params.SLcheck) {
-                let tickets = this.learnGeneList[1].level * SOC_LEARN_TICKET_MULTIPLIER;
-                for(let i = 0; i < tickets; i++) {
-                // for(let i = 0; i < 1; i++) {
-                    let index = getRandomInteger(0, 4);
-                    this.socLearning(index, params.SLoption);
-                }
-
-                // Previous Method
-                // if (params.socialChance != 0 && random() < params.socialChance && this.village.organisms.length > 1) {
-                //     this.socLearning();
-                // }
-
-                // if (params.socialDays != 0 && this.days % params.socialDays === 0) {
-                //     this.socLearning();
-                // }
+            let socialTickets = this.learnGeneList[1].level * params.SOC_LEARN_TICKET_MULTIPLIER;
+            for(let i = 0; i < socialTickets; i++) {
+            // for(let i = 0; i < 1; i++) {
+                let index = getRandomInteger(0, 4);
+                this.socLearning(index, params.SLoption);
             }
 
-            // individual learning
-            if (!params.ILcheck) {
-
-                let tickets = this.learnGeneList[0].level * IND_LEARN_TICKET_MULTIPLIER;
-                for(let i = 0; i < tickets; i++) {
-                // for(let i = 0; i < 1; i++) {
-                    this.indLearning();
-                }
- 
-                // Previous Method
-                // if (params.indChance != 0 && random() < params.indChance && this.village.organisms.length > 1) {
-                //     this.indLearning();
-                // }
-
-                // if (params.indDays != 0 && this.days % params.indDays === 0) {
-                //     this.indLearning();
-                // }
+            let individualTickets = this.learnGeneList[0].level * params.IND_LEARN_TICKET_MULTIPLIER;
+            for(let i = 0; i < individualTickets; i++) {
+                this.indLearning();
             }
         }
     };

@@ -3,6 +3,7 @@ const params = {
     // Maybe use for toggle-able logging?
     isDebugging: true,
     debugEntities: {},
+    
     gridSize: [5, 5],
     migrationThreshold: 0,
     SLradios: 0,
@@ -17,6 +18,16 @@ const params = {
     worldSize: 5,
     worldType: 'random',
     isolated: true,
+    // ticket multipliers
+    IND_LEARN_TICKET_MULTIPLIER: 5,
+    SOC_LEARN_TICKET_MULTIPLIER: 5,
+    // reproduction base
+    REPRODUCTION_BASE: 25,
+    // gene weights
+    GENE_WEIGHT: 1,
+    IND_WEIGHT: 1,
+    SOC_WEIGHT: 1, 
+    
     canvas: {
         width: 2000,
         height: 1600,
