@@ -276,7 +276,6 @@ class Organism {
             // requires at least 2 organisms in the village
             let socialTickets = this.learnGeneList[1].level * params.SOC_LEARN_TICKET_MULTIPLIER;
             for(let i = 0; i < socialTickets; i++) {
-            // for(let i = 0; i < 1; i++) {
                 let index = getRandomInteger(0, 4);
                 this.socLearning(index, params.SLoption);
             }

@@ -406,6 +406,9 @@ const getParams = () => {
     params.IND_WEIGHT = document.getElementById("indWeight").value;
     params.SOC_WEIGHT = document.getElementById("socWeight").value;
 
+    // console.log("rep_base[" + params.REPRODUCTION_BASE + "]geneWeight[" + params.GENE_WEIGHT 
+    // + "]indWeight[" + params.IND_WEIGHT + "]socWeight[" + params.SOC_WEIGHT + "]"); // debugging
+
     params.migrationThreshold = document.getElementById("migrationChance").value;
     params.sexualReproThreshold = document.getElementById("sexualRepChance").value;
 
@@ -420,6 +423,8 @@ const getParams = () => {
     // Social Learning Option
     params.IND_LEARN_TICKET_MULTIPLIER = document.getElementById("indMultiplier").value;
     params.SOC_LEARN_TICKET_MULTIPLIER = document.getElementById("socMultiplier").value;
+
+    // console.log("indTickets[" + params.IND_LEARN_TICKET_MULTIPLIER + "]socTickets[" + params.SOC_LEARN_TICKET_MULTIPLIER + "]");
 
     params.SLradios = document.getElementsByName("socialType"); // this will return an array of the radio buttons
 
