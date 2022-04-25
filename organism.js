@@ -76,14 +76,13 @@ class Organism {
             }
         }
 
-        params.fillToLevel = 1;
+        // params.fillToLevel = 1;
         this.learnList = [];
         for (let i = 0; i < ARR_LEN; i++) {
             let meme = new Meme();
-            meme.fillT
             this.learnList.push(meme);
         }
-        params.fillToLevel = 0;
+        // params.fillToLevel = 0;
 
         this.taskCapabilities = [];
         this.taskCapabilities = this.getTaskCapabilities();        // will be gene + learn
@@ -263,8 +262,9 @@ class Organism {
             this.successes += this.reward.successes;            // keep track of successes on the tasks
             this.failures += this.reward.failures;              // will allow percentage calculation
             this.energy += this.reward.energy;
-            if (this.village.organisms.length > 100) {
-                this.energy -= Math.floor(this.village.organisms.length/100);
+
+            if (this.village.organisms.length > 30) {  //CHANGES THIS TO A PARAMETER
+                this.energy -= Math.floor(this.village.organisms.length/30);
             }
 
             if (sexualReproChance < params.sexualReproThreshold) {     //sexual
@@ -284,6 +284,8 @@ class Organism {
 
             // social learning
             // requires at least 2 organisms in the village
+
+            // make ticket multipliers fractional and require that the tickets get to a full value .
            
             let socialTickets = this.learnGeneList[1].level * params.soc_learn_ticket_multiplier;
             for(let i = 0; i < socialTickets; i++) {
