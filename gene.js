@@ -468,11 +468,7 @@ const libGene = (() => {
                         ? this.levels[level] : 0;
                 }
             }
-        }
-
-        get cellCount() {
-            // Make this faster if it is acting up
-            return this.cells.reduceBits((accumulated, bit) => accumulated + bit, 0);
+            this.cellCount = this.cells.reduceBits((accumulated, bit) => accumulated + bit, 0);
         }
 
         recombine(otherGene, recomboer = params.gene.recomboer) {
