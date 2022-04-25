@@ -58,9 +58,6 @@ class Village {
             this.environment = chooseRandom(Object.keys(params.environments));
         }
 
-
-            
-
         this.taskList = [];             // all the tasks associated with the village
         this.numTasks = 5;
 
@@ -150,21 +147,27 @@ class Village {
         return this.caches.elderOrganisms;
     }
 
-    get smartOrganisms() { 
+    get smartOrganisms() {
         if (!this.caches.smartOrganisms) {
             // this.caches.smartOrganisms = this.organisms.filter(organism => organism.learnCapability > LEARN_THRESH); 
 
             // one pass to find the average
-            let sum = 0; 
-            for (let i = 0; i < this.organisms.length; i++) {
-                sum += this.organisms[i].learnCapability;
-            }
-            let average = sum / this.organisms.length; // average
-            // second pass to find the top 25%
-            sum = 0; 
+            let sum = 0;
             let selected = 0;
             for (let i = 0; i < this.organisms.length; i++) {
-                if (this.organisms[i].learnCapability >= average) {
+                if(this.organisms[i].learnCapability != null){
+                    sum += this.organisms[i].learnCapability;
+                    selected++;
+                }
+            }
+            let average = sum / selected; // Average
+
+
+            // second pass to find the top 25%
+            sum = 0;
+            selected = 0;
+            for (let i = 0; i < this.organisms.length; i++) {
+                if (this.organisms[i].learnCapability != null && this.organisms[i].learnCapability >= average) {
                     sum += this.organisms[i].learnCapability;
                     selected++;
                 }

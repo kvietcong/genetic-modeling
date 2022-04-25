@@ -76,13 +76,11 @@ class Organism {
             }
         }
 
-        // params.fillToLevel = 1;
         this.learnList = [];
         for (let i = 0; i < ARR_LEN; i++) {
             let meme = new Meme();
             this.learnList.push(meme);
         }
-        // params.fillToLevel = 0;
 
         this.taskCapabilities = [];
         this.taskCapabilities = this.getTaskCapabilities();        // will be gene + learn
@@ -148,6 +146,7 @@ class Organism {
     get learnCapability() {
         let sum = 0;
         for (let i = 0; i < ARR_LEN; i++) {
+            console.log(this.learnList[i]);
             sum += this.learnList[i].level;
         }
         return sum;
@@ -227,7 +226,7 @@ class Organism {
             // 3) Elder (age is  over 50 ticks)
             let elder = this.village.getElderOrganism();
             if (elder != undefined) {
-                this.learnList[index]= this.learnList[index].recombine(elder.learnList[index]).mutate();
+                this.learnList[index] = this.learnList[index].recombine(elder.learnList[index]).mutate();
             } else {
                 this.socLearning(index, 1); // if there are no wise select random villager
             }
@@ -263,9 +262,12 @@ class Organism {
             this.failures += this.reward.failures;              // will allow percentage calculation
             this.energy += this.reward.energy;
 
-            if (this.village.organisms.length > 30) {  //CHANGES THIS TO A PARAMETER
-                this.energy -= Math.floor(this.village.organisms.length/30);
+            // console.log(" params.softcap_modifier: ", params.softcap_modifier);
+
+            if (this.village.organisms.length > params.softcap_modifier) {  //CHANGES THIS TO A PARAMETER
+                this.energy -= Math.floor(this.village.organisms.length/params.softcap_modifier);
             }
+
 
             if (sexualReproChance < params.sexualReproThreshold) {     //sexual
                 let otherParent = this.village.getFitOrganism();
