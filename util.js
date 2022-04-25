@@ -8,6 +8,18 @@ const params = {
     SLradios: 0,
     sexualReproThreshold: 0,
     SLcheck: false,
+
+    // reproduction base
+    reproduction_base: 15,
+    // gene weights
+    gene_weight: 1,
+    ind_weight: 1,
+    soc_weight: 1, 
+
+    // ticket multipliers
+    ind_learn_ticket_multiplier: 5,
+    soc_learn_ticket_multiplier: 5,
+
     SLoption: 0,
     socialChance: 0,
     socialDays: 0,

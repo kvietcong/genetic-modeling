@@ -401,18 +401,19 @@ const addSim = () => {
 
 const getParams = () => {
     // reproduction related
-    params.migrationThreshold = document.getElementById("migrationChance").value;
-    params.sexualReproThreshold = document.getElementById("sexualRepChance").value;
 
-    // learning related
-    params.SLcheck = document.getElementById("noSocial").checked;
-    params.socialChance = document.getElementById("socialPercent").value;
-    params.socialDays = document.getElementById("socialDays").value;
-    params.ILcheck = document.getElementById("noIndividual").checked;
-    params.indChance = document.getElementById("indPercent").value;
-    params.indDays = document.getElementById("indDays").value;
+    params.reproduction_base = parseFloat(document.getElementById("repBase").value);
+    params.gene_weight = parseFloat(document.getElementById("geneWeight").value);
+    params.ind_weight = parseFloat(document.getElementById("indWeight").value);
+    params.soc_weight = parseFloat(document.getElementById("socWeight").value);
 
-    // Social Learning Option
+    params.migrationThreshold = parseFloat(document.getElementById("migrationChance").value);
+    params.sexualReproThreshold = parseFloat(document.getElementById("sexualRepChance").value);
+
+    // Social Learning Options
+    params.ind_learn_ticket_multiplier = parseFloat(document.getElementById("indMultiplier").value);
+    params.soc_learn_ticket_multiplier = parseFloat(document.getElementById("socMultiplier").value);
+
     params.SLradios = document.getElementsByName("socialType"); // this will return an array of the radio buttons
 
     if (params.SLradios[0].checked) params.SLoption = 0;      // this is for random of all the below options
@@ -448,11 +449,11 @@ const getParams = () => {
     }
 
     // Misc Parameters
-    params.fillToLevel = document.getElementById("fillToLevelIn").value;
-    params.partitionSize = document.getElementById("partitionSize").value;
-    params.mutationChance = document.getElementById("mutationChance").value;
+    params.fillToLevel = parseFloat(document.getElementById("fillToLevelIn").value);
+    params.partitionSize = parseFloat(document.getElementById("partitionSize").value);
+    params.mutationChance = parseFloat(document.getElementById("mutationChance").value);
 
-    params.worldSize = document.getElementById("worldSi").value;
+    params.worldSize = parseFloat(document.getElementById("worldSi").value);
 
     // Village Type Option
     params.isolatedVillageOption = document.getElementsByName("villageType"); // this will return an array of the radio buttons
