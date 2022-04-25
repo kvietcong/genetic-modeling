@@ -209,18 +209,18 @@ class Organism {
 
             let randomOrganism = this.village.getRandomOrganism();
             if (randomOrganism != undefined) {
-                this.learnList[index].recombine(randomOrganism.learnList[index]).mutate();
+                this.learnList[index] = this.learnList[index].recombine(randomOrganism.learnList[index]).mutate();
             }
         } else if (SLoption === 2 && this.parent1 != undefined) {
             // 2) Parent
             if (this.parent1 === this.parent2) { // comes from asexual repr
-                this.learnList[index].recombine(this.parent1.learnList[index]).mutate();
+                this.learnList[index] = this.learnList[index].recombine(this.parent1.learnList[index]).mutate();
             } else if (this.parent1 != this.parent2) { // comes from sexual repr
                 let parentIndex = getRandomInteger(0, 1);
                 if (parentIndex === 0) {
-                    this.learnList[index].recombine(this.parent1.learnList[index]).mutate();
+                    this.learnList[index] = this.learnList[index].recombine(this.parent1.learnList[index]).mutate();
                 } else {
-                    this.learnList[index].recombine(this.parent2.learnList[index]).mutate();
+                    this.learnList[index] = this.learnList[index].recombine(this.parent2.learnList[index]).mutate();
                 }
             }
         }
@@ -228,7 +228,7 @@ class Organism {
             // 3) Elder (age is  over 50 ticks)
             let elder = this.village.getElderOrganism();
             if (elder != undefined) {
-                this.learnList[index].recombine(elder.learnList[index]).mutate();
+                this.learnList[index]= this.learnList[index].recombine(elder.learnList[index]).mutate();
             } else {
                 this.socLearning(index, 1); // if there are no wise select random villager
             }
@@ -236,7 +236,7 @@ class Organism {
             // 4) Smart people
             let smart = this.village.getSmartOrganism();
             if (smart != undefined) {
-                this.learnList[index].recombine(smart.learnList[index]).mutate();
+                this.learnList[index] = this.learnList[index].recombine(smart.learnList[index]).mutate();
             } else {
                 this.socLearning(index, 1); // if there are no wise select random villager
             }
