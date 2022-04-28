@@ -12,6 +12,7 @@ const params = {
 
     // reproduction base
     reproduction_base: 15,
+
     // gene weights
     gene_weight: 1,
     ind_weight: 1,
@@ -21,13 +22,10 @@ const params = {
     ind_learn_ticket_multiplier: 5,
     soc_learn_ticket_multiplier: 5,
 
-    SLoption: 0,
-    // SLcheck: false,
-    // socialChance: 0,
-    // socialDays: 0,
-    // ILcheck: false,
-    // indChance: 0,
-    // indDays: 0,
+    // Set Soft Cap 
+    softcap_modifier: 100,
+
+    // World params
     worldSize: 5,
     worldType: 'random',
     isolated: true,
