@@ -137,12 +137,12 @@ class Village {
     removeOrganism(organism) { organism.removeFromWorld = true; }
 
     get fitOrganisms() { 
-        return this.organisms.filter(organism => organism.energy > organism.reproduction_thresh);
+        return this.organisms.filter(organism => (organism.alive && organism.energy > organism.reproduction_thresh));
     }
 
     get elderOrganisms() { 
         if (!this.caches.elderOrganisms) {
-            this.caches.elderOrganisms = this.organisms.filter(organism => organism.days > ELDER_THRESH); 
+            this.caches.elderOrganisms = this.organisms.filter(organism => (organism.alive && organism.days > ELDER_THRESH)); 
         }
         return this.caches.elderOrganisms;
     }
@@ -155,19 +155,18 @@ class Village {
             let sum = 0;
             let selected = 0;
             for (let i = 0; i < this.organisms.length; i++) {
-                if(this.organisms[i].learnCapability != null){
+                if(this.organisms[i].alive){
                     sum += this.organisms[i].learnCapability;
                     selected++;
                 }
             }
             let average = sum / selected; // Average
 
-
             // second pass to find the top 25%
             sum = 0;
             selected = 0;
             for (let i = 0; i < this.organisms.length; i++) {
-                if (this.organisms[i].learnCapability != null && this.organisms[i].learnCapability >= average) {
+                if (this.organisms[i].alive && this.organisms[i].learnCapability >= average) {
                     sum += this.organisms[i].learnCapability;
                     selected++;
                 }

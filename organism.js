@@ -35,6 +35,8 @@ class Organism {
         this.geneList = [];
         this.learnGeneList = [];  // The learning genes: index 0 = individual and index 1 = social
         this.reproduction_thresh = this.reproductionThresh;
+        this.indTicketsCount = 0;
+        this.socTicketsCount = 0;
 
         // Instance variables
         // Creation of the genes associated with the current organism
@@ -146,7 +148,6 @@ class Organism {
     get learnCapability() {
         let sum = 0;
         for (let i = 0; i < ARR_LEN; i++) {
-            console.log(this.learnList[i]);
             sum += this.learnList[i].level;
         }
         return sum;
@@ -206,19 +207,23 @@ class Organism {
             // Recombining learn gene at index with learn gene at index of a random villager (teacher)
 
             let randomOrganism = this.village.getRandomOrganism();
-            if (randomOrganism != undefined) {
-                this.learnList[index] = this.learnList[index].recombine(randomOrganism.learnList[index]).mutate();
+            if (randomOrganism != undefined && randomOrganism.alive) {
+                this.learnList[index] = this.learnList[index].recombine(randomOrganism.learnList[index]);
+                this.learnList[index].mutate();
             }
         } else if (SLoption === 2 && this.parent1 != undefined) {
             // 2) Parent
             if (this.parent1 === this.parent2) { // comes from asexual repr
-                this.learnList[index] = this.learnList[index].recombine(this.parent1.learnList[index]).mutate();
+                this.learnList[index] = this.learnList[index].recombine(this.parent1.learnList[index]);
+                this.learnList[index].mutate();
             } else if (this.parent1 != this.parent2) { // comes from sexual repr
                 let parentIndex = getRandomInteger(0, 1);
                 if (parentIndex === 0) {
-                    this.learnList[index] = this.learnList[index].recombine(this.parent1.learnList[index]).mutate();
+                    this.learnList[index] = this.learnList[index].recombine(this.parent1.learnList[index]);
+                    this.learnList[index].mutate();
                 } else {
-                    this.learnList[index] = this.learnList[index].recombine(this.parent2.learnList[index]).mutate();
+                    this.learnList[index] = this.learnList[index].recombine(this.parent2.learnList[index]);
+                    this.learnList[index].mutate();
                 }
             }
         }
@@ -226,7 +231,8 @@ class Organism {
             // 3) Elder (age is  over 50 ticks)
             let elder = this.village.getElderOrganism();
             if (elder != undefined) {
-                this.learnList[index] = this.learnList[index].recombine(elder.learnList[index]).mutate();
+                this.learnList[index] = this.learnList[index].recombine(elder.learnList[index]);
+                this.learnList[index].mutate();
             } else {
                 this.socLearning(index, 1); // if there are no wise select random villager
             }
@@ -234,7 +240,8 @@ class Organism {
             // 4) Smart people
             let smart = this.village.getSmartOrganism();
             if (smart != undefined) {
-                this.learnList[index] = this.learnList[index].recombine(smart.learnList[index]).mutate();
+                this.learnList[index] = this.learnList[index].recombine(smart.learnList[index]);
+                this.learnList[index].mutate();
             } else {
                 this.socLearning(index, 1); // if there are no wise select random villager
             }
@@ -248,6 +255,8 @@ class Organism {
 
         // Figure out how to use this.time instead of the count or if it is necessary.
         this.days++;
+        this.indTicketsCount += params.ind_learn_ticket_multiplier;
+        this.socTicketsCount += params.soc_learn_ticket_multiplier;
 
         // 1% chance of dying - soft age cap
         if (this.alive && random() < 0.01) {
@@ -288,17 +297,31 @@ class Organism {
             // requires at least 2 organisms in the village
 
             // make ticket multipliers fractional and require that the tickets get to a full value .
-           
-            let socialTickets = this.learnGeneList[1].level * params.soc_learn_ticket_multiplier;
-            for(let i = 0; i < socialTickets; i++) {
-                let index = getRandomInteger(0, 4);
-                this.socLearning(index, params.SLoption);
-            }
+                   // 1.5
 
-            let indTickets = this.learnGeneList[0].level * params.ind_learn_ticket_multiplier;
-            for(let i = 0; i < indTickets; i++) {
-                this.indLearning();
-            }
+            console.log("ind tickets count " + this.indTicketsCount + ", soc tickets count " + this.socTicketsCount);
+
+
+           let indWhole = Math.floor(this.indTicketsCount);
+           let indRest = this.indTicketsCount - Math.floor(this.indTicketsCount);
+
+           if (indWhole >= 1) {
+                for(let i = 0; i < indWhole * this.learnGeneList[0].level; i++) {
+                    this.indLearning();
+                }
+               this.indTicketsCount = indRest;
+           }
+
+           let socWhole = Math.floor(this.socTicketsCount);
+           let socRest = this.socTicketsCount - Math.floor(this.socTicketsCount);
+
+           if (socWhole >= 1) {
+                for(let i = 0; i < socWhole * this.learnGeneList[1].level; i++) {
+                    let index = getRandomInteger(0, 4);
+                this.socLearning(index, params.SLoption);
+                }
+               this.socTicketsCount = socRest;
+           }
         }
     };
 };
