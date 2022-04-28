@@ -23,8 +23,8 @@ const params = {
     soc_learn_ticket_multiplier: 5,
 
     // Set Soft Cap 
-    softcap_modifier: 100,
-
+    softcap_modifier: 30,   // Take population you want and divide by this number. If the number is 5 or more, 
+                            // then the population growth will stop at that point. 
     // World params
     worldSize: 5,
     worldType: 'random',

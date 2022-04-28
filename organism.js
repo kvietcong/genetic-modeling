@@ -259,7 +259,7 @@ class Organism {
 
         let sexualReproChance = random();   // random value between 0 and 1
 
-        if (this.alive) { // this would be 20 (7300) - 60 "years" (365 days * 60 years)
+        if (this.alive) {                                       // this would be 20 (7300) - 60 "years" (365 days * 60 years)
             this.successes += this.reward.successes;            // keep track of successes on the tasks
             this.failures += this.reward.failures;              // will allow percentage calculation
             this.energy += this.reward.energy;
@@ -269,7 +269,6 @@ class Organism {
             if (this.village.organisms.length > params.softcap_modifier) {  //CHANGES THIS TO A PARAMETER
                 this.energy -= Math.floor(this.village.organisms.length/params.softcap_modifier);
             }
-
 
             if (sexualReproChance < params.sexualReproThreshold) {     //sexual
                 let otherParent = this.village.getFitOrganism();
