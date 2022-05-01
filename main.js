@@ -31,6 +31,7 @@ const establishSocket = ipString => {
         connection.isConnected = false;
         console.log("Disconnected from the server.");
     });
+    socket.on("log", console.log);
 };
 establishSocket();
 document.getElementById("server-ip").value = params.defaultIP;
