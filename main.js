@@ -1,4 +1,40 @@
-// const socket = typeof io !== "undefined" ? io.connect("http://76.28.146.35:8888") : null;
+const connection = {};
+
+attachPropertiesWithCallbacks(connection, [
+    ["isConnected", false, connectionStatus => {
+        const histogramUploadCurrentElement = document.getElementById("histogramUploadCurrent");
+        const histogramUploadAllElement = document.getElementById("histogramUploadAll");
+        const serverStatusElement = document.getElementById("serverStatus");
+        histogramUploadCurrentElement.disabled = !connectionStatus;
+        histogramUploadAllElement.disabled = !connectionStatus;
+        serverStatusElement.innerText = connectionStatus ? "Connected" : "Disconnected (Failed to Connect)";
+    }]
+]);
+
+let socket;
+const establishSocket = ipString => {
+    if (!ipString) ipString = params.defaultIP;
+    console.log(ipString)
+    socket = io.connect(ipString, { reconnection: false });
+    connection.socket = socket;
+    connection.isConnected = false;
+
+    socket.on("connect", _ => {
+        connection.isConnected = true;
+        console.log("Connected to the server.");
+    });
+    socket.on("connect_error", _ => {
+        connection.isConnected = false;
+        console.error("Failed to connect the server!");
+    });
+    socket.on("disconnect", _ => {
+        connection.isConnected = false;
+        console.log("Disconnected from the server.");
+    });
+};
+establishSocket();
+document.getElementById("server-ip").value = params.defaultIP;
+
 const assetManager = new AssetManager();
 let gameEngines = [];
 
@@ -44,11 +80,19 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
 
             this.histogramDownloadCurrentElement = document.getElementById("histogramDownloadCurrent");
             if (this.histogramDownloadCurrentElement)
-                this.histogramDownloadCurrentElement.addEventListener("click", _ => this.downloadCSVForCurrentType());
+                this.histogramDownloadCurrentElement.addEventListener("click", _ => this.downloadCSVForType());
 
             this.histogramDownloadAllElement = document.getElementById("histogramDownloadAll");
             if (this.histogramDownloadAllElement)
                 this.histogramDownloadAllElement.addEventListener("click", _ => this.downloadCSVForAllTypes());
+
+            this.histogramUploadCurrentElement = document.getElementById("histogramUploadCurrent");
+            if (this.histogramUploadCurrentElement)
+                this.histogramUploadCurrentElement.addEventListener("click", _ => this.uploadForType());
+
+            this.histogramUploadAllElement = document.getElementById("histogramUploadAll");
+            if (this.histogramUploadAllElement)
+                this.histogramUploadAllElement.addEventListener("click", _ => this.uploadForAllTypes());
 
             this.drawLast = histograms[0][0][type].drawLast;
             this.collectionRate = histograms[0][0][type].unitTimePerUpdate;
@@ -143,7 +187,7 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
             });
         }
 
-        downloadCSVForCurrentType(type) {
+        downloadCSVForType(type) {
             const zip = new JSZip();
             for (const [i, row] of this.toCSVTextArray(type).entries()) {
                 for (const [j, csvData] of row.entries()) {
@@ -164,6 +208,35 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
             }
             this.downloadZip(zip);
         }
+
+        uploadForType(type) {
+            type = type ?? this.histogramType;
+            let ticks = 0;
+            const data = this.histograms.reduce((acc, row, i) => {
+                acc.push([]);
+                row.forEach((histogramInfo, j) => {
+                    acc[i][j] = histogramInfo[type].allCounts.slice();
+                    ticks = ticks || acc[i][j].length;
+                });
+                return acc;
+            }, []);
+
+            const payload = {
+                db: "genetic-modeling",
+                collection: "histogramData",
+                data: {
+                    data,
+                    type,
+                    ticks,
+                    date: new Date(),
+                },
+            };
+
+            if (connection.isConnected) socket.emit("insert", payload);
+            else alert("NOT CONNECTED");
+        }
+
+        uploadForAllTypes() { this.types.forEach(type => this.uploadForType(type)); }
     }
 
     const histograms = [];

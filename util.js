@@ -3,7 +3,9 @@ const params = {
     // Maybe use for toggle-able logging?
     isDebugging: true,
     debugEntities: {},
-    
+
+    defaultIP: "http://76.28.146.35:8888",
+
     gridSize: [5, 5],
     migrationThreshold: 0,
     SLradios: 0,
@@ -16,15 +18,15 @@ const params = {
     // gene weights
     gene_weight: 1,
     ind_weight: 1,
-    soc_weight: 1, 
+    soc_weight: 1,
 
     // ticket multipliers
     ind_learn_ticket_multiplier: 5,
     soc_learn_ticket_multiplier: 5,
 
-    // Set Soft Cap 
-    softcap_modifier: 30,   // Take population you want and divide by this number. If the number is 5 or more, 
-                            // then the population growth will stop at that point. 
+    // Set Soft Cap
+    softcap_modifier: 30,   // Take population you want and divide by this number. If the number is 5 or more,
+                            // then the population growth will stop at that point.
     // World params
     worldSize: 5,
     worldType: 'random',
@@ -37,8 +39,8 @@ const params = {
     // gene weights
     GENE_WEIGHT: 1,
     IND_WEIGHT: 1,
-    SOC_WEIGHT: 1, 
-    
+    SOC_WEIGHT: 1,
+
     canvas: {
         width: 2000,
         height: 1600,

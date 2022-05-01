@@ -8,7 +8,7 @@
     <link rel="stylesheet" type="text/css" href="./style.css"></link>
 
     <script type="text/javascript" src="./jszip.min.js"></script>
-    <!-- <script type="text/javascript" src="http://76.28.146.35:8888/socket.io/socket.io.js"></script> -->
+    <script src="/socket.io.min.js"></script>
 
     <script type="text/javascript" src="./assetmanager.js"></script>
     <script type="text/javascript" src="./timer.js"></script>
@@ -96,7 +96,7 @@
 
         <input type="radio" id = "rejuvenate" name = "mutatorType" value = "rejuvenate">
         <label for = "rejuvenate"> Rejuvenate </label> <br>
-        
+
         <br>
 
         <p> Recomboer type </p>
@@ -223,9 +223,24 @@
 
         <div>
             <h3 style="margin: 5px;">Download CSV</h3>
-            <p>Fairly slow to Zip everything. Check console for progress.</p>
+            <p style="font-size: 1.25rem;">Fairly slow to Zip everything. Check console for progress.</p>
             <button id="histogramDownloadCurrent">Current Type</button>
             <button id="histogramDownloadAll">All Types</button>
+        </div>
+
+        <div>
+            <h3 style="margin: 5px;">Upload to Server</h3>
+            <p style="font-size: 1.25rem;">Server is <span id="serverStatus">Disconnected</span></p>
+            <button id="histogramUploadCurrent">Current Type</button>
+            <button id="histogramUploadAll">All Types</button>
+            <br>
+            <input type="text" name="Server IP" id="server-ip" style="font-size: 1rem;">
+            <button
+                type="submit"
+                onclick="establishSocket(document.getElementById('server-ip').value)"
+            >
+                Attempt Reconnection
+            </button>
         </div>
     </div>
 </body>
