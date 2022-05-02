@@ -32,6 +32,7 @@ const establishSocket = ipString => {
         console.log("Disconnected from the server.");
     });
     socket.on("log", console.log);
+    socket.on("error", console.error);
 };
 establishSocket();
 document.getElementById("server-ip").value = params.defaultIP;
@@ -58,9 +59,6 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
         types = ["learn", "gene", "individual", "social"];
 
         constructor(histograms, type = "learn") {
-            this.histograms = histograms;
-            this.histogramType = type;
-
             this.histogramSelectorElement =
                 document.getElementById("histogramType");
             if (this.histogramSelectorElement)
@@ -95,8 +93,10 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
             if (this.histogramUploadAllElement)
                 this.histogramUploadAllElement.addEventListener("click", _ => this.uploadForAllTypes());
 
+            this.histograms = histograms;
             this.drawLast = histograms[0][0][type].drawLast;
             this.collectionRate = histograms[0][0][type].unitTimePerUpdate;
+            this.histogramType = type;
         }
 
         get collectionRate() { return this._collectionRate; }
@@ -233,6 +233,7 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
                 },
             };
 
+            console.log("Sending: ", payload)
             if (connection.isConnected) socket.emit("insert", payload);
             else alert("NOT CONNECTED");
         }
@@ -326,6 +327,8 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
 
             learnHistogram.isDrawing = false;
             geneHistogram.isDrawing = false;
+            individualHistogram.isDrawing = false;
+            socialHistogram.isDrawing = false;
 
             histograms[i][j] = { learn: learnHistogram, gene: geneHistogram, individual: individualHistogram, social: socialHistogram };
 

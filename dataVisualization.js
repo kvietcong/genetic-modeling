@@ -69,8 +69,8 @@ class Histogram {
 
     getRatios(counts) {
         const total = counts.total;
-        const ratios = this.categories.reduce((accumulated, current) => {
-            accumulated[current] = counts[current] / (total || 1);
+        const ratios = this.categories.reduce((accumulated, category) => {
+            accumulated[category] = counts[category] / (total || 1);
             return accumulated;
         }, {});
         return ratios;
