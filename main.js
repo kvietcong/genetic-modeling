@@ -1,3 +1,4 @@
+const globals = {};
 const connection = {};
 
 attachPropertiesWithCallbacks(connection, [
@@ -36,6 +37,23 @@ const establishSocket = ipString => {
 };
 establishSocket();
 document.getElementById("server-ip").value = params.defaultIP;
+
+const dbFind = (db, collection, query, callback) => {
+    if (!connection.isConnected) return alert("Not connected to the server!");
+    socket.emit("find", { db, collection, query });
+    socket.once("find", callback);
+}
+
+const dbFindAll = (callback, db = "genetic-modeling", collection = "histogramData") =>
+    dbFind(db, collection, {}, callback);
+
+const dbFindAllAndLog = (db = "genetic-modeling", collection = "histogramData") =>
+    dbFindAll(db, collection, console.log);
+
+const dbFindAllAndGlobalStore = (db = "genetic-modeling", collection = "histogramData") => {
+    globals.data = undefined;
+    dbFindAll(db, collection, data => globals.data = data);
+};
 
 const assetManager = new AssetManager();
 let gameEngines = [];
