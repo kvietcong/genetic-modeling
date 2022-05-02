@@ -125,22 +125,11 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
 
         get histogramType() { return this._histogramType; }
         set histogramType(type) {
-            if (!this._histogramType) this._histogramType = type;
-
-            for (const row of this.histograms) {
-                for (const histogramInfo of row) {
-                    histogramInfo[this.histogramType].isDrawing = false;
-                }
-            }
-            for (const row of this.histograms) {
-                for (const histogramInfo of row) {
-                    if (!(type in histogramInfo))
-                        throw new Error(`Invalid histogram index: ${type}`);
-                    histogramInfo[type].isDrawing = true;
-                }
-            }
-
             this._histogramType = type;
+            this.histograms.forEach(row =>
+                row.forEach(histogramInfo =>
+                    Object.keys(histogramInfo).forEach(key =>
+                        histogramInfo[key].isDrawing = key === type)));
 
             if (this.histogramSelectorElement)
                 this.histogramSelectorElement.value = this.histogramType;
