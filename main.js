@@ -27,7 +27,7 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
     const world = new World(rows, columns);
     const width = params.canvas.width / columns;
     const height = params.canvas.height / rows;
-    
+
     const histograms = [];
     for (let i = 0; i < rows; i++) {
         histograms[i] = [];
@@ -132,6 +132,36 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
             world.syncedEntities.push(socialHistogram);
         }
     }
+
+    const ticksPerGet = 100;
+    const dataGetter = (collector) => {
+        const villages = world.villages;
+        if (!collector.info.data) collector.info.data = [];
+        const tick = collector.info.data.length * ticksPerGet;
+        const villageData = villages.map(row =>
+            row.map(village => ({
+                village: {
+                    taskList: village.taskList,
+                },
+                organisms: village.organisms.map(organism => ({
+                    age: organism.days,
+                    genes: organism.geneList.map(gene => gene.level),
+                    learn: organism.learnList.map(meme => meme.level),
+                    individual: organism.learnGeneList[0].level,
+                    social: organism.learnGeneList[1].level,
+                    successes: organism.successes,
+                    failures: organism.failures,
+                    taskCapabilities: console.log(organism.getTaskCapabilities()),
+                }))
+            }))
+        );
+        collector.info.data.push({villageData, tick});
+    };
+    const collector = new Collector();
+    collector.setUpdater(dataGetter, ticksPerGet);
+    world.syncedEntities.push(collector);
+    params.debugEntities.collector = collector;
+
     const histogramManager = new HistogramManager(histograms, "gene");
     gameEngine.histogramManager = histogramManager; // Not the best way to do this. TODO: Make this better.
     params.debugEntities.histogramManager = histogramManager;

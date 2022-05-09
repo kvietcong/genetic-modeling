@@ -16,7 +16,6 @@ class Histogram {
         this.isDrawing = true;
         this.title = title ?? "Histogram";
 
-        this._categoryCounts = {};
         this.allCounts = [];
         if (initialData) this.pushData(initialData);
 
@@ -124,8 +123,7 @@ class Histogram {
         }
     }
 
-
-    draw(ctx, gameEngine) {
+    draw(ctx, _gameEngine) {
         if (!this.isDrawing) return;
         if (this.customDrawer) return this.customDrawer(this, ctx);
 
