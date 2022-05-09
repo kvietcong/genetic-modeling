@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Data!</title>
+
+        <script type="text/javascript" src="./util.js"></script>
+        <script src="../socket.io.min.js"></script>
+        <script type="text/javascript" src="../util.js"></script>
+        <script type="text/javascript" src="../db.js"></script>
+
+        <script>
+        window.addEventListener("load", () => {
+            document.getElementById("server-ip").value = params.defaultIP;
+        });
+        const findAndOutput = () => {
+            dbFindAll(data => {
+                console.log("Received", data);
+                console.log("Now putting it into the document");
+                document.getElementById("data").innerHTML = JSON.stringify(data, null, document.getElementById("prettify").checked && 4);
+            });
+        };
+        </script>
+    </head>
+    <body>
+        <h1>Data!</h1>
+        <input type="text" name="Server IP" id="server-ip" style="font-size: 1rem;">
+        <div>
+            <input type="checkbox" id="prettify">
+            Prettify JSON output? (Slower to output onto the document!)
+        </div>
+        <button
+            type="submit"
+            onclick="establishSocket(document.getElementById('server-ip').value)"
+        >
+            Attempt Reconnection
+        </button>
+
+        <br>
+
+        <div>
+            <button onclick="findAndOutput()">Output Data Onto Document</button>
+            <p style="display: inline-block">Takes a while to output ALL the data</p>
+        </div>
+
+        <main>
+            <h2>Data Below</h2>
+            <p id="loading"></p>
+            <pre id="data" style="background-color: lightgray; word-wrap: break-word; white-space: pre-wrap;">
+            </pre>
+        </main>
+    </body>
+</html>
