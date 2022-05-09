@@ -8,7 +8,6 @@
 
 // Constants associated with every Organism
 const ARR_LEN = 5;              // the number of tasks/genes/learning that the Organism has to do
-
 const ELDER_THRESH = 50;        // Organism is considered Elder after 50 days old
 
 /**
@@ -33,7 +32,6 @@ class Organism {
 
         // Instance variables
         // Creation of the genes associated with the current organism
-
         if (this.parent1 && this.parent2) {
             for (let i = 0; i < ARR_LEN; i++) {
                 const newGene = this.parent1.geneList[i].recombine(this.parent2.geneList[i]);
@@ -99,16 +97,16 @@ class Organism {
             for (let i = 0; i < ARR_LEN; i++) {
                 penalty += this.parent1.geneList[i].cellCount * params.gene_weight;
                 penalty += this.parent2.geneList[i].cellCount * params.gene_weight;
-                // penalty += Math.floor((this.parent1.geneList[i].cellCount + this.parent2.geneList[i].cellCount) / 2) * GENE_WEIGHT;
+                // penalty += Math.floor((this.parent1.geneList[i].cellCount + this.parent2.geneList[i].cellCount) / 2) * params.gene_weight;
             }
 
             penalty += this.parent1.learnGeneList[0].cellCount * params.ind_weight;
             penalty += this.parent2.learnGeneList[0].cellCount * params.ind_weight;
-            // penalty += Math.floor((this.parent1.learnGeneList[0].cellCount + this.parent2.learnGeneList[0].cellCount) / 2) * IND_WEIGHT;
+            // penalty += Math.floor((this.parent1.learnGeneList[0].cellCount + this.parent2.learnGeneList[0].cellCount) / 2) * params.ind_weight;
 
             penalty += this.parent1.learnGeneList[1].cellCount * params.soc_weight;
             penalty += this.parent2.learnGeneList[1].cellCount * params.soc_weight;
-            // penalty += Math.floor((this.parent1.learnGeneList[1].cellCount + this.parent2.learnGeneList[1].cellCount) / 2) * SOC_WEIGHT;
+            // penalty += Math.floor((this.parent1.learnGeneList[1].cellCount + this.parent2.learnGeneList[1].cellCount) / 2) * params.soc_weight;
         } else if (this.parent1) {
             for (let i = 0; i < ARR_LEN; i++) {
                 penalty += this.parent1.geneList[i].cellCount * params.gene_weight;

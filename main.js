@@ -557,9 +557,6 @@ const getParams = () => {
     } else if (document.getElementsByName("worldType")[3].checked) {
         params.worldType = 'random';
     }
-
-
-
 }
 
 const nuke = () => {
