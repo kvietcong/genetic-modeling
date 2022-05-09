@@ -219,8 +219,7 @@ class Organism {
                     this.learnList[index].mutate();
                 }
             }
-        }
-        else if (SLoption === 3 && this.days < ELDER_THRESH) {
+        } else if (SLoption === 3 && this.days < ELDER_THRESH) {
             // 3) Elder (age is  over 50 ticks)
             let elder = this.village.getElderOrganism();
             if (elder != undefined) {
