@@ -120,7 +120,7 @@
 
         <br><br>
 
-        <input type="text" id="mutationChance" value="0.3" /> Chance of Mutation <br >
+        <input type="text" id="mutationChance" value="0.05" /> Chance of Mutation <br >
         <input type="text" id="partitionSize" value="1" /> Partition Size <br >
         <input type="text" id="fillToLevelIn" value="0" /> Fill to level<br > <br>
 
@@ -129,10 +129,10 @@
     <div id = "reproductionDiv">
         <p> Reproduction </p>
 
-        <input type="text" id="repBase" value="15" /> Reproduction Base Cost<br />
-        <input type="text" id="geneWeight" value="1" /> Gene Weight Penalty<br />
-        <input type="text" id="indWeight" value="1" /> Ind. Learning Gene Weight Penalty<br />
-        <input type="text" id="socWeight" value="1" /> Soc. Learning Gene Weight Penalty<br />
+        <input type="text" id="repBase" value="1" /> Reproduction Base Cost<br />
+        <input type="text" id="geneWeight" value="0" /> Gene Weight Penalty<br />
+        <input type="text" id="indWeight" value="0" /> Ind. Learning Gene Weight Penalty<br />
+        <input type="text" id="socWeight" value="0" /> Soc. Learning Gene Weight Penalty<br />
 
         <br>
 
@@ -142,8 +142,8 @@
 
     <div id = "learningDiv">
         <p> Learning </p>
-        <input type="text" id="indMultiplier" value="5" /> Individual Ticket Multiplier<br />
-        <input type="text" id="socMultiplier" value="5" /> Social Ticket Multiplier<br /> <br>
+        <input type="text" id="indMultiplier" value="0.04" /> Individual Ticket Multiplier<br />
+        <input type="text" id="socMultiplier" value="0.04" /> Social Ticket Multiplier<br /> <br>
 
         Social learning from: <br>
         <input type="radio" name = "socialType"checked>
