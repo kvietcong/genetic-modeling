@@ -42,7 +42,7 @@ attachPropertiesWithCallbacks(params, [ // Function in `util.js`
     [ "cellSize", 5 ], // For Drawing (Currently Unused)
     [ "fillToLevel", 0 ],  // getRandomInteger(1,3); // document.getElementById("fillToLevelIn").value;
     [ "partitionSize", 1 ], // document.getElementById("sizeOfLevelIn").value; // it was set at 2 but Chris might want this at 1
-    [ "mutationChance", 0.3 ],
+    [ "mutationChance", 0.05 ],
     [ "initialPartitions", 5 ],
     [ "gene", {} ],
     [ "meme", {} ]

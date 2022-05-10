@@ -7,22 +7,20 @@ const params = {
     defaultIP: "http://76.28.146.35:8888",
 
     gridSize: [5, 5],
-    migrationThreshold: 0,
+    migrationThreshold: 0.01,
     SLradios: 0,
     sexualReproThreshold: 0,
-    SLcheck: false,
 
     // reproduction base
-    reproduction_base: 15,
-
+    reproduction_base: 1,
     // gene weights
-    gene_weight: 1,
-    ind_weight: 1,
-    soc_weight: 1,
+    gene_weight: 0,
+    ind_weight: 0,
+    soc_weight: 0,
 
     // ticket multipliers
-    ind_learn_ticket_multiplier: 5,
-    soc_learn_ticket_multiplier: 5,
+    ind_learn_ticket_multiplier: 0.04,
+    soc_learn_ticket_multiplier: 0.04,
 
     // Set Soft Cap
     softcap_modifier: 30,   // Take population you want and divide by this number. If the number is 5 or more,
@@ -31,15 +29,6 @@ const params = {
     worldSize: 5,
     worldType: 'random',
     isolated: true,
-    // ticket multipliers
-    IND_LEARN_TICKET_MULTIPLIER: 5,
-    SOC_LEARN_TICKET_MULTIPLIER: 5,
-    // reproduction base
-    REPRODUCTION_BASE: 25,
-    // gene weights
-    GENE_WEIGHT: 1,
-    IND_WEIGHT: 1,
-    SOC_WEIGHT: 1,
 
     canvas: {
         width: 2000,
