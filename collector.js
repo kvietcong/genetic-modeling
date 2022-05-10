@@ -7,7 +7,7 @@ class Collector {
     timeSinceLastUpdate;
     ticksSinceLastUpdate;
 
-    constructor(unitTimePerUpdate) {
+    constructor() {
         this.onTickTime = true;
         this.timeSinceLastUpdate = 0;
         this.ticksSinceLastUpdate = 0;

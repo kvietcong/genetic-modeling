@@ -138,12 +138,9 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
         const villages = world.villages;
         if (!collector.info.data) collector.info.data = [];
         const tick = collector.info.data.length * ticksPerGet;
-        const villageData = villages.map(row =>
-            row.map(village => ({
-                village: {
-                    taskList: village.taskList,
-                },
-                organisms: village.organisms.map(organism => ({
+        const organismData = villages.map(row =>
+            row.map(village =>
+                village.organisms.map(organism => ({
                     age: organism.days,
                     genes: organism.geneList.map(gene => gene.level),
                     learn: organism.learnList.map(meme => meme.level),
@@ -151,14 +148,22 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
                     social: organism.learnGeneList[1].level,
                     successes: organism.successes,
                     failures: organism.failures,
-                    taskCapabilities: console.log(organism.getTaskCapabilities()),
+                    taskCapabilities: organism.getTaskCapabilities(),
                 }))
-            }))
+            )
         );
-        collector.info.data.push({villageData, tick});
+        collector.info.data.push({organismData, tick});
     };
     const collector = new Collector();
     collector.setUpdater(dataGetter, ticksPerGet);
+    collector.info.villages = world.villages.map(row =>
+        row.map(village => ({
+            taskList: village.taskList,
+            isIsolated: village.isolated,
+        }))
+    );
+    collector.info.params = {
+    };
     world.syncedEntities.push(collector);
     params.debugEntities.collector = collector;
 
