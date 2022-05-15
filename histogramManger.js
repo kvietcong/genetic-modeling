@@ -5,36 +5,36 @@ class HistogramManager {
         this.histogramSelectorElement =
             document.getElementById("histogramType");
         if (this.histogramSelectorElement)
-        this.histogramSelectorElement.addEventListener("change",
-            event => this.histogramType = event.target.value);
+            this.histogramSelectorElement.addEventListener("change",
+                event => this.histogramType = event.target.value);
 
         this.histogramCollectionRateElement =
             document.getElementById("histogramCollectionRate");
         if (this.histogramCollectionRateElement)
-        this.histogramCollectionRateElement.addEventListener("change",
-            event => this.collectionRate = event.target.value);
+            this.histogramCollectionRateElement.addEventListener("change",
+                event => this.collectionRate = event.target.value);
 
         this.histogramDrawLastElement =
             document.getElementById("histogramDrawLast");
         if (this.histogramDrawLastElement)
-        this.histogramDrawLastElement.addEventListener("change",
-            event => this.drawLast = Number(event.target.value));
+            this.histogramDrawLastElement.addEventListener("change",
+                event => this.drawLast = Number(event.target.value));
 
         this.histogramDownloadCurrentElement = document.getElementById("histogramDownloadCurrent");
         if (this.histogramDownloadCurrentElement)
-        this.histogramDownloadCurrentElement.addEventListener("click", _ => this.downloadCSVForType());
+            this.histogramDownloadCurrentElement.addEventListener("click", _ => this.downloadCSVForType());
 
         this.histogramDownloadAllElement = document.getElementById("histogramDownloadAll");
         if (this.histogramDownloadAllElement)
-        this.histogramDownloadAllElement.addEventListener("click", _ => this.downloadCSVForAllTypes());
+            this.histogramDownloadAllElement.addEventListener("click", _ => this.downloadCSVForAllTypes());
 
         this.histogramUploadCurrentElement = document.getElementById("histogramUploadCurrent");
         if (this.histogramUploadCurrentElement)
-        this.histogramUploadCurrentElement.addEventListener("click", _ => this.uploadForType());
+            this.histogramUploadCurrentElement.addEventListener("click", _ => this.uploadForType());
 
         this.histogramUploadAllElement = document.getElementById("histogramUploadAll");
         if (this.histogramUploadAllElement)
-        this.histogramUploadAllElement.addEventListener("click", _ => this.uploadForAllTypes());
+            this.histogramUploadAllElement.addEventListener("click", _ => this.uploadForAllTypes());
 
         this.histograms = histograms;
         this.drawLast = histograms[0][0][type].drawLast;

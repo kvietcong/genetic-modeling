@@ -89,6 +89,11 @@ class GameEngine {
         this.entitiesToAdd.push(entity);
     };
 
+    clearEntities() {
+        this.entities.forEach(entity => entity?.drop && entity.drop(this));
+        this.entities = [];
+    }
+
     draw() {
         // Clear the whole canvas
         this.ctx.clearRect(0, 0, this.width, this.height);

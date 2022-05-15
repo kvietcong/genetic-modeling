@@ -1,31 +1,30 @@
-﻿
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
-    <title>Genetic Modeling</title>
+    <head>
+        <meta charset="utf-8">
+        <title>Genetic Modeling</title>
 
-    <link rel="stylesheet" type="text/css" href="./style.css"></link>
+        <link rel="stylesheet" type="text/css" href="./style.css"></link>
 
-    <script type="text/javascript" src="./jszip.min.js"></script>
-    <script src="./socket.io.min.js"></script>
+        <script type="text/javascript" src="./jszip.min.js"></script>
+        <script src="./socket.io.min.js"></script>
 
-    <script type="text/javascript" src="./util.js"></script>
-    <script type="text/javascript" src="./assetmanager.js"></script>
-    <script type="text/javascript" src="./timer.js"></script>
-    <script type="text/javascript" src="./gameengine.js"></script>
+        <script type="text/javascript" src="./util.js"></script>
+        <script type="text/javascript" src="./assetmanager.js"></script>
+        <script type="text/javascript" src="./timer.js"></script>
+        <script type="text/javascript" src="./gameengine.js"></script>
 
-    <script type="text/javascript" src="./db.js"></script>
-    <script type="text/javascript" src="./collector.js"></script>
-    <script type="text/javascript" src="./histogramManger.js"></script>
-    <script type="text/javascript" src="./environments.js"></script>
-    <script type="text/javascript" src="./gridEnvironment.js"></script>
-    <script type="text/javascript" src="./organism.js"></script>
-    <script type="text/javascript" src="./dataVisualization.js"></script>
-    <script type="text/javascript" src="./gene.js" defer></script>
-    <script type="text/javascript" src="./main.js" defer></script>
-    <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
-    <style>
+        <script type="text/javascript" src="./db.js"></script>
+        <script type="text/javascript" src="./collector.js"></script>
+        <script type="text/javascript" src="./histogramManger.js"></script>
+        <script type="text/javascript" src="./environments.js"></script>
+        <script type="text/javascript" src="./gridEnvironment.js"></script>
+        <script type="text/javascript" src="./organism.js"></script>
+        <script type="text/javascript" src="./dataVisualization.js"></script>
+        <script type="text/javascript" src="./gene.js" defer></script>
+        <script type="text/javascript" src="./main.js" defer></script>
+        <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
+        <style>
         #simulations {
             padding-left: 75px;
             counter-reset: listcounter;
@@ -49,193 +48,201 @@
             overflow: auto;
             max-height: 75vh;
         }
-    </style>
-</head>
-<body>
-    <ol id="simulations"></ol>
-    <button onclick="addSim()" style="position: fixed; top: 10px; right: 10px;">
-        Add Simulation
-    </button>
-    <button onclick="nuke()" style="position: fixed; top: 50px; right: 10px;">
-        NUKE
-    </button>
-    <ol id="buttons" style="position: fixed; top: 90px; right: 10px;">
-    </ol>
+        </style>
+    </head>
+    <body>
+        <ol id="simulations"></ol>
+        <button onclick="addSim()" style="position: fixed; top: 10px; right: 10px;">
+            Add Simulation
+        </button>
+        <button onclick="nuke()" style="position: fixed; top: 50px; right: 10px;">
+            NUKE
+        </button>
+        <ol id="buttons" style="position: fixed; top: 90px; right: 10px;">
+        </ol>
 
-    <!--
-    <div>
-        <br>
-        <!- - <input type="checkbox" id="migrationBox"> Offspring migration - ->
-        <!- - <input type="checkbox" id="sexualReproductionBox"> Sexual reproduction - ->
-        Sexual Reproduction Chance (0-100%) <input type="range" id="sexualRepSlider" min="0" max="1" value="0.5" step="0.05">
-        <br><br>
-        Offspring Migration Chance (0-100%) <input type="range" id="migrationSlider" min="0" max="1" value="0.5" step="0.05">
-        <br><br>
-        Initial Learning Ability (0 - 4) <input type="range" id="learningSlider" min="0" max="4" value="0" step="1">
-        <br><br>
-        <!- - Population Cap ( - 4) <input type="range" id="learningSlider" min="0" max="4" value="0" step="1">  - ->
-    </div> -->
+        <!--
+<div>
+<br>
+<!- - <input type="checkbox" id="migrationBox"> Offspring migration - ->
+<!- - <input type="checkbox" id="sexualReproductionBox"> Sexual reproduction - ->
+Sexual Reproduction Chance (0-100%) <input type="range" id="sexualRepSlider" min="0" max="1" value="0.5" step="0.05">
+<br><br>
+Offspring Migration Chance (0-100%) <input type="range" id="migrationSlider" min="0" max="1" value="0.5" step="0.05">
+<br><br>
+Initial Learning Ability (0 - 4) <input type="range" id="learningSlider" min="0" max="4" value="0" step="1">
+<br><br>
+<!- - Population Cap ( - 4) <input type="range" id="learningSlider" min="0" max="4" value="0" step="1">  - ->
+</div> -->
 
-    <!-- <div id = "tasksDiv">
-        <p> Tasks </p>
-        <input type="text" id="num_tasks_in" value="5" />Number of tasks<br />
-    </div> -->
+        <!-- <div id = "tasksDiv">
+<p> Tasks </p>
+<input type="text" id="num_tasks_in" value="5" />Number of tasks<br />
+</div> -->
 
-    <h1 id="dayOutput"></h1>
+        <h1 id="dayOutput"></h1>
 
-
-    <br>
-
-    <div id = "geneDiv">
-        <p> Gene </p>
-
-        <p> Mutator type </p>
-
-        <input type="radio" id = "destroy" name = "mutatorType" value = "destroy">
-        <label for = "destroy"> Destroy </label> <br>
-
-        <input type="radio" id = "flip" name = "mutatorType" value = "flip" checked>
-        <label for = "flip"> Flip </label> <br>
-
-        <input type="radio" id = "rejuvenate" name = "mutatorType" value = "rejuvenate">
-        <label for = "rejuvenate"> Rejuvenate </label> <br>
 
         <br>
 
-        <p> Recomboer type </p>
-        <input type="radio" id = "and" name = "recomboType" value = "and">
-        <label for = "and"> AND </label> <br>
+        <div id = "geneDiv">
+            <p> Gene </p>
 
-        <input type="radio" id = "orand" name = "recomboType" value = "orand" checked>
-        <label for = "orand"> ORAND </label> <br>
+            <p> Mutator type </p>
 
-        <input type="radio" id = "or" name = "recomboType" value = "or">
-        <label for = "or"> OR </label> <br>
+            <input type="radio" id = "destroy" name = "mutatorType" value = "destroy">
+            <label for = "destroy"> Destroy </label> <br>
 
-        <input type="radio" id = "xor" name = "recomboType" value = "xor">
-        <label for = "xor"> XOR </label> <br>
+            <input type="radio" id = "flip" name = "mutatorType" value = "flip" checked>
+            <label for = "flip"> Flip </label> <br>
 
-        <input type="radio" id = "nand" name = "recomboType" value = "nand">
-        <label for = "nand"> NAND </label> <br>
+            <input type="radio" id = "rejuvenate" name = "mutatorType" value = "rejuvenate">
+            <label for = "rejuvenate"> Rejuvenate </label> <br>
 
-        <input type="radio" id = "nor" name = "recomboType" value = "nor">
-        <label for = "nor"> NOR </label>
+            <br>
 
-        <br><br>
+            <p> Recomboer type </p>
+            <input type="radio" id = "and" name = "recomboType" value = "and">
+            <label for = "and"> AND </label> <br>
 
-        <input type="text" id="mutationChance" value="0.05" /> Chance of Mutation <br >
-        <input type="text" id="partitionSize" value="1" /> Partition Size <br >
-        <input type="text" id="fillToLevelIn" value="0" /> Fill to level<br > <br>
+            <input type="radio" id = "orand" name = "recomboType" value = "orand" checked>
+            <label for = "orand"> ORAND </label> <br>
 
-    </div>
+            <input type="radio" id = "or" name = "recomboType" value = "or">
+            <label for = "or"> OR </label> <br>
 
-    <div id = "reproductionDiv">
-        <p> Reproduction </p>
+            <input type="radio" id = "xor" name = "recomboType" value = "xor">
+            <label for = "xor"> XOR </label> <br>
 
-        <input type="text" id="repBase" value="1" /> Reproduction Base Cost<br />
-        <input type="text" id="geneWeight" value="0" /> Gene Weight Penalty<br />
-        <input type="text" id="indWeight" value="0" /> Ind. Learning Gene Weight Penalty<br />
-        <input type="text" id="socWeight" value="0" /> Soc. Learning Gene Weight Penalty<br />
+            <input type="radio" id = "nand" name = "recomboType" value = "nand">
+            <label for = "nand"> NAND </label> <br>
 
-        <br>
+            <input type="radio" id = "nor" name = "recomboType" value = "nor">
+            <label for = "nor"> NOR </label>
 
-        <input type="text" id="sexualRepChance" value="0.5" /> Sexual Reproduction Chance (0 - 1)<br />
-        <input type="text" id="migrationChance" value="0.01" /> Migration Chance (0 - 1)<br />
-    </div>
+            <br><br>
 
-    <div id = "learningDiv">
-        <p> Learning </p>
-        <input type="text" id="indMultiplier" value="0.04" /> Individual Ticket Multiplier<br />
-        <input type="text" id="socMultiplier" value="0.04" /> Social Ticket Multiplier<br /> <br>
+            <input type="text" id="mutationChance" value="0.05" /> Chance of Mutation <br >
+            <input type="text" id="partitionSize" value="1" /> Partition Size <br >
+            <input type="text" id="fillToLevelIn" value="0" /> Fill to level<br > <br>
 
-        Social learning from: <br>
-        <input type="radio" name = "socialType"checked>
-        <label for = "random"> Random of all options below. </label>  <br>
-
-        <input type="radio" name = "socialType">
-        <label for = "villager"> Random Villager </label> <br>
-
-        <input type="radio" name = "socialType">
-        <label for = "parent"> Parent </label> <br>
-
-        <input type="radio" name = "socialType">
-        <label for = "elder"> Elder </label> <br>
-
-        <input type="radio" name = "socialType">
-        <label for = "wise"> Wise </label> <br>
-    </div>
-
-    <div id = "worldConfig">
-        <p> World Configuration </p>
-
-        <label>Select Village Type:</label> <br>
-
-        <input type="radio" name = "villageType">
-        <label for = "isolated"> Isolated </label>  <br>
-
-        <input type="radio" name = "villageType" checked>
-        <label for = "neighborly"> Neighborly </label>  <br>
-
-        <label for="worldS">Select World Dimensions for Random & Layered:</label>
-        <select name="worldS" id="worldSi">
-            <options style="font-size: 100px;">
-            <option value=5>5 by 5</option>
-            <option value=7>7 by 7 </option>
-            <option value=8>8 by 8 </option>
-            <option value=9>9 by 9 </option>
-            </options>
-        </select> <br>
-
-        <input type="radio" name = "worldType">
-        <label for = "layer8by8"> Layered (only 8x8) </label>  <br>
-
-        <input type="radio" name = "worldType" checked>
-        <label for = "spiral"> Spiral (only 5x5) </label>  <br>
-
-        <input type="radio" name = "worldType">
-        <label for = "layered"> Layered </label> <br>
-
-        <input type="radio" name = "worldType">
-        <label for = "random"> Random </label>  <br>
-
-
-        <!-- <input type="radio" name = "worldType"checked>
-        <label for = "random"> Random World Configuration </label>  <br> -->
-    </div>
-
-    <div id="histogramConfig">
-        <label for="histogramType">Histogram Type:</label>
-        <select name="histogramType" id="histogramType">
-            <group>
-                <option value="gene">Gene</option>
-                <option value="learn">Learning</option>
-                <option value="individual">Individual Ticket Gene</option>
-                <option value="social">Social Ticket Gene</option>
-            </group>
-        </select>
-
-        <br>
-
-        <label for="histogramCollectionRate">Histogram Collection Rate:</label>
-        <input type="number" name="histogramCollectionRate" min="0" max="200" id="histogramCollectionRate">
-
-        <br>
-
-        <label for="histogramDrawLast">Plot Last N Ticks:</label>
-        <input type="number" name="histogramDrawLast" min="0" id="histogramDrawLast">
-
-        <div>
-            <h3 style="margin: 5px;">Download CSV</h3>
-            <p style="font-size: 1.25rem;">Fairly slow to Zip everything. Check console for progress.</p>
-            <button id="histogramDownloadCurrent">Current Type</button>
-            <button id="histogramDownloadAll">All Types</button>
         </div>
 
-        <div>
+        <div id = "reproductionDiv">
+            <p> Reproduction </p>
+
+            <input type="text" id="repBase" value="1" /> Reproduction Base Cost<br />
+            <input type="text" id="geneWeight" value="0" /> Gene Weight Penalty<br />
+            <input type="text" id="indWeight" value="0" /> Ind. Learning Gene Weight Penalty<br />
+            <input type="text" id="socWeight" value="0" /> Soc. Learning Gene Weight Penalty<br />
+
+            <br>
+
+            <input type="text" id="sexualRepChance" value="0.5" /> Sexual Reproduction Chance (0 - 1)<br />
+            <input type="text" id="migrationChance" value="0.01" /> Migration Chance (0 - 1)<br />
+        </div>
+
+        <div id = "learningDiv">
+            <p> Learning </p>
+            <input type="text" id="indMultiplier" value="0.04" /> Individual Ticket Multiplier<br />
+            <input type="text" id="socMultiplier" value="0.04" /> Social Ticket Multiplier<br /> <br>
+
+                Social learning from: <br>
+            <input type="radio" name = "socialType"checked>
+            <label for = "random"> Random of all options below. </label>  <br>
+
+            <input type="radio" name = "socialType">
+            <label for = "villager"> Random Villager </label> <br>
+
+            <input type="radio" name = "socialType">
+            <label for = "parent"> Parent </label> <br>
+
+            <input type="radio" name = "socialType">
+            <label for = "elder"> Elder </label> <br>
+
+            <input type="radio" name = "socialType">
+            <label for = "wise"> Wise </label> <br>
+        </div>
+
+        <div id = "worldConfig">
+            <p> World Configuration </p>
+
+            <label>Select Village Type:</label> <br>
+
+            <input type="radio" name = "villageType">
+            <label for = "isolated"> Isolated </label>  <br>
+
+            <input type="radio" name = "villageType" checked>
+            <label for = "neighborly"> Neighborly </label>  <br>
+
+            <label for="worldS">Select World Dimensions for Random & Layered:</label>
+            <select name="worldS" id="worldSi">
+                <options style="font-size: 100px;">
+                    <option value=5>5 by 5</option>
+                    <option value=7>7 by 7 </option>
+                    <option value=8>8 by 8 </option>
+                    <option value=9>9 by 9 </option>
+                </options>
+            </select> <br>
+
+            <input type="radio" name = "worldType">
+            <label for = "layer8by8"> Layered (only 8x8) </label>  <br>
+
+            <input type="radio" name = "worldType" checked>
+            <label for = "spiral"> Spiral (only 5x5) </label>  <br>
+
+            <input type="radio" name = "worldType">
+            <label for = "layered"> Layered </label> <br>
+
+            <input type="radio" name = "worldType">
+            <label for = "random"> Random </label>  <br>
+
+
+                <!-- <input type="radio" name = "worldType"checked>
+<label for = "random"> Random World Configuration </label>  <br> -->
+        </div>
+
+        <div id="histogramConfig">
+            <label for="histogramType">Histogram Type:</label>
+            <select name="histogramType" id="histogramType">
+                <group>
+                    <option value="gene">Gene</option>
+                    <option value="learn">Learning</option>
+                    <option value="individual">Individual Ticket Gene</option>
+                    <option value="social">Social Ticket Gene</option>
+                </group>
+            </select>
+
+            <br>
+
+            <label for="histogramCollectionRate">Histogram Collection Rate:</label>
+            <input type="number" name="histogramCollectionRate" min="0" max="200" id="histogramCollectionRate">
+
+            <br>
+
+            <label for="histogramDrawLast">Plot Last N Ticks:</label>
+            <input type="number" name="histogramDrawLast" min="0" id="histogramDrawLast">
+
+            <div>
+                <h3 style="margin: 5px;">Download CSV</h3>
+                <p style="font-size: 1.25rem;">Fairly slow to Zip everything. Check console for progress.</p>
+                <button id="histogramDownloadCurrent">Current Type</button>
+                <button id="histogramDownloadAll">All Types</button>
+            </div>
+        </div>
+        <div id="collectorConfig">
+            <h3>Collector Configuration</h3>
+            <label for="ticksPerGetInput">Ticks Between Data Points</label>
+            <input type="number" name="ticksPerGetInput" min="0" id="ticksPerGetInput" value=100 />
+            <span style="font-size: 1rem;">(For Next Sim)</span>
+            <p style="font-size: 1rem;">Current Ticks Between Data Points <span id="ticksPerGet">?</span></p>
+        </div>
+        <div id="server">
             <h3 style="margin: 5px;">Upload to Server</h3>
             <p style="font-size: 1.25rem;">Server is <span id="serverStatus">Disconnected</span></p>
-            <button id="histogramUploadCurrent">Current Type</button>
-            <button id="histogramUploadAll">All Types</button>
+            <button id="histogramUploadCurrent">Upload current histograms</button>
+            <button id="histogramUploadAll">Upload all histograms</button>
+            <button id="uploadRaw">Upload raw data</button>
             <br>
             <input type="text" name="Server IP" id="server-ip" style="font-size: 1rem;">
             <button
@@ -245,6 +252,5 @@
                 Attempt Reconnection
             </button>
         </div>
-    </div>
-</body>
+    </body>
 </html>

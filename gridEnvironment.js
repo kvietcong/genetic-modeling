@@ -2,7 +2,7 @@ params.stepsPerSecond = 20;
 params.population = 20;
 
 // This represents a "village"
-class Village {             
+class Village {
     constructor(i, j, grid) {
         this._grid = grid;
         this._pos = Object.freeze({ i, j });
@@ -28,7 +28,7 @@ class Village {
                 this.environment = "polarice";
             }
         } else if (params.worldType === 'layered8by8'){
-            
+
             if((i === 3 || i === 4) && (j === 3 || j === 4)) { // middle rainforest
 
                 this.environment = "rainforest";
@@ -71,7 +71,7 @@ class Village {
      * createTaskList:
      * will create a list of the tasks that the organism will attempt in a tick if they live in this village.
      */
-    createTaskList() {        
+    createTaskList() {
         for(let i = 0; i < this.numTasks; i++) {
             let task = {reward: 0, threshold: 0};
             if (this.environment === "polarice") {
@@ -136,20 +136,20 @@ class Village {
 
     removeOrganism(organism) { organism.removeFromWorld = true; }
 
-    get fitOrganisms() { 
+    get fitOrganisms() {
         return this.organisms.filter(organism => (organism.alive && organism.energy > organism.reproduction_thresh));
     }
 
-    get elderOrganisms() { 
+    get elderOrganisms() {
         if (!this.caches.elderOrganisms) {
-            this.caches.elderOrganisms = this.organisms.filter(organism => (organism.alive && organism.days > ELDER_THRESH)); 
+            this.caches.elderOrganisms = this.organisms.filter(organism => (organism.alive && organism.days > ELDER_THRESH));
         }
         return this.caches.elderOrganisms;
     }
 
     get smartOrganisms() {
         if (!this.caches.smartOrganisms) {
-            // this.caches.smartOrganisms = this.organisms.filter(organism => organism.learnCapability > LEARN_THRESH); 
+            // this.caches.smartOrganisms = this.organisms.filter(organism => organism.learnCapability > LEARN_THRESH);
 
             // one pass to find the average
             let sum = 0;
@@ -174,7 +174,7 @@ class Village {
             average = sum / selected; // average
             // third pass to filter those above the average
 
-            this.caches.smartOrganisms = this.organisms.filter(organism => organism.learnCapability > average); 
+            this.caches.smartOrganisms = this.organisms.filter(organism => organism.learnCapability > average);
         }
         return this.caches.smartOrganisms;
     }
@@ -206,11 +206,11 @@ class Village {
         return this.getVillagesInRange(this, 1, 1);
     }
 
-    getRandomOrganism() { 
+    getRandomOrganism() {
         if (this.isolated) {
-            return chooseRandom(this.organisms); 
+            return chooseRandom(this.organisms);
         }
-        
+
         // else if !this.isolated
         let neighborAgents = [];
         for (let i = 0; i < this.neighborList.length; i++) {
@@ -226,7 +226,7 @@ class Village {
         if (this.isolated) {
             return this.fitOrganisms[getRandomInteger(0, this.fitOrganisms.length - 1)];
         }
-        
+
         // else if !this.isolated
         let neighborAgents = [];
         for (let i = 0; i < this.neighborList.length; i++) {
@@ -252,7 +252,7 @@ class Village {
         if (this.isolated) {
             return this.smartOrganisms[getRandomInteger(0, this.smartOrganisms.length - 1)];
         }
-       
+
         // else if !this.isolated
         let neighborAgents = [];
         for (let i = 0; i < this.neighborList.length; i++) {

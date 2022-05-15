@@ -30,6 +30,10 @@ const params = {
     worldType: 'random',
     isolated: true,
 
+    collector: {
+        ticksPerGet: 100,
+    },
+
     canvas: {
         width: 2000,
         height: 1600,

@@ -13,6 +13,10 @@ class Collector {
         this.ticksSinceLastUpdate = 0;
 
         this.info = {};
+
+        this.uploadElement = document.getElementById("uploadRaw");
+        if (this.uploadElement)
+        this.uploadElement.addEventListener("click", () => this.upload());
     }
 
     setIndependentUpdater(updater, updatesPerSecond) {
@@ -33,11 +37,11 @@ class Collector {
 
     stopUpdate() { this.updater = null; this.unitTimePerUpdate = 0; }
 
-    step() {
+    step(world, _gameEngine, _secondsPerStep) {
         this.ticksSinceLastUpdate += 1;
         if (this.ticksSinceLastUpdate >= this.unitTimePerUpdate) {
             this.ticksSinceLastUpdate -= this.unitTimePerUpdate;
-            this.updater(this);
+            this.updater(this, world);
         }
     }
 
@@ -53,5 +57,23 @@ class Collector {
             this.timeSinceLastUpdate -= this.unitTimePerUpdate;
             this.updater(this, gameEngine);
         }
+    }
+
+    upload() {
+        const { info } = this;
+        const { villages, params, data: organism_data } = info;
+
+        const payload = {
+            db: "genetic-modeling",
+            collection: "runs",
+            data: {
+                villages, params, organism_data,
+                date: new Date(),
+            },
+        };
+
+        console.log("Sending: ", payload)
+        if (connection.isConnected) socket.emit("insert", payload);
+        else alert("NOT CONNECTED");
     }
 }

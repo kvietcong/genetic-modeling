@@ -7,6 +7,8 @@ attachPropertiesWithCallbacks(connection, [
         const histogramUploadCurrentElement = document.getElementById("histogramUploadCurrent");
         const histogramUploadAllElement = document.getElementById("histogramUploadAll");
         const serverStatusElement = document.getElementById("serverStatus");
+        const uploadRawElement = document.getElementById("uploadRaw");
+        uploadRawElement.disabled = !connectionStatus;
         histogramUploadCurrentElement.disabled = !connectionStatus;
         histogramUploadAllElement.disabled = !connectionStatus;
         serverStatusElement.innerText = connectionStatus ? "Connected" : "Disconnected (Failed to Connect)";
@@ -133,11 +135,10 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
         }
     }
 
-    const ticksPerGet = 100;
+    const { ticksPerGet } = params.collector;
     const dataGetter = (collector) => {
         const villages = world.villages;
         if (!collector.info.data) collector.info.data = [];
-        const tick = collector.info.data.length * ticksPerGet;
         const organismData = villages.map(row =>
             row.map(village =>
                 village.organisms.map(organism => ({
@@ -148,11 +149,11 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
                     social: organism.learnGeneList[1].level,
                     successes: organism.successes,
                     failures: organism.failures,
-                    taskCapabilities: organism.getTaskCapabilities(),
+                    // taskCapabilities: organism.getTaskCapabilities(),
                 }))
             )
         );
-        collector.info.data.push({organismData, tick});
+        collector.info.data.push({organismData, tick: world.days});
     };
     const collector = new Collector();
     collector.setUpdater(dataGetter, ticksPerGet);
@@ -162,7 +163,41 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
             isIsolated: village.isolated,
         }))
     );
+    const {
+        ind_learn_ticket_multiplier,
+        soc_learn_ticket_multiplier,
+        reproduction_base,
+        gene_weight,
+        ind_weight,
+        soc_weight,
+
+        migrationThreshold,
+        sexualReproThreshold,
+
+        softcap_modifier,
+
+        gridSize,
+        worldSize,
+        worldType,
+        isolated,
+    } = params;
     collector.info.params = {
+        ind_learn_ticket_multiplier,
+        soc_learn_ticket_multiplier,
+        reproduction_base,
+        gene_weight,
+        ind_weight,
+        soc_weight,
+
+        migrationThreshold,
+        sexualReproThreshold,
+
+        softcap_modifier,
+
+        gridSize,
+        worldSize,
+        worldType,
+        isolated,
     };
     world.syncedEntities.push(collector);
     params.debugEntities.collector = collector;
@@ -294,12 +329,13 @@ const addSim = () => {
         timer.attachTo(gameEngine, "draw");
         timer.updateAverageFPSElement(`avg-fps-${id}`);
         timer.updateFPSElement(`fps-${id}`);
-
     });
 }
 
 const getParams = () => {
     // reproduction related
+    params.collector.ticksPerGet = parseInt(document.getElementById("ticksPerGetInput").value);
+    if (params.collector.ticksPerGet < 10) params.collector.ticksPerGet = 100;
 
     params.reproduction_base = parseFloat(document.getElementById("repBase").value);
     params.gene_weight = parseFloat(document.getElementById("geneWeight").value);
@@ -383,5 +419,10 @@ const nuke = () => {
     gameEngines = [];
     regenerateButtons();
 }
+
+attachPropertyWithCallback(params.collector, "ticksPerGet", 100, newValue => {
+    const ticksPerGetElement = document.getElementById("ticksPerGet");
+    ticksPerGetElement.textContent = newValue;
+});
 
 addSim();
