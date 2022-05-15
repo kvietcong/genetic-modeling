@@ -431,13 +431,9 @@ const updateParams = () => {
 }
 
 const nuke = () => {
-    const simulations = document.getElementById("simulations");
-    while (simulations.firstChild) {
-        simulations.removeChild(simulations.firstChild);
+    for (let gameEngine of gameEngines) {
+        deleteSim(gameEngine.id);
     }
-    gameEngines.forEach(gameEngine => gameEngine.stop());
-    gameEngines = [];
-    regenerateButtons();
 }
 
 attachPropertyWithCallback(params.collector, "ticksPerGet", 800, newValue => {
