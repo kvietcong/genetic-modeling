@@ -25,6 +25,14 @@ class GameEngine {
         this.options = options || params.defaultGameEngineOptions;
     };
 
+    drop() {
+        this.entities.forEach(entity => {
+            if (entity.drop) entity.drop()
+            if (entity.deconstructor) entity.deconstructor()
+        });
+        this.entities = [];
+    }
+
     init(ctx) {
         this.ctx = ctx;
         this.startInput();
@@ -89,9 +97,8 @@ class GameEngine {
         this.entitiesToAdd.push(entity);
     };
 
-    clearEntities() {
-        this.entities.forEach(entity => entity?.drop && entity.drop(this));
-        this.entities = [];
+    stillAliveCheck() {
+        console.log(this.id, "Is Still Alive");
     }
 
     draw() {

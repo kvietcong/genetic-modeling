@@ -15,8 +15,14 @@ class Collector {
         this.info = {};
 
         this.uploadElement = document.getElementById("uploadRaw");
-        if (this.uploadElement)
-        this.uploadElement.addEventListener("click", () => this.upload());
+        this.uploadCallback = () => this.upload();
+        this.uploadElement
+            ?.addEventListener("click", this.uploadCallback);
+    }
+
+    drop() {
+        this.uploadElement
+            ?.removeEventListener("click", this.uploadCallback);
     }
 
     setIndependentUpdater(updater, updatesPerSecond) {

@@ -298,6 +298,14 @@ class World {
         }
     }
 
+    drop() {
+        this.syncedEntities.forEach(entity => {
+            if (entity.drop) entity.drop()
+            if (entity.deconstructor) entity.deconstructor()
+        });
+        this.syncedEntities = [];
+    }
+
     get villages() { return this._villages; }
 
     getVillage(i, j) {

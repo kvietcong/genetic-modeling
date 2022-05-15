@@ -242,11 +242,10 @@ const geneExample = gameEngine => {
 
 const deleteSim = id => {
     const deletedGameEngine = gameEngines.find(gameEngine => gameEngine.id === id);
+    deletedGameEngine.drop();
     deletedGameEngine.stop();
     gameEngines = gameEngines.filter(gameEngine => gameEngine.id !== id);
 
-    // const simulations = document.getElementById("simulations");
-    // simulations.removeChild(simulations.childNodes[simID]);
     const simulation = document.getElementById(`simulation-${id}`);
     simulation.remove();
 
@@ -255,7 +254,6 @@ const deleteSim = id => {
 
 const scrollToSim = id => {
     const simulation = document.getElementById(`simulation-${id}`);
-    print(simulation)
     simulation.scrollIntoView({behavior: "smooth", block: "start"});
 };
 

@@ -4,42 +4,63 @@ class HistogramManager {
     constructor(histograms, type = "learn") {
         this.histogramSelectorElement =
             document.getElementById("histogramType");
-        if (this.histogramSelectorElement)
-            this.histogramSelectorElement.addEventListener("change",
-                event => this.histogramType = event.target.value);
+        this.histogramSelectorCallback = event => this.histogramType = event.target.value;
+        this.histogramSelectorElement
+            ?.addEventListener("change", this.histogramSelectorCallback);
 
         this.histogramCollectionRateElement =
             document.getElementById("histogramCollectionRate");
-        if (this.histogramCollectionRateElement)
-            this.histogramCollectionRateElement.addEventListener("change",
-                event => this.collectionRate = event.target.value);
+        this.histogramCollectionCallback = event => this.collectionRate = event.target.value;
+        this.histogramCollectionRateElement
+            ?.addEventListener("change", this.histogramCollectionCallback);
 
         this.histogramDrawLastElement =
             document.getElementById("histogramDrawLast");
-        if (this.histogramDrawLastElement)
-            this.histogramDrawLastElement.addEventListener("change",
-                event => this.drawLast = Number(event.target.value));
+        this.histogramDrawLastCallback = event => this.drawLast = Number(event.target.value);
+        this.histogramDrawLastElement
+            ?.addEventListener("change", this.histogramDrawLastCallback);
 
         this.histogramDownloadCurrentElement = document.getElementById("histogramDownloadCurrent");
-        if (this.histogramDownloadCurrentElement)
-            this.histogramDownloadCurrentElement.addEventListener("click", _ => this.downloadCSVForType());
+        this.histogramDownloadCurrentCallback = _ => this.downloadCSVForType();
+        this.histogramDownloadCurrentElement
+            ?.addEventListener("click", this.histogramDownloadCurrentCallback);
 
         this.histogramDownloadAllElement = document.getElementById("histogramDownloadAll");
-        if (this.histogramDownloadAllElement)
-            this.histogramDownloadAllElement.addEventListener("click", _ => this.downloadCSVForAllTypes());
+        this.histogramDownloadAllCallback = _ => this.downloadCSVForAllTypes();
+        this.histogramDownloadAllElement
+            ?.addEventListener("click", this.histogramDownloadAllCallback);
 
         this.histogramUploadCurrentElement = document.getElementById("histogramUploadCurrent");
-        if (this.histogramUploadCurrentElement)
-            this.histogramUploadCurrentElement.addEventListener("click", _ => this.uploadForType());
+        this.histogramUploadCurrentCallback = _ => this.uploadForType();
+        this.histogramUploadCurrentElement
+            ?.addEventListener("click", this.histogramUploadCurrentCallback);
 
         this.histogramUploadAllElement = document.getElementById("histogramUploadAll");
-        if (this.histogramUploadAllElement)
-            this.histogramUploadAllElement.addEventListener("click", _ => this.uploadForAllTypes());
+        this.histogramUploadAllCallback = _ => this.uploadForAllTypes();
+        this.histogramUploadAllElement
+            ?.addEventListener("click", this.histogramUploadAllCallback);
 
         this.histograms = histograms;
         this.drawLast = histograms[0][0][type].drawLast;
         this.collectionRate = histograms[0][0][type].unitTimePerUpdate;
         this.histogramType = type;
+    }
+
+    drop() {
+        this.histogramSelectorElement
+            ?.removeEventListener("change", this.histogramSelectorCallback);
+        this.histogramCollectionRateElement
+            ?.removeEventListener("change", this.histogramCollectionCallback);
+        this.histogramDrawLastElement
+            ?.removeEventListener("change", this.histogramDrawLastCallback);
+        this.histogramDownloadCurrentElement
+            ?.removeEventListener("click", this.histogramDownloadCurrentCallback);
+        this.histogramDownloadAllElement
+            ?.removeEventListener("click", this.histogramDownloadAllCallback);
+        this.histogramUploadCurrentElement
+            ?.removeEventListener("click", this.histogramUploadCurrentCallback);
+        this.histogramUploadAllElement
+            ?.removeEventListener("click", this.histogramUploadAllCallback);
     }
 
     get collectionRate() { return this._collectionRate; }
