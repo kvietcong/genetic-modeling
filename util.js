@@ -175,7 +175,7 @@ const chooseRandom = items => items.length > 0
  * @param {Object} options Options for canvas. Look at params for defaults
  * @returns Canvas context
  */
-const initCanvas = options => {
+const initCanvas = (id, options) => {
     const {
         backgroundColor, border, width, height, attachID,
     } = options || params.canvas;
@@ -187,12 +187,13 @@ const initCanvas = options => {
     canvas.height = height;
     canvas.style.border = border;
     canvas.style.backgroundColor = backgroundColor;
-    canvas.style.float = "left";
+    // canvas.style.float = "left";
     // canvas.style.display = "inline-block";
     // canvas.style.display = "flex";
 
 	const context = canvas.getContext("2d");
     const listItem = document.createElement("li");
+    listItem.id = `simulation-${id}`
     listItem.appendChild(canvas);
     simulations.appendChild(listItem);
 

@@ -1,5 +1,6 @@
 const assetManager = new AssetManager();
 let gameEngines = [];
+let totalSims = 0;
 
 document.getElementById("server-ip").value = params.defaultIP;
 attachPropertiesWithCallbacks(connection, [
@@ -203,7 +204,6 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
     params.debugEntities.collector = collector;
 
     const histogramManager = new HistogramManager(histograms, "gene");
-    gameEngine.histogramManager = histogramManager; // Not the best way to do this. TODO: Make this better.
     params.debugEntities.histogramManager = histogramManager;
     params.debugEntities.world = world;
     gameEngine.addEntity(histogramManager);
@@ -240,24 +240,32 @@ const geneExample = gameEngine => {
 // DOM Manipulation
 // There's probably a memory leak somewhere XD
 
-const deleteSim = simID => {
-    gameEngines[simID].stop();
-    gameEngines = gameEngines.filter((_, id) => id !== simID);
+const deleteSim = id => {
+    const deletedGameEngine = gameEngines.find(gameEngine => gameEngine.id === id);
+    deletedGameEngine.stop();
+    gameEngines = gameEngines.filter(gameEngine => gameEngine.id !== id);
 
-    const simulations = document.getElementById("simulations");
-    simulations.removeChild(simulations.childNodes[simID]);
+    // const simulations = document.getElementById("simulations");
+    // simulations.removeChild(simulations.childNodes[simID]);
+    const simulation = document.getElementById(`simulation-${id}`);
+    simulation.remove();
 
     regenerateButtons();
 };
 
-const scrollToSim = simID => {
-    const simulations = document.getElementById("simulations");
-    simulations.children[simID].scrollIntoView({behavior: "smooth", block: "start"});
+const scrollToSim = id => {
+    const simulation = document.getElementById(`simulation-${id}`);
+    print(simulation)
+    simulation.scrollIntoView({behavior: "smooth", block: "start"});
 };
 
-const pausePlayEngine = simID => gameEngines[simID].isPaused = !gameEngines[simID].isPaused;
+const pausePlayEngine = id => {
+    const gameEngine = gameEngines.find(gameEngine => gameEngine.id === id);
+    gameEngine.isPaused = !gameEngine.isPaused;
+}
 
-const pausePlaySim = simID => gameEngines[simID]
+const pausePlaySim = id => gameEngines
+    .find(gameEngine => gameEngine.id === id)
     .entities
     .filter(e => e instanceof World)
     .forEach(world => world.isPaused = !world.isPaused);
@@ -269,9 +277,8 @@ const regenerateButtons = () => {
         buttonList.removeChild(buttonList.firstChild);
     }
 
-    gameEngines.forEach((gameEngine, id) => {
-        gameEngine.id = id; // Update Game Engine ID
-
+    gameEngines.forEach(gameEngine => {
+        const { id } = gameEngine;
         const deletionButton = document.createElement("button");
         deletionButton.innerText = `Delete Sim ${id}`;
         deletionButton.onclick = () => deleteSim(id);
@@ -313,15 +320,16 @@ const regenerateButtons = () => {
 
 const addSim = () => {
     assetManager.downloadAll(() => {
+        const id = totalSims++;
         const gameEngine = new GameEngine();
-        const ctx = initCanvas();
+        const ctx = initCanvas(id);
 
         gameEngine.init(ctx);
         restart(gameEngine);
         gameEngine.start();
 
-        const id = gameEngines.length;
         gameEngines.push(gameEngine);
+        gameEngine.id = id;
 
         regenerateButtons();
 
