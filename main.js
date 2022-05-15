@@ -277,10 +277,10 @@ const regenerateButtons = () => {
 
     gameEngines.forEach(gameEngine => {
         const { id } = gameEngine;
-        const deletionButton = document.createElement("button");
-        deletionButton.innerText = `Delete Sim ${id}`;
-        deletionButton.onclick = () => deleteSim(id);
-        deletionButton.id = `delete-sim-${id}`;
+        // const deletionButton = document.createElement("button");
+        // deletionButton.innerText = `Delete Sim ${id}`;
+        // deletionButton.onclick = () => deleteSim(id);
+        // deletionButton.id = `delete-sim-${id}`;
 
         const pausePlayEngineButton = document.createElement("button");
         pausePlayEngineButton.innerText = `Pause/Play Engine ${id}`;
@@ -306,7 +306,7 @@ const regenerateButtons = () => {
         fps.style = "color: red; font-size: 1em;";
 
         const li = document.createElement("li");
-        li.appendChild(deletionButton);
+        // li.appendChild(deletionButton);
         li.appendChild(scrollToButton);
         li.appendChild(pausePlayEngineButton);
         li.appendChild(pausePlaySimButton);
@@ -426,9 +426,16 @@ const nuke = () => {
     regenerateButtons();
 }
 
-attachPropertyWithCallback(params.collector, "ticksPerGet", 100, newValue => {
+attachPropertyWithCallback(params.collector, "ticksPerGet", 800, newValue => {
     const ticksPerGetElement = document.getElementById("ticksPerGet");
     ticksPerGetElement.textContent = newValue;
+    const ticksPerGetInputElement = document.getElementById("ticksPerGetInput");
+    ticksPerGetInputElement.value = newValue;
 });
 
-addSim();
+const initializeNewEnvironment = () => {
+    nuke();
+    addSim();
+}
+
+initializeNewEnvironment();

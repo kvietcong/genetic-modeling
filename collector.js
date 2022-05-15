@@ -18,11 +18,23 @@ class Collector {
         this.uploadCallback = () => this.upload();
         this.uploadElement
             ?.addEventListener("click", this.uploadCallback);
+
+        this.ticksStoredElement = document.getElementById("ticksStored");
+
+        this.pruneElement = document.getElementById("tickPrune");
+        this.pruneCallback = () => {
+            this.info.data = this.info.data.filter((_, i) => i % 2 == 0);
+            this.ticksStoredElement.textContent = this.info?.data?.length;
+        };
+        this.pruneElement
+            ?.addEventListener("click", this.pruneCallback);
     }
 
     drop() {
         this.uploadElement
             ?.removeEventListener("click", this.uploadCallback);
+        this.pruneElement
+            ?.removeEventListener("click", this.pruneCallback);
     }
 
     setIndependentUpdater(updater, updatesPerSecond) {
@@ -48,6 +60,7 @@ class Collector {
         if (this.ticksSinceLastUpdate >= this.unitTimePerUpdate) {
             this.ticksSinceLastUpdate -= this.unitTimePerUpdate;
             this.updater(this, world);
+            this.ticksStoredElement.textContent = this.info?.data?.length;
         }
     }
 

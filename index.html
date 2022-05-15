@@ -52,15 +52,15 @@
     </head>
     <body>
         <ol id="simulations"></ol>
-        <button onclick="addSim()" style="position: fixed; top: 10px; right: 10px;">
-            Add Simulation
+        <button onclick="initializeNewEnvironment()" style="position: fixed; top: 10px; right: 10px;">
+            Initialize New Environment
         </button>
-        <button onclick="nuke()" style="position: fixed; top: 50px; right: 10px;">
-            NUKE
-        </button>
-        <button id="stillAliveButton" style="position: fixed; top: 90px; right: 10px;">
-            Still Alive?
-        </button>
+        <!-- <button onclick="addSim()" style="position: fixed; top: 10px; right: 10px;"> -->
+        <!--     Add Simulation -->
+        <!-- </button> -->
+        <!-- <button onclick="nuke()" style="position: fixed; top: 50px; right: 10px;"> -->
+        <!--     NUKE -->
+        <!-- </button> -->
         <ol id="buttons" style="position: fixed; top: 90px; right: 10px;">
         </ol>
 
@@ -236,9 +236,14 @@ Initial Learning Ability (0 - 4) <input type="range" id="learningSlider" min="0"
         <div id="collectorConfig">
             <h3>Collector Configuration</h3>
             <label for="ticksPerGetInput">Ticks Between Data Points</label>
-            <input type="number" name="ticksPerGetInput" min="0" id="ticksPerGetInput" value=100 />
+            <input type="number" name="ticksPerGetInput" min="0" id="ticksPerGetInput" />
             <span style="font-size: 1rem;">(For Next Sim)</span>
             <p style="font-size: 1rem;">Current Ticks Between Data Points <span id="ticksPerGet">?</span></p>
+            <p style="font-size: 1rem;">Current Ticks Stored <span id="ticksStored">?</span></p>
+            <button id="tickPrune">Prune Ticks</button>
+            <p style="font-size: 1rem;">
+                Prune deletes all "odd-indexed" ticks. Useful if your data doesn't come through due to size.
+            </p>
         </div>
         <div id="server">
             <h3 style="margin: 5px;">Upload to Server</h3>
