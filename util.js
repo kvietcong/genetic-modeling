@@ -6,7 +6,6 @@ const params = {
 
     defaultIP: "http://76.28.146.35:8888",
 
-    gridSize: [5, 5],
     migrationThreshold: 0.01,
     SLradios: 0,
     sexualReproThreshold: 0,

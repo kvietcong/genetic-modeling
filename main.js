@@ -16,13 +16,14 @@ attachPropertiesWithCallbacks(connection, [
     }]
 ]);
 
-const restart = gameEngine => {
-    gridExample(gameEngine, params.gridSize[0], params.gridSize[1]);
+const restart = (gameEngine, paramsModifier) => {
+    gridExample(gameEngine, paramsModifier);
     // geneExample(gameEngine);
 }
 
-const gridExample = (gameEngine, rows = 5, columns = 5) => {
-    getParams();
+const gridExample = (gameEngine, paramsModifier) => {
+    updateParams();
+    if (paramsModifier) { paramsModifier(params) }
 
     rows = params.worldSize;
     columns = params.worldSize;
@@ -208,6 +209,19 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
     params.debugEntities.world = world;
     gameEngine.addEntity(histogramManager);
     gameEngine.addEntity(world);
+
+    if (params.autoCommand) {
+        const { stopAt, action, repeat } = params.autoCommand;
+        const stopper = {
+            step(world) {
+                if (world.days == stopAt) {
+                    action(world, gameEngine, histogramManager, collector);
+                }
+            }
+        };
+        world.syncedEntities.push(stopper);
+        params.autoCommand = undefined;
+    }
 };
 
 const geneExample = gameEngine => {
@@ -316,14 +330,14 @@ const regenerateButtons = () => {
     });
 };
 
-const addSim = () => {
+const addSim = paramsModifier => {
     assetManager.downloadAll(() => {
         const id = totalSims++;
         const gameEngine = new GameEngine();
         const ctx = initCanvas(id);
 
         gameEngine.init(ctx);
-        restart(gameEngine);
+        restart(gameEngine, paramsModifier);
         gameEngine.start();
 
         gameEngines.push(gameEngine);
@@ -338,7 +352,7 @@ const addSim = () => {
     });
 }
 
-const getParams = () => {
+const updateParams = () => {
     // reproduction related
     params.collector.ticksPerGet = parseInt(document.getElementById("ticksPerGetInput").value);
     if (params.collector.ticksPerGet < 10) params.collector.ticksPerGet = 100;
@@ -433,9 +447,19 @@ attachPropertyWithCallback(params.collector, "ticksPerGet", 800, newValue => {
     ticksPerGetInputElement.value = newValue;
 });
 
-const initializeNewEnvironment = () => {
+const initializeNewEnvironment = paramsModifier => {
     nuke();
-    addSim();
+    addSim(paramsModifier);
 }
 
-initializeNewEnvironment();
+initializeNewEnvironment(params => {
+    params.worldSize = 4;
+    params.worldType = "random";
+    params.autoCommand = {
+        stopAt: 100,
+        action: (world, gameEngine, histogramManger, collector) => {
+            print(world, gameEngine, histogramManger, collector);
+            world.stop();
+        },
+    };
+});

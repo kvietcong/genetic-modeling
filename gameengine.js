@@ -107,10 +107,10 @@ class GameEngine {
         // Draw latest things first
         this.entities.reduceRight((_, entity) => entity.draw?.(this.ctx, this), null);
 
-        if (this.isPaused) {
+        if (this.isPaused || !this.isRunning) {
             this.ctx.fillStyle = rgba(0, 0, 0, 0.5);
             this.ctx.fillRect(0, 0, this.width, this.height);
-            const pauseText = "Game Engine Paused";
+            const pauseText = `Game Engine ${this.isRunning ? "Paused" : "Stopped (Please Restart)"}`;
             const pauseTextWidth = this.ctx.measureText(pauseText).width;
             this.ctx.fillStyle = "red";
             this.ctx.font = "bold 50px Arial";
