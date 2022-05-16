@@ -163,6 +163,7 @@ const gridExample = (gameEngine, paramsModifier) => {
         row.map(village => ({
             taskList: village.taskList,
             isIsolated: village.isolated,
+            environment: village.environment,
         }))
     );
     const {
@@ -381,11 +382,11 @@ const updateParams = () => {
 
     // mutate
     if (document.getElementById("destroy").checked) {
-        params.gene.mutators = (gene) => libGene.mutators.currentLevel.template(gene, libGene.mutators.currentLevel.destroy);
+        params.gene.mutator = (gene) => libGene.mutators.currentLevel.template(gene, libGene.mutators.currentLevel.destroy);
     } else if (document.getElementById("flip").checked) {
-        params.gene.mutators = (gene) => libGene.mutators.currentLevel.template(gene, libGene.mutators.currentLevel.flip);
+        params.gene.mutator = (gene) => libGene.mutators.currentLevel.template(gene, libGene.mutators.currentLevel.flip);
     } else if (document.getElementById("rejuvenate").checked) {
-        params.gene.mutators = (gene) => libGene.mutators.currentLevel.template(gene, libGene.mutators.currentLevel.rejuvenate);
+        params.gene.mutator = (gene) => libGene.mutators.currentLevel.template(gene, libGene.mutators.currentLevel.rejuvenate);
     }
 
     // recombo
