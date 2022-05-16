@@ -8,6 +8,7 @@
 
 // Constants associated with every Organism
 const ARR_LEN = 5;              // the number of tasks/genes/learning that the Organism has to do
+
 const ELDER_THRESH = 50;        // Organism is considered Elder after 50 days old
 
 /**
@@ -32,6 +33,7 @@ class Organism {
 
         // Instance variables
         // Creation of the genes associated with the current organism
+
         if (this.parent1 && this.parent2) {
             for (let i = 0; i < ARR_LEN; i++) {
                 const newGene = this.parent1.geneList[i].recombine(this.parent2.geneList[i]);
@@ -97,16 +99,16 @@ class Organism {
             for (let i = 0; i < ARR_LEN; i++) {
                 penalty += this.parent1.geneList[i].cellCount * params.gene_weight;
                 penalty += this.parent2.geneList[i].cellCount * params.gene_weight;
-                // penalty += Math.floor((this.parent1.geneList[i].cellCount + this.parent2.geneList[i].cellCount) / 2) * params.gene_weight;
+                // penalty += Math.floor((this.parent1.geneList[i].cellCount + this.parent2.geneList[i].cellCount) / 2) * GENE_WEIGHT;
             }
 
             penalty += this.parent1.learnGeneList[0].cellCount * params.ind_weight;
             penalty += this.parent2.learnGeneList[0].cellCount * params.ind_weight;
-            // penalty += Math.floor((this.parent1.learnGeneList[0].cellCount + this.parent2.learnGeneList[0].cellCount) / 2) * params.ind_weight;
+            // penalty += Math.floor((this.parent1.learnGeneList[0].cellCount + this.parent2.learnGeneList[0].cellCount) / 2) * IND_WEIGHT;
 
             penalty += this.parent1.learnGeneList[1].cellCount * params.soc_weight;
             penalty += this.parent2.learnGeneList[1].cellCount * params.soc_weight;
-            // penalty += Math.floor((this.parent1.learnGeneList[1].cellCount + this.parent2.learnGeneList[1].cellCount) / 2) * params.soc_weight;
+            // penalty += Math.floor((this.parent1.learnGeneList[1].cellCount + this.parent2.learnGeneList[1].cellCount) / 2) * SOC_WEIGHT;
         } else if (this.parent1) {
             for (let i = 0; i < ARR_LEN; i++) {
                 penalty += this.parent1.geneList[i].cellCount * params.gene_weight;
@@ -200,29 +202,30 @@ class Organism {
             let randomOrganism = this.village.getRandomOrganism();
             if (randomOrganism != undefined && randomOrganism.alive) {
                 this.learnList[index] = this.learnList[index].recombine(randomOrganism.learnList[index]);
-                this.learnList[index].mutate();
+                // this.learnList[index].mutate();
             }
         } else if (SLoption === 2 && this.parent1 != undefined) {
             // 2) Parent
             if (this.parent1 === this.parent2) { // comes from asexual repr
                 this.learnList[index] = this.learnList[index].recombine(this.parent1.learnList[index]);
-                this.learnList[index].mutate();
+                // this.learnList[index].mutate();
             } else if (this.parent1 != this.parent2) { // comes from sexual repr
                 let parentIndex = getRandomInteger(0, 1);
                 if (parentIndex === 0) {
                     this.learnList[index] = this.learnList[index].recombine(this.parent1.learnList[index]);
-                    this.learnList[index].mutate();
+                    // this.learnList[index].mutate();
                 } else {
                     this.learnList[index] = this.learnList[index].recombine(this.parent2.learnList[index]);
-                    this.learnList[index].mutate();
+                    // this.learnList[index].mutate();
                 }
             }
-        } else if (SLoption === 3 && this.days < ELDER_THRESH) {
+        }
+        else if (SLoption === 3 && this.days < ELDER_THRESH) {
             // 3) Elder (age is  over 50 ticks)
             let elder = this.village.getElderOrganism();
             if (elder != undefined) {
                 this.learnList[index] = this.learnList[index].recombine(elder.learnList[index]);
-                this.learnList[index].mutate();
+                // this.learnList[index].mutate();
             } else {
                 this.socLearning(index, 1); // if there are no wise select random villager
             }
@@ -231,7 +234,7 @@ class Organism {
             let smart = this.village.getSmartOrganism();
             if (smart != undefined) {
                 this.learnList[index] = this.learnList[index].recombine(smart.learnList[index]);
-                this.learnList[index].mutate();
+                // this.learnList[index].mutate();
             } else {
                 this.socLearning(index, 1); // if there are no wise select random villager
             }
@@ -256,7 +259,7 @@ class Organism {
 
         let sexualReproChance = random();   // random value between 0 and 1
 
-        if (this.alive) {                                       // this would be 20 (7300) - 60 "years" (365 days * 60 years)
+        if (this.alive) { // this would be 20 (7300) - 60 "years" (365 days * 60 years)
             this.successes += this.reward.successes;            // keep track of successes on the tasks
             this.failures += this.reward.failures;              // will allow percentage calculation
             this.energy += this.reward.energy;
@@ -266,6 +269,7 @@ class Organism {
             if (this.village.organisms.length > params.softcap_modifier) {  //CHANGES THIS TO A PARAMETER
                 this.energy -= Math.floor(this.village.organisms.length/params.softcap_modifier);
             }
+
 
             if (sexualReproChance < params.sexualReproThreshold) {     //sexual
                 let otherParent = this.village.getFitOrganism();
@@ -287,6 +291,8 @@ class Organism {
 
             // make ticket multipliers fractional and require that the tickets get to a full value .
                    // 1.5
+
+            console.log("ind tickets count " + this.indTicketsCount + ", soc tickets count " + this.socTicketsCount);
 
 
            let indWhole = Math.floor(this.indTicketsCount);
