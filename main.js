@@ -151,7 +151,7 @@ const gridExample = (gameEngine, rows = 5, columns = 5) => {
                     social: organism.learnGeneList[1].level,
                     successes: organism.successes,
                     failures: organism.failures,
-                    taskCapabilities: console.log(organism.getTaskCapabilities()),
+                    taskCapabilities: organism.getTaskCapabilities(),
                 }))
             }))
         );
