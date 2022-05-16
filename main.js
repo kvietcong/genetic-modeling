@@ -437,7 +437,7 @@ const nuke = () => {
     }
 }
 
-attachPropertyWithCallback(params.collector, "ticksPerGet", 800, newValue => {
+attachPropertyWithCallback(params.collector, "ticksPerGet", params.collector.ticksPerGet, newValue => {
     const ticksPerGetElement = document.getElementById("ticksPerGet");
     ticksPerGetElement.textContent = newValue;
     const ticksPerGetInputElement = document.getElementById("ticksPerGetInput");

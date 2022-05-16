@@ -33,13 +33,13 @@ const dbFind = (db, collection, query, callback) => {
     socket.once("find", callback);
 }
 
-const dbFindAll = (callback, db = "genetic-modeling", collection = "histogramData") =>
+const dbFindAll = (callback, collection = "histogramData", db = "genetic-modeling") =>
     dbFind(db, collection, {}, callback);
 
-const dbFindAllAndLog = (db = "genetic-modeling", collection = "histogramData") =>
+const dbFindAllAndLog = (collection = "histogramData", db = "genetic-modeling") =>
     dbFindAll(console.log, db, collection);
 
-const dbFindAllAndGlobalStore = (db = "genetic-modeling", collection = "histogramData") => {
+const dbFindAllAndGlobalStore = (collection = "histogramData", db = "genetic-modeling") => {
     globals.data = undefined;
     dbFindAll(db, collection, data => globals.data = data);
 };

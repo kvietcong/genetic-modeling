@@ -80,13 +80,13 @@ class Collector {
 
     upload() {
         const { info } = this;
-        const { villages, params, data: organism_data } = info;
+        const { villages, params, data: organismDataPoints } = info;
 
         const payload = {
             db: "genetic-modeling",
             collection: "runs",
             data: {
-                villages, params, organism_data,
+                villages, params, organismDataPoints,
                 date: new Date(),
             },
         };

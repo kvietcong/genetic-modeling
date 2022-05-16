@@ -5,6 +5,7 @@ const params = {
     debugEntities: {},
 
     defaultIP: "http://76.28.146.35:8888",
+    // defaultIP: "localhost:8888",
 
     migrationThreshold: 0.01,
     SLradios: 0,
@@ -30,7 +31,7 @@ const params = {
     isolated: true,
 
     collector: {
-        ticksPerGet: undefined, // Defined in main at the bottom
+        ticksPerGet: 800,
     },
 
     canvas: {
@@ -48,7 +49,7 @@ const params = {
             scrolling: false,
         },
         debugging: false,
-    }
+    },
 };
 
 const logReturn = thing => console.log(thing) || thing;
@@ -130,12 +131,22 @@ const average = args => {
 // Inclusive!
 const range = (start, end) => [...Array(end - start + 1).keys()].map(i => i + start);
 
+const flatten = item => Array.isArray(item)
+    ? item
+    .map(flatten)
+    .reduce((accumulatedArrays, nextArray) =>
+        accumulatedArrays.concat(nextArray), [])
+    : item;
+
+
 /**
  * Random number between two numbers inclusively
  * @param {Number} min Lower bound
  * @param {Number} max Upper bound
  */
 const getRandomRange = (min, max) => random() * (max - min) + min;
+
+const getRandomColor = () => rgb(...range(1,3).map(_ => getRandomInteger(0, 255)));
 
 /**
  * Compute log with arbitrary base
