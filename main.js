@@ -488,8 +488,7 @@ const runPredefinedScenarios = (predefinedScenarios, options) => {
             print(world, gameEngine, histogramManger, collector);
             world.stop();
             if (willUpload) collector.upload();
-            if (allScenarios.length > ++i)
-            initializeNewEnvironment(wrapper);
+            if (allScenarios.length > ++i) initializeNewEnvironment(wrapper);
         });
     params.collector.ticksPerGet = options.collectionRate
         ?? params.collector.ticksPerGet
