@@ -93,6 +93,6 @@ class Collector {
 
         console.log("Sending: ", payload)
         if (connection.isConnected) socket.emit("insert", payload);
-        else alert("NOT CONNECTED");
+        else alert("Could not upload. Server is not connected.");
     }
 }

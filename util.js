@@ -31,7 +31,7 @@ const params = {
     isolated: true,
 
     collector: {
-        ticksPerGet: 800,
+        ticksPerGet: 100,
     },
 
     canvas: {
