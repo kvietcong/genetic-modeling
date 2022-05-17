@@ -183,6 +183,8 @@ const gridExample = (gameEngine, paramsModifier) => {
         worldSize,
         worldType,
         isolated,
+
+        initialPartitions,
     } = params;
     collector.info.params = {
         ind_learn_ticket_multiplier,
@@ -201,6 +203,8 @@ const gridExample = (gameEngine, paramsModifier) => {
         worldSize,
         worldType,
         isolated,
+
+        initialPartitions,
     };
     world.syncedEntities.push(collector);
     params.debugEntities.collector = collector;
@@ -478,7 +482,6 @@ const runPredefinedScenarios = (predefinedScenarios, options) => {
     // be pre-existing values that can be detrimental.
     const allScenarios = Object.entries(predefinedScenarios);
     let i = 0;
-
 
     const stopAt = options.stopAt ?? 20_000;
     const willUpload = options.willUpload ?? true;
