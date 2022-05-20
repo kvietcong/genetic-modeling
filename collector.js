@@ -80,7 +80,63 @@ class Collector {
 
     upload() {
         const { info } = this;
-        const { villages, params, data: organismDataPoints } = info;
+        const { villages, params, data } = info;
+
+        const organismDataPoints = data.map(({ organismData, tick }) => ({
+            organismData: organismData.map((row, i) =>
+                row.map((villageOrganisms, j) =>
+                    villageOrganisms.reduce((aggregate, organism) => {
+                        organism.genes.forEach((geneLevel, k) => {
+                            aggregate.genes[k][geneLevel] =
+                                1 + (aggregate.genes[k][geneLevel] ?? 0);
+                        });
+                        organism.learn.forEach((memeLevel, k) => {
+                            aggregate.memes[k][memeLevel] =
+                                1 + (aggregate.memes[k][memeLevel] ?? 0);
+                        });
+                        aggregate.social[organism.social] =
+                            1 + (aggregate.social[organism.social] ?? 0);
+                        aggregate.individual[organism.individual] =
+                            1 + (aggregate.individual[organism.individual] ?? 0);
+                        aggregate.population++;
+                        return aggregate;
+                    }, {
+                        genes: zeroes(ARR_LEN).map(_ => ({})),
+                        memes: zeroes(ARR_LEN).map(_ => ({})),
+                        individual: {}, social: {},
+                        population: 0, position: [i,j],
+                    })
+                )
+            ),
+            tick,
+        }));
+
+        // TODO: Ask About Saving Memory by not filling in 0 spots
+        // const organismDataPoints = data.map(({ organismData, tick }) => ({
+        //     organismData: organismData.map((row, i) =>
+        //         row.map((villageOrganisms, j) =>
+        //             villageOrganisms.reduce((aggregate, organism) => {
+        //                 organism.genes.forEach((geneLevel, k) => {
+        //                     aggregate.genes[k][geneLevel]++;
+        //                 });
+        //                 organism.learn.forEach((memeLevel, k) => {
+        //                     aggregate.memes[k][memeLevel]++;
+        //                 });
+        //                 aggregate.social[organism.social]++;
+        //                 aggregate.individual[organism.individual]++;
+        //                 aggregate.population++;
+        //                 return aggregate;
+        //             }, {
+        //                 genes: zeroes(ARR_LEN).map(_ => zeroes(params.initialPartitions)),
+        //                 memes: zeroes(ARR_LEN).map(_ => zeroes(params.initialPartitions)),
+        //                 individual: zeroes(params.initialPartitions),
+        //                 social: zeroes(params.initialPartitions),
+        //                 population: 0, position: [i,j],
+        //             })
+        //         )
+        //     ),
+        //     tick,
+        // }));
 
         const payload = {
             db: "genetic-modeling",
@@ -93,6 +149,6 @@ class Collector {
 
         console.log("Sending: ", payload)
         if (connection.isConnected) socket.emit("insert", payload);
-        else alert("NOT CONNECTED");
+        else alert("Could not upload. Server is not connected.");
     }
 }

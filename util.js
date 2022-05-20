@@ -31,7 +31,7 @@ const params = {
     isolated: true,
 
     collector: {
-        ticksPerGet: 800,
+        ticksPerGet: 20,
     },
 
     canvas: {
@@ -130,6 +130,8 @@ const average = args => {
 
 // Inclusive!
 const range = (start, end) => [...Array(end - start + 1).keys()].map(i => i + start);
+
+const zeroes = amount => range(1, amount).map(_ => 0);
 
 const flatten = item => Array.isArray(item)
     ? item

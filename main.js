@@ -183,6 +183,8 @@ const gridExample = (gameEngine, paramsModifier) => {
         worldSize,
         worldType,
         isolated,
+
+        initialPartitions,
     } = params;
     collector.info.params = {
         ind_learn_ticket_multiplier,
@@ -201,6 +203,8 @@ const gridExample = (gameEngine, paramsModifier) => {
         worldSize,
         worldType,
         isolated,
+
+        initialPartitions,
     };
     world.syncedEntities.push(collector);
     params.debugEntities.collector = collector;
@@ -212,16 +216,18 @@ const gridExample = (gameEngine, paramsModifier) => {
     gameEngine.addEntity(world);
 
     if (params.autoCommand) {
-        const { stopAt, action, repeat } = params.autoCommand;
+        const { stopAt, action } = params.autoCommand;
         const stopper = {
+            hasRun: false,
             step(world) {
-                if (world.days == stopAt) {
+                if (!this.hasRun && world.days == stopAt) {
+                    this.hasRun = true;
                     action(world, gameEngine, histogramManager, collector);
                 }
             }
         };
         world.syncedEntities.push(stopper);
-        params.autoCommand = undefined;
+        params.autoCommand = null;
     }
 };
 
@@ -449,14 +455,58 @@ const initializeNewEnvironment = paramsModifier => {
     addSim(paramsModifier);
 }
 
-initializeNewEnvironment(params => {
-    params.worldSize = 4;
-    params.worldType = "random";
-    params.autoCommand = {
-        stopAt: 100,
-        action: (world, gameEngine, histogramManger, collector) => {
+
+const testPredefinedScenarios = {
+    test0: {
+        worldSize: 4,
+        worldType: "random",
+    },
+    test1: {
+        worldSize: 2,
+        worldType: "random",
+    },
+    test2: {
+        worldSize: 8,
+        worldType: "random",
+    },
+};
+
+const testPredefinedScenariosAndOptions = [
+    testPredefinedScenarios,
+    { stopAt: 100, willUpload: false, }
+];
+
+const runPredefinedScenarios = (predefinedScenarios, options) => {
+    // WARNING: ASSIGN CAN BE A SOURCE OF BUGS!
+    // If we're missing stuff in the test scenarios, there can
+    // be pre-existing values that can be detrimental.
+    const allScenarios = Object.entries(predefinedScenarios);
+    let i = 0;
+
+    const stopAt = options.stopAt ?? 20_000;
+    const willUpload = options.willUpload ?? true;
+    const action = options.action
+        ?? ((world, gameEngine, histogramManger, collector) => {
+            print(`Finished Scenario "${allScenarios[i][0]}"`);
             print(world, gameEngine, histogramManger, collector);
             world.stop();
-        },
+            if (willUpload) collector.upload();
+            if (allScenarios.length > ++i) initializeNewEnvironment(wrapper);
+        });
+    params.collector.ticksPerGet = options.collectionRate
+        ?? params.collector.ticksPerGet
+        ?? 100;
+
+    const wrapper = params => {
+        Object.assign(params, allScenarios[i][1]);
+
+        params.autoCommand = {
+            stopAt,
+            action,
+        };
     };
-});
+
+    initializeNewEnvironment(wrapper);
+};
+
+initializeNewEnvironment();
