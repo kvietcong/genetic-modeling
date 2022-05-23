@@ -457,7 +457,7 @@ const initializeNewEnvironment = paramsModifier => {
 
 
 const testPredefinedScenarios = {
-    test0: {
+    /* test0: {
         worldSize: 4,
         worldType: "random",
     },
@@ -468,12 +468,55 @@ const testPredefinedScenarios = {
     test2: {
         worldSize: 8,
         worldType: "random",
+    }, */
+    default: {
+        description: "Test #1 - Default Settings",
     },
+    no_learning: {
+        description: "Test #2 - No Learning",
+        worldSize: 5,
+        worldType: "spiral",
+        ind_learn_ticket_multiplier: 0,
+        soc_learn_ticket_multiplier: 0
+    },
+    no_genetics: {
+        description: "Test #3 - No Genetics",
+        gene_weight: 1000,
+        ind_learn_ticket_multiplier: 0.075,
+        soc_learn_ticket_multiplier: 0.075
+    },
+    no_ind_learning: {
+        description: "Test #4 - No Ind Learning",
+        gene_weight: 0.001,
+        ind_learn_ticket_multiplier: 0, // no ind
+        soc_learn_ticket_multiplier: 0.075
+    },
+    no_social: {
+        description: "Test #5 - No Soc Learning",
+        gene_weight: 0.001,
+        ind_learn_ticket_multiplier: 0.075,
+        soc_learn_ticket_multiplier: 0 // no soc
+    },
+    similar_ind_soc_growth: {
+        description: "Test #6 - Similar ind/soc learning growth",
+        gene_weight: 0.001,
+        ind_learn_ticket_multiplier: 1,
+        soc_learn_ticket_multiplier: 0.05
+    },
+    regression: {
+        description: "Test #7 - Migration regression?",
+        gene_weight: 0.001,
+        ind_learn_ticket_multiplier: 0.075,
+        soc_learn_ticket_multiplier: 0.075,
+        gene: {
+            recomboer : (gene, otherGene) => libGene.recomboers.perCell.template(gene, otherGene, libGene.recomboers.perCell.AND)
+        }
+    } 
 };
 
 const testPredefinedScenariosAndOptions = [
     testPredefinedScenarios,
-    { stopAt: 100, willUpload: false, }
+    { stopAt: 50, willUpload: false, }
 ];
 
 const runPredefinedScenarios = (predefinedScenarios, options) => {

@@ -358,8 +358,9 @@ class World {
         this.days++;
         this.TICK = gameEngine.clockTick;
 
-        document.getElementById("dayOutput").innerHTML = "Day # " + this.days;
-
+        document.getElementById("dayOutput").innerHTML = "Day # " + this.days + " " + params.description;
+        document.getElementById("penaltyOutput").innerHTML = "Gene penalty: " + params.gene_weight + " | Ind penalty: " + params.ind_weight + " | Soc penalty: " + params.soc_weight ;
+        document.getElementById("ticketOutput").innerHTML = "Ind ticket: " + params.ind_learn_ticket_multiplier + " | Soc ticket: " + params.soc_learn_ticket_multiplier;
     }
 
     get getTick() {

@@ -94,3 +94,7 @@ h1 {
 input[type='radio'] {
     transform: scale(2.5);
 }
+
+button {
+    font-size:30px;
+}

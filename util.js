@@ -7,6 +7,8 @@ const params = {
     defaultIP: "http://76.28.146.35:8888",
     // defaultIP: "localhost:8888",
 
+    description: "Live Sim",
+
     migrationThreshold: 0.01,
     SLradios: 0,
     sexualReproThreshold: 0,
@@ -14,13 +16,13 @@ const params = {
     // reproduction base
     reproduction_base: 1,
     // gene weights
-    gene_weight: 0,
-    ind_weight: 0,
-    soc_weight: 0,
+    gene_weight: 0.001,
+    ind_weight: 0.1,
+    soc_weight: 0.1,
 
     // ticket multipliers
-    ind_learn_ticket_multiplier: 0.04,
-    soc_learn_ticket_multiplier: 0.04,
+    ind_learn_ticket_multiplier: 0.075,
+    soc_learn_ticket_multiplier: 0.075,
 
     // Set Soft Cap
     softcap_modifier: 30,   // Take population you want and divide by this number. If the number is 5 or more,
