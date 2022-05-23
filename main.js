@@ -516,7 +516,7 @@ const testPredefinedScenarios = {
 
 const testPredefinedScenariosAndOptions = [
     testPredefinedScenarios,
-    { stopAt: 50, willUpload: false, }
+    { stopAt: 200, willUpload: false, }
 ];
 
 const runPredefinedScenarios = (predefinedScenarios, options) => {
