@@ -55,16 +55,22 @@
         <h1 id="dayOutput"></h1>
         <h2 id="penaltyOutput"></h2>
         <h2 id="ticketOutput"></h2>
+        <details>
+            <summary>Current Parameters <button onclick="print({params})">Print in Console</button></summary>
+            <pre id="currentParameters">
+            Loading...
+            </pre>
+        </details>
 
         <ol id="simulations"></ol>
         <button onclick="initializeNewEnvironment()" style="position: fixed; top: 10px; right: 10px;">
             Initialize New Environment
         </button>
-        <button onclick="runPredefinedScenarios(...testPredefinedScenariosAndOptions)" style="position: fixed; top: 50px; right: 10px;">
-            Run Test Predefined Scenarios
+        <button onclick="runPredefinedScenarios(...predefinedScenariosAndOptions)" style="position: fixed; top: 50px; right: 10px;">
+            Run Predefined Scenarios
         </button>
-        <button onclick="print(...testPredefinedScenariosAndOptions)" style="position: fixed; top: 90px; right: 10px;">
-            Print Test Predefined Scenarios
+        <button onclick="print(...predefinedScenariosAndOptions)" style="position: fixed; top: 90px; right: 10px;">
+            Print Predefined Scenarios
         </button>
         <!-- <button onclick="addSim()" style="position: fixed; top: 10px; right: 10px;"> -->
         <!--     Add Simulation -->

@@ -292,9 +292,6 @@ class Organism {
             // make ticket multipliers fractional and require that the tickets get to a full value .
                    // 1.5
 
-            console.log("ind tickets count " + this.indTicketsCount + ", soc tickets count " + this.socTicketsCount);
-
-
            let indWhole = Math.floor(this.indTicketsCount);
            let indRest = this.indTicketsCount - Math.floor(this.indTicketsCount);
 

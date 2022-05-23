@@ -24,6 +24,8 @@ const restart = (gameEngine, paramsModifier) => {
 const gridExample = (gameEngine, paramsModifier) => {
     updateParams();
     if (paramsModifier) { paramsModifier(params) }
+    const currentParametersElement = document.getElementById("currentParameters");
+    currentParametersElement.textContent = JSON.stringify(params, null, 4);
 
     rows = params.worldSize;
     columns = params.worldSize;
@@ -456,7 +458,7 @@ const initializeNewEnvironment = paramsModifier => {
 }
 
 
-const testPredefinedScenarios = {
+const predefinedScenarios = {
     /* test0: {
         worldSize: 4,
         worldType: "random",
@@ -511,12 +513,12 @@ const testPredefinedScenarios = {
         gene: {
             recomboer : (gene, otherGene) => libGene.recomboers.perCell.template(gene, otherGene, libGene.recomboers.perCell.AND)
         }
-    } 
+    }
 };
 
-const testPredefinedScenariosAndOptions = [
-    testPredefinedScenarios,
-    { stopAt: 200, willUpload: false, }
+const predefinedScenariosAndOptions = [
+    predefinedScenarios,
+    { stopAt: 200, willUpload: false, collectionRate: 100, }
 ];
 
 const runPredefinedScenarios = (predefinedScenarios, options) => {
