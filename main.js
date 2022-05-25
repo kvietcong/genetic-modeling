@@ -521,7 +521,7 @@ const predefinedScenarios = {
     },
 };
 
-predefinedscenarios.regression.gene = object.assign(params.gene, predefinedscenarios.regression.gene);
+predefinedscenarios.regression.gene = Object.assign(params.gene, predefinedscenarios.regression.gene);
 
 const predefinedScenariosAndOptions = [
     predefinedScenarios,
