@@ -25,7 +25,10 @@ const gridExample = (gameEngine, paramsModifier) => {
     updateParams();
     if (paramsModifier) { paramsModifier(params) }
     const currentParametersElement = document.getElementById("currentParameters");
+    const temp = params.debugEntities;
+    params.debugEntities = null;
     currentParametersElement.textContent = JSON.stringify(params, null, 4);
+    params.debugEntities = temp;
 
     rows = params.worldSize;
     columns = params.worldSize;
