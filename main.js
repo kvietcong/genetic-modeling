@@ -190,6 +190,7 @@ const gridExample = (gameEngine, paramsModifier) => {
         isolated,
 
         initialPartitions,
+        description,
     } = params;
     collector.info.params = {
         ind_learn_ticket_multiplier,
@@ -210,6 +211,7 @@ const gridExample = (gameEngine, paramsModifier) => {
         isolated,
 
         initialPartitions,
+        description,
     };
     world.syncedEntities.push(collector);
     params.debugEntities.collector = collector;
@@ -516,12 +518,14 @@ const predefinedScenarios = {
         gene: {
             recomboer : (gene, otherGene) => libGene.recomboers.perCell.template(gene, otherGene, libGene.recomboers.perCell.AND)
         }
-    }
+    },
 };
+
+predefinedscenarios.regression.gene = object.assign(params.gene, predefinedscenarios.regression.gene);
 
 const predefinedScenariosAndOptions = [
     predefinedScenarios,
-    { stopAt: 200, willUpload: false, collectionRate: 100, }
+    { stopAt: 20_000, willUpload: true, collectionRate: 100, }
 ];
 
 const runPredefinedScenarios = (predefinedScenarios, options) => {
@@ -539,7 +543,8 @@ const runPredefinedScenarios = (predefinedScenarios, options) => {
             print(world, gameEngine, histogramManger, collector);
             world.stop();
             if (willUpload) collector.upload();
-            if (allScenarios.length > ++i) initializeNewEnvironment(wrapper);
+            i = (i + 1) % allScenarios.length;
+            initializeNewEnvironment(wrapper);
         });
     params.collector.ticksPerGet = options.collectionRate
         ?? params.collector.ticksPerGet
