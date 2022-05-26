@@ -78,11 +78,37 @@ class Collector {
         }
     }
 
-    upload() {
-        const { info } = this;
-        const { villages, params, data } = info;
+    get organismDataPoints() {
+        // TODO: Ask About Saving Memory by not filling in 0 spots
+        // const organismDataPoints = data.map(({ organismData, tick }) => ({
+        //     organismData: organismData.map((row, i) =>
+        //         row.map((villageOrganisms, j) =>
+        //             villageOrganisms.reduce((aggregate, organism) => {
+        //                 organism.genes.forEach((geneLevel, k) => {
+        //                     aggregate.genes[k][geneLevel]++;
+        //                 });
+        //                 organism.learn.forEach((memeLevel, k) => {
+        //                     aggregate.memes[k][memeLevel]++;
+        //                 });
+        //                 aggregate.social[organism.social]++;
+        //                 aggregate.individual[organism.individual]++;
+        //                 aggregate.population++;
+        //                 return aggregate;
+        //             }, {
+        //                 genes: zeroes(ARR_LEN).map(_ => zeroes(params.initialPartitions)),
+        //                 memes: zeroes(ARR_LEN).map(_ => zeroes(params.initialPartitions)),
+        //                 individual: zeroes(params.initialPartitions),
+        //                 social: zeroes(params.initialPartitions),
+        //                 population: 0, position: [i,j],
+        //             })
+        //         )
+        //     ),
+        //     tick,
+        // }));
 
-        const organismDataPoints = data.map(({ organismData, tick }) => ({
+        const { info } = this;
+        const { data } = info;
+        return data.map(({ organismData, tick }) => ({
             organismData: organismData.map((row, i) =>
                 row.map((villageOrganisms, j) =>
                     villageOrganisms.reduce((aggregate, organism) => {
@@ -110,33 +136,31 @@ class Collector {
             ),
             tick,
         }));
+    }
 
-        // TODO: Ask About Saving Memory by not filling in 0 spots
-        // const organismDataPoints = data.map(({ organismData, tick }) => ({
-        //     organismData: organismData.map((row, i) =>
-        //         row.map((villageOrganisms, j) =>
-        //             villageOrganisms.reduce((aggregate, organism) => {
-        //                 organism.genes.forEach((geneLevel, k) => {
-        //                     aggregate.genes[k][geneLevel]++;
-        //                 });
-        //                 organism.learn.forEach((memeLevel, k) => {
-        //                     aggregate.memes[k][memeLevel]++;
-        //                 });
-        //                 aggregate.social[organism.social]++;
-        //                 aggregate.individual[organism.individual]++;
-        //                 aggregate.population++;
-        //                 return aggregate;
-        //             }, {
-        //                 genes: zeroes(ARR_LEN).map(_ => zeroes(params.initialPartitions)),
-        //                 memes: zeroes(ARR_LEN).map(_ => zeroes(params.initialPartitions)),
-        //                 individual: zeroes(params.initialPartitions),
-        //                 social: zeroes(params.initialPartitions),
-        //                 population: 0, position: [i,j],
-        //             })
-        //         )
-        //     ),
-        //     tick,
-        // }));
+    download() {
+        const { info } = this;
+        const { villages, params } = info;
+        const organismDataPoints = this.organismDataPoints;
+
+        const data = JSON.stringify({
+            villages, params, organismDataPoints,
+        });
+
+        const dateString = new Date().toISOString().replace(/:/g, "-");
+        const jsonData = new Blob([data], { type: "text/json" });
+        const jsonURL = URL.createObjectURL(jsonData);
+        const link = document.createElement("a");
+        link.href = jsonURL;
+        link.target = "_blank";
+        link.download = `${dateString}.json`;
+        link.click();
+    }
+
+    upload() {
+        const { info } = this;
+        const { villages, params } = info;
+        const organismDataPoints = this.organismDataPoints;
 
         const payload = {
             db: "genetic-modeling",
