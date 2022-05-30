@@ -2,6 +2,7 @@ const assetManager = new AssetManager();
 let gameEngines = [];
 let totalSims = 0;
 
+let isReconnecting = true;
 document.getElementById("server-ip").value = params.defaultIP;
 attachPropertiesWithCallbacks(connection, [
     ["isConnected", false, connectionStatus => {
@@ -16,8 +17,8 @@ attachPropertiesWithCallbacks(connection, [
     }]
 ]);
 
-const reconnectionTimerID = setTimeout(() => {
-    if (connection.isConnected) return;
+const reconnectionTimerID = setInterval(() => {
+    if (!isReconnecting || connection.isConnected) return;
     console.log("Trying to reconnect");
     establishSocket(document.getElementById("server-ip").value);
 }, 1000 * 5);
