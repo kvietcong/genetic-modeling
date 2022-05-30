@@ -16,6 +16,12 @@ attachPropertiesWithCallbacks(connection, [
     }]
 ]);
 
+const reconnectionTimerID = setTimeout(() => {
+    if (connection.isConnected) return;
+    console.log("Trying to reconnect");
+    establishSocket(document.getElementById("server-ip").value);
+}, 1000 * 5);
+
 const restart = (gameEngine, paramsModifier) => {
     gridExample(gameEngine, paramsModifier);
     // geneExample(gameEngine);
