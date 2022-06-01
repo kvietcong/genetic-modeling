@@ -13,7 +13,7 @@ const findAndOutput = () => {
 const doSomething = () => {
     print("I DID SOMETHING");
     const visualizationDivs = document.getElementById("visualizations");
-    dbFindAll(data => {
+    dbFind("genetic-modeling", "runs", {"params.description": "Test #4 - No Ind Learning"}, data => {
         data.forEach(runData => {
             console.log("On Run", runData);
             const { organismDataPoints } = runData;
@@ -55,5 +55,5 @@ const doSomething = () => {
                 config,
             );
         });
-    }, "runs");
+    });
 };
