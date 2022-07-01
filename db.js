@@ -28,10 +28,10 @@ establishSocket();
 
 const dbFind = (db, collection, query, callback) => {
     if (!connection.isConnected) return alert("Not connected to the server!");
-    console.log(db, collection, query)
+    console.log({ db, collection, query });
     socket.emit("find", { db, collection, query });
     socket.once("find", callback);
-}
+};
 
 const dbFindAll = (callback, collection = "histogramData", db = "genetic-modeling") =>
     dbFind(db, collection, {}, callback);
@@ -43,4 +43,3 @@ const dbFindAllAndGlobalStore = (collection = "histogramData", db = "genetic-mod
     globals.data = undefined;
     dbFindAll(db, collection, data => globals.data = data);
 };
-

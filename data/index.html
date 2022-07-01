@@ -11,6 +11,10 @@
         <script type="text/javascript" src="../data.js"></script>
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+        <script defer>
+            getDistinctRunTypes();
+        </script>
+
         <style>
         main {
             width: 85%;
@@ -41,6 +45,7 @@
         <div>
             <button onclick="doSomething()">Do Something Plz</button>
             <p style="display: inline-block">Does something I hope</p>
+            <select name="runTypes" id="runTypes"></select>
         </div>
 
         <main>
