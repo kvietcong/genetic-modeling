@@ -101,22 +101,7 @@ const hsl = (h, s, l) => `hsl(${h}, ${s}, ${l})`;
 const minMax = array => array.reduce(
     ([min, max], x) => [x < min ? x : min, x > max ? x : max], [0, 0]);
 
-/** Creates an alias for requestAnimationFrame for backwards compatibility */
-window.requestAnimFrame = (() => {
-    return window.requestAnimationFrame ||
-        window.webkitRequestAnimationFrame ||
-        window.mozRequestAnimationFrame ||
-        window.oRequestAnimationFrame ||
-        window.msRequestAnimationFrame ||
-        /**
-         * Compatibility for requesting animation frames in older browsers
-         * @param {Function} callback Function
-         * @param {DOM} element DOM ELEMENT
-         */
-        ((callback, element) => {
-            window.setTimeout(callback, 1000 / 60);
-        });
-})();
+const requestAnimFrame = window.requestAnimationFrame;
 
 /**
  * Random Integer between two numbers inclusively

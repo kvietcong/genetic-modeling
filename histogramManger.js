@@ -40,6 +40,11 @@ class HistogramManager {
         this.histogramUploadAllElement
             ?.addEventListener("click", this.histogramUploadAllCallback);
 
+        this.histogramDrawingElement = document.getElementById("histogramDrawing");
+        this.histogramDrawingElementCallback = _ => this.histogramType = this.histogramType;
+        this.histogramDrawingElement
+            ?.addEventListener("click", this.histogramDrawingElementCallback);
+
         this.histograms = histograms;
         this.drawLast = histograms[0][0][type].drawLast;
         this.collectionRate = histograms[0][0][type].unitTimePerUpdate;
@@ -47,6 +52,7 @@ class HistogramManager {
     }
 
     drop() {
+        // I hate this. Big mistake :(
         this.histogramSelectorElement
             ?.removeEventListener("change", this.histogramSelectorCallback);
         this.histogramCollectionRateElement
@@ -61,6 +67,8 @@ class HistogramManager {
             ?.removeEventListener("click", this.histogramUploadCurrentCallback);
         this.histogramUploadAllElement
             ?.removeEventListener("click", this.histogramUploadAllCallback);
+        this.histogramDrawingElement
+            ?.removeEventListener("click", this.histogramDrawingElementCallback);
     }
 
     get collectionRate() { return this._collectionRate; }
@@ -89,14 +97,15 @@ class HistogramManager {
 
     get histogramType() { return this._histogramType; }
     set histogramType(type) {
-        this._histogramType = type;
+        if (type) this._histogramType = type;
         this.histograms.forEach(row =>
             row.forEach(histogramInfo =>
                 Object.keys(histogramInfo).forEach(key =>
-                    histogramInfo[key].isDrawing = key === type)));
+                    histogramInfo[key].isDrawing =
+                        this.histogramDrawingElement.checked && (key === type))));
 
         if (this.histogramSelectorElement)
-        this.histogramSelectorElement.value = this.histogramType;
+            this.histogramSelectorElement.value = this.histogramType;
     }
 
     toCSVTextArray(type) {
