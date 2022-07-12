@@ -18,12 +18,15 @@ const getDistinctRunTypes = () => {
         "key": "params.description"
     });
     socket.once("distinct", data => {
-        const selector = document.getElementById("runTypes");
+        const selectorElement = document.getElementById("runTypes");
+        while (selectorElement.lastChild) {
+            selectorElement.removeChild(selectorElement.lastChild);
+        }
         data.forEach(description => {
             const option = document.createElement("option");
             option.textContent = description;
             option.value = description;
-            selector.appendChild(option);
+            selectorElement.appendChild(option);
         });
     });
 };
